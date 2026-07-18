@@ -2,10 +2,9 @@
   "name": "site",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "npm@10",
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && next build",
+    "build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
@@ -51,14 +50,4 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "ignoreScripts": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "trustedDependencies": [
-    "sharp",
-    "unrs-resolver",
-    "prisma",
-    "@prisma/client"
-  ]
 }
