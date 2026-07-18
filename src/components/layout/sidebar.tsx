@@ -17,6 +17,7 @@ import {
   Briefcase,
   Upload,
   Settings,
+  CreditCard,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -35,6 +36,7 @@ const mainNavItems = [
 ]
 
 const bottomNavItems = [
+  { href: "/pricing", label: "Pricing", icon: CreditCard },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

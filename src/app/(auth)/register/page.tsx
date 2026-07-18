@@ -107,7 +107,7 @@ export default function RegisterPage() {
             </CardContent>
           </form>
 
-          <CardFooter className="pb-6">
+          <CardFooter className="pb-4">
             <p className="text-xs text-muted-foreground text-center w-full">
               Already have an account?{" "}
               <Link href="/login" className="text-foreground hover:underline font-medium">
@@ -115,6 +115,11 @@ export default function RegisterPage() {
               </Link>
             </p>
           </CardFooter>
+          <div className="pb-6 text-center">
+            <Link href="/pricing" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              View pricing
+            </Link>
+          </div>
         </Card>
       </div>
     </div>
