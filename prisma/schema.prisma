@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  entities  Entity[]
+  projects  Project[]
+  tasks     Task[]
+  documents Document[]
+  contacts  Contact[]
+  meetings      Meeting[]
+  notifications Notification[]
+  comments      Comment[]
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  passwordHash   String?
+  image          String?
+  role           String       @default("STAFF") // OWNER, EXECUTIVE_ASSISTANT, OPERATIONS_MANAGER, STAFF, READ_ONLY
+  organizationId String
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  assignedTasks  Task[]         @relation("TaskAssignee")
+  createdTasks   Task[]         @relation("TaskCreator")
+  uploadedDocs   Document[]     @relation("DocumentUploader")
+  accounts       Account[]
+  sessions       Session[]
+  notifications  Notification[]
+  comments       Comment[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Entity {
+  id             String       @id @default(cuid())
+  name           String
+  type           String       // BUSINESS, HOTEL, GAS_STATION, COMMERCIAL_PROPERTY, INVESTMENT, OTHER
+  metadata       String       @default("{}") // JSON string for type-specific fields
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  projects       Project[]
+  tasks          Task[]
+  documents      Document[]
+  contacts       Contact[]
+}
+
+model Project {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  status         String       @default("ACTIVE") // ACTIVE, ON_HOLD, COMPLETED, CANCELLED
+  phase          String       @default("ACQUISITION") // ACQUISITION, DUE_DILIGENCE, DESIGN, PERMITTING, CONSTRUCTION, CLOSEOUT, OPERATIONS
+  progress       Int          @default(0)
+  budget         Float?
+  startDate      DateTime?
+  targetDate     DateTime?
+  organizationId String
+  entityId       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  entity         Entity?      @relation(fields: [entityId], references: [id])
+  tasks          Task[]
+  documents      Document[]
+  meetings       Meeting[]
+}
+
+model Task {
+  id             String       @id @default(cuid())
+  title          String
+  description    String?
+  status         String       @default("TODO") // TODO, IN_PROGRESS, DONE, BLOCKED, WAITING_ON
+  priority       String       @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  dueDate        DateTime?
+  category       String?
+  organizationId String
+  projectId      String?
+  entityId       String?
+  assigneeId     String?
+  createdById    String?
+  dependsOnId    String?
+  notes          String?
+  aiSuggestion   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  project        Project?     @relation(fields: [projectId], references: [id])
+  entity         Entity?      @relation(fields: [entityId], references: [id])
+  assignee       User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy      User?        @relation("TaskCreator", fields: [createdById], references: [id])
+  dependsOn      Task?        @relation("TaskDependency", fields: [dependsOnId], references: [id])
+  dependedBy     Task[]       @relation("TaskDependency")
+  comments       Comment[]
+}
+
+model Document {
+  id             String       @id @default(cuid())
+  name           String
+  type           String       // CONTRACT, PURCHASE_AGREEMENT, LEASE, INSURANCE, LICENSE, TAX, FINANCIAL_STATEMENT, PHOTO, PDF, OTHER
+  url            String?
+  filePath       String?
+  organizationId String
+  projectId      String?
+  entityId       String?
+  uploadedById   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  project        Project?     @relation(fields: [projectId], references: [id])
+  entity         Entity?      @relation(fields: [entityId], references: [id])
+  uploadedBy     User?        @relation("DocumentUploader", fields: [uploadedById], references: [id])
+}
+
+model Contact {
+  id             String       @id @default(cuid())
+  name           String
+  company        String?
+  position       String?
+  phone          String?
+  email          String?
+  organizationId String
+  entityId       String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  entity         Entity?      @relation(fields: [entityId], references: [id])
+}
+
+model Meeting {
+  id             String       @id @default(cuid())
+  title          String
+  date           DateTime
+  location       String?
+  organizationId String
+  projectId      String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  project        Project?     @relation(fields: [projectId], references: [id])
+}
+
+model Notification {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  type           String       // DEADLINE, OVERDUE, STALLED, RENEWAL, MENTION, ASSIGNED, COMPLETED, WAITING, UNBLOCKED
+  title          String
+  message        String
+  link           String?
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id             String       @id @default(cuid())
+  content        String
+  taskId         String
+  authorId       String
+  organizationId String
+  createdAt      DateTime     @default(now())
+
+  task           Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author         User         @relation(fields: [authorId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
