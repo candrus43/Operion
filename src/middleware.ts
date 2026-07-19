@@ -16,7 +16,12 @@ export default auth((req) => {
   }
 
   if (isAuth && isAuthPage) {
-    return NextResponse.redirect(new URL("/", req.url))
+    return NextResponse.redirect(new URL("/home", req.url))
+  }
+
+  // Redirect authenticated users from landing page to dashboard
+  if (isAuth && req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/home", req.url))
   }
 
   return NextResponse.next()

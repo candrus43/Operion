@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 const mainNavItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/home", label: "Dashboard", icon: LayoutDashboard },
   { href: "/entities", label: "Entities", icon: Building2 },
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
