@@ -1,6 +1,5 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Building2, Search, Users, Zap, Brain, LayoutDashboard, FileText } from "lucide-react"
+import { ArrowRight, Sparkles, Building2, Search, Zap, Brain, LayoutDashboard, FileText } from "lucide-react"
 
 const features = [
   {
@@ -49,15 +48,13 @@ export default function LandingPage() {
               <span className="text-base font-semibold tracking-tight">Operion</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button asChild size="sm" className="gap-1.5">
-                <Link href="/register">
-                  Get Started
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <Link href="/login" className="inline-flex items-center justify-center rounded-md text-sm font-medium text-muted-foreground hover:text-foreground h-9 px-3 transition-colors">
+                Sign In
+              </Link>
+              <Link href="/register" className="inline-flex items-center justify-center gap-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium h-9 px-4 transition-colors hover:bg-primary/90">
+                Get Started
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
         </div>
@@ -81,20 +78,13 @@ export default function LandingPage() {
             recommends what to do next.
           </p>
           <div className="flex items-center justify-center gap-3 pt-4">
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/register">
-                Start Free Trial
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-            >
-              <Link href="/login">Sign In</Link>
-            </Button>
+            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90">
+              Start Free Trial
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 transition-colors hover:bg-[#222]">
+              Sign In
+            </Link>
           </div>
           <p className="text-xs text-muted-foreground pt-2">
             14-day free trial · No credit card required
@@ -146,20 +136,13 @@ export default function LandingPage() {
             your 14-day free trial today.
           </p>
           <div className="flex items-center justify-center gap-3">
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/register">
-                Start Free Trial
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-            >
-              <Link href="/login">Sign In</Link>
-            </Button>
+            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90">
+              Start Free Trial
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 transition-colors hover:bg-[#222]">
+              Sign In
+            </Link>
           </div>
         </div>
       </section>
