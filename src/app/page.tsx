@@ -61,28 +61,28 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8 lg:pt-32">
+      <section className="mx-auto max-w-6xl px-4 pt-16 pb-12 sm:px-6 sm:pt-24 sm:pb-16 lg:px-8 lg:pt-32">
         <div className="mx-auto max-w-3xl text-center space-y-6">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-[#111111] px-3 py-1 text-xs text-muted-foreground">
             <Sparkles className="h-3 w-3" />
             AI Chief of Staff for entrepreneurs
           </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Run your entire portfolio
             <br />
             <span className="text-muted-foreground">from one dashboard</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed sm:text-lg">
             Operion sits above your existing tools, giving you a single place to see
             everything across your companies. AI prioritizes, surfaces risks, and
             recommends what to do next.
           </p>
-          <div className="flex items-center justify-center gap-3 pt-4">
-            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90">
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 transition-colors hover:bg-[#222]">
+            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]">
               Sign In
             </Link>
           </div>
@@ -93,9 +93,9 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h2 className="text-xl font-bold tracking-tight sm:text-3xl">
             Everything you need to run your portfolio
           </h2>
           <p className="mt-3 text-muted-foreground max-w-lg mx-auto">
@@ -123,8 +123,8 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-10 sm:p-16 text-center max-w-2xl mx-auto">
+      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+        <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-8 sm:p-16 text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-6">
             <Sparkles className="h-6 w-6 text-primary" />
           </div>
@@ -135,12 +135,12 @@ export default function LandingPage() {
             Join entrepreneurs who trust Operion as their AI Chief of Staff. Start
             your 14-day free trial today.
           </p>
-          <div className="flex items-center justify-center gap-3">
-            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/register" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90">
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 transition-colors hover:bg-[#222]">
+            <Link href="/login" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]">
               Sign In
             </Link>
           </div>
