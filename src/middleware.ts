@@ -6,10 +6,12 @@ export default auth((req) => {
   const isAuthPage = req.nextUrl.pathname.startsWith("/login") || 
                      req.nextUrl.pathname.startsWith("/register")
   const isApiAuth = req.nextUrl.pathname.startsWith("/api/auth")
+  const isPublicPage = req.nextUrl.pathname === "/" ||
+                       req.nextUrl.pathname === "/pricing"
 
   if (isApiAuth) return NextResponse.next()
 
-  if (!isAuth && !isAuthPage) {
+  if (!isAuth && !isAuthPage && !isPublicPage) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
