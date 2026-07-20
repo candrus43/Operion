@@ -18,6 +18,7 @@ import {
   Upload,
   Settings,
   CreditCard,
+  ClipboardList,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -40,6 +41,10 @@ const bottomNavItems = [
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 
+const adminNavItems = [
+  { href: "/audit-log", label: "Audit Log", icon: ClipboardList },
+]
+
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
@@ -48,6 +53,14 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => setUserRole(data?.user?.role || null))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     fetch("/api/settings/logo")
@@ -165,6 +178,29 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </Link>
           )
         })}
+
+        {/* Admin-only links */}
+        {userRole && (userRole === "OWNER" || userRole === "EXECUTIVE_ASSISTANT") &&
+          adminNavItems.map((item) => {
+            const isActive = pathname === item.href
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-sidebar-accent group",
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/40 hover:text-sidebar-foreground"
+                )}
+              >
+                <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-accent-foreground")} />
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            )
+          })
+        }
       </div>
     </aside>
   )

@@ -23,6 +23,7 @@ model Organization {
   meetings      Meeting[]
   notifications Notification[]
   comments      Comment[]
+  auditLogs     AuditLog[]
 }
 
 model User {
@@ -43,6 +44,7 @@ model User {
   sessions       Session[]
   notifications  Notification[]
   comments       Comment[]
+  auditLogs      AuditLog[]
 }
 
 model Account {
@@ -217,4 +219,18 @@ model Comment {
   task           Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
   author         User         @relation(fields: [authorId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  action         String       // CREATE, UPDATE, DELETE
+  entity         String       // what was acted on (Task, Project, etc.)
+  entityId       String       // id of the record
+  details        String?      // optional JSON with change details
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
 }

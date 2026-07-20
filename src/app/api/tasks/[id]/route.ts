@@ -3,6 +3,19 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 // ── Notification helpers ──────────────────────────────────────────
 
 interface TaskSnapshot {
@@ -193,6 +206,16 @@ export async function PATCH(
   const actor: Actor = { id: userId, name: userName, organizationId: orgId }
   void createTaskNotifications(oldSnapshot, task, actor)
 
+  // Fire-and-forget: audit log
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "UPDATE",
+    entity: "Task",
+    entityId: task.id,
+    details: JSON.stringify({ title: task.title, status: task.status }),
+  })
+
   return NextResponse.json(task)
 }
 
@@ -231,6 +254,16 @@ export async function DELETE(
   })
 
   await prisma.task.delete({ where: { id } })
+
+  // Fire-and-forget: audit log
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "DELETE",
+    entity: "Task",
+    entityId: id,
+    details: JSON.stringify({ title: existing.title }),
+  })
 
   return NextResponse.json({ success: true })
 }

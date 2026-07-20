@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session?.user) {
@@ -107,6 +120,16 @@ export async function POST(req: Request) {
       entity: true,
       dependsOn: { select: { id: true, title: true, status: true } },
     },
+  })
+
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "CREATE",
+    entity: "Task",
+    entityId: task.id,
+    details: JSON.stringify({ title: task.title, status: task.status }),
   })
 
   return NextResponse.json(task, { status: 201 })

@@ -1,15 +1,41 @@
-import { auth } from "@/lib/auth"
+"use client"
+
+import { useState } from "react"
+import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
-import { getBranding } from "@/lib/branding"
 import { LogoUploader } from "./logo-uploader"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Download, Loader2 } from "lucide-react"
 
-export default async function SettingsPage() {
-  const session = await auth()
+export default function SettingsPage() {
+  const { data: session, status } = useSession()
+  const [exporting, setExporting] = useState(false)
+
+  if (status === "loading") return null
   if (!session?.user) redirect("/login")
 
-  const { logoUrl } = getBranding()
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const res = await fetch("/api/export", { method: "POST" })
+      if (!res.ok) throw new Error("Export failed")
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `operion-export-${new Date().toISOString().split("T")[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error("Export failed:", err)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -32,7 +58,33 @@ export default async function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LogoUploader initialLogoUrl={logoUrl} />
+          <LogoUploader initialLogoUrl={null} />
+        </CardContent>
+      </Card>
+
+      {/* Data Export Section */}
+      <Card className="border-[#262626] bg-[#111111]">
+        <CardHeader>
+          <CardTitle className="text-lg">Data Export</CardTitle>
+          <CardDescription>
+            Download all your organization data as a JSON file. Includes entities, projects,
+            tasks, contacts, and document metadata.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            onClick={handleExport}
+            disabled={exporting}
+            variant="outline"
+            className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+          >
+            {exporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            {exporting ? "Exporting..." : "Export My Data"}
+          </Button>
         </CardContent>
       </Card>
     </div>

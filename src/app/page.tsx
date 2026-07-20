@@ -1,5 +1,23 @@
 import Link from "next/link"
-import { ArrowRight, Sparkles, Building2, Search, Zap, Brain, LayoutDashboard, FileText } from "lucide-react"
+import { ArrowRight, Sparkles, Building2, Search, Zap, Brain, LayoutDashboard, FileText, Lock, Shield, Download } from "lucide-react"
+
+const trustPoints = [
+  {
+    icon: Lock,
+    title: "Enterprise-grade encryption",
+    description: "Your data is encrypted at rest and in transit with industry-standard protocols.",
+  },
+  {
+    icon: Shield,
+    title: "Your data is never shared or sold",
+    description: "We don't sell, share, or monetize your data. Your portfolio is your business.",
+  },
+  {
+    icon: Download,
+    title: "Export your data anytime",
+    description: "Download all your organization data as JSON — no lock-in, ever.",
+  },
+]
 
 const features = [
   {
@@ -116,6 +134,31 @@ export default function LandingPage() {
               <h3 className="text-sm font-semibold mb-1.5">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Trust / Privacy */}
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
+        <div className="text-center mb-8">
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
+            Your data belongs to you
+          </h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3 max-w-3xl mx-auto">
+          {trustPoints.map((point) => (
+            <div
+              key={point.title}
+              className="rounded-xl bg-[#0d0d0d] border border-white/[0.03] p-5 text-center transition-colors hover:bg-[#121212]"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground/5 mx-auto mb-3">
+                <point.icon className="h-4 w-4 text-foreground/60" />
+              </div>
+              <h3 className="text-xs font-semibold mb-1">{point.title}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {point.description}
               </p>
             </div>
           ))}
