@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Topbar } from "@/components/layout/topbar"
 import { TrialBanner } from "@/components/trial-banner"
+import { DemoBanner } from "@/components/demo-banner"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
@@ -43,6 +44,7 @@ export default function DashboardLayout({
           user={session?.user}
         />
         <TrialBanner />
+        <DemoBanner />
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>

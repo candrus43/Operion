@@ -15,6 +15,7 @@ import {
   BarChart3,
   Bell,
   Layers,
+  Play,
 } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
 
@@ -143,10 +144,10 @@ export default function LandingPage() {
                   Sign In
                 </Link>
                 <Link
-                  href="/register"
+                  href="/api/demo"
                   className="inline-flex items-center justify-center gap-1.5 rounded-md bg-foreground text-background text-sm font-medium h-9 px-4 transition-all hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
                 >
-                  Get Started
+                  Try the Demo
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -183,21 +184,22 @@ export default function LandingPage() {
             <ScrollReveal delay={300}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                 <Link
-                  href="/register"
+                  href="/api/demo"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground text-background text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-foreground/90 hover:shadow-[0_0_30px_rgba(250,250,250,0.12)]"
+                >
+                  <Play className="h-4 w-4" />
+                  Try the Demo
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#111111] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#1a1a1a] hover:border-white/[0.08]"
                 >
                   Start Free Trial
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#111111] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#1a1a1a] hover:border-white/[0.08]"
-                >
-                  Sign In
-                </Link>
               </div>
               <p className="text-xs text-muted-foreground pt-3">
-                14-day free trial · No credit card required
+                No sign-up · Explore the full product instantly
               </p>
             </ScrollReveal>
           </div>
@@ -381,22 +383,23 @@ export default function LandingPage() {
                   Ready to see everything in one place?
                 </h2>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto text-sm">
-                  Join entrepreneurs who trust Operion as their AI Chief of
-                  Staff. Start your 14-day free trial today.
+                  Explore Operion instantly — no sign-up required. See how AI
+                  keeps your entire portfolio organized in one dashboard.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
-                    href="/register"
+                    href="/api/demo"
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground text-background text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-foreground/90 hover:shadow-[0_0_30px_rgba(250,250,250,0.12)]"
+                  >
+                    <Play className="h-4 w-4" />
+                    Try the Demo
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#222]"
                   >
                     Start Free Trial
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#222]"
-                  >
-                    Sign In
                   </Link>
                 </div>
               </div>

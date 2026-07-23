@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Sparkles, CheckCircle2 } from "lucide-react"
+import { Sparkles, CheckCircle2, Monitor } from "lucide-react"
 
 function LoginForm() {
   const router = useRouter()
@@ -20,6 +20,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const showRegistered = searchParams.get("registered") === "true"
+  const isDemo = searchParams.get("demo") === "true"
+  const emailParam = searchParams.get("email") || ""
 
   useEffect(() => {
     fetch("/api/settings/logo")
@@ -27,6 +29,13 @@ function LoginForm() {
       .then((data) => setLogoUrl(data.logoUrl))
       .catch(() => {})
   }, [])
+
+  // Pre-fill demo credentials
+  useEffect(() => {
+    if (isDemo && emailParam) {
+      setEmail(emailParam)
+    }
+  }, [isDemo, emailParam])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,9 +76,11 @@ function LoginForm() {
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome to Operion</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {isDemo ? "Explore the Demo" : "Welcome to Operion"}
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              AI Chief of Staff for your portfolio
+              {isDemo ? "No sign-up required — click Sign in to explore" : "AI Chief of Staff for your portfolio"}
             </p>
           </div>
         </div>
@@ -77,8 +88,12 @@ function LoginForm() {
         <Card className="border-0 bg-[#111111] shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Sign in</CardTitle>
-              <CardDescription>Enter your credentials to continue</CardDescription>
+              <CardTitle className="text-lg">{isDemo ? "Demo access" : "Sign in"}</CardTitle>
+              <CardDescription>
+                {isDemo
+                  ? "Credentials pre-filled. Just click Sign in."
+                  : "Enter your credentials to continue"}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {showRegistered && (
@@ -90,6 +105,12 @@ function LoginForm() {
               {error && (
                 <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {error}
+                </div>
+              )}
+              {isDemo && (
+                <div className="rounded-lg bg-violet-500/10 px-3 py-2.5 text-sm text-violet-300 flex items-center gap-2 border border-violet-500/20">
+                  <Monitor className="h-4 w-4 shrink-0" />
+                  Demo access — password: password123
                 </div>
               )}
               <div className="space-y-2">
