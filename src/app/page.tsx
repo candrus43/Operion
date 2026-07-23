@@ -271,83 +271,31 @@ export default function LandingPage() {
           <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
             <div className="mx-auto max-w-3xl">
               <div className="rounded-2xl border border-white/[0.06] bg-[#0d0d0d] overflow-hidden shadow-[0_0_60px_rgba(168,139,250,0.04)]">
-                {/* Mock browser chrome */}
+                {/* Browser chrome */}
                 <div className="flex items-center gap-2 px-4 py-3 bg-[#111111] border-b border-white/[0.04]">
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5 shrink-0">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
                   </div>
                   <div className="flex-1 flex justify-center">
-                    <div className="w-48 h-4 rounded-full bg-white/[0.04]" />
+                    <div className="w-56 h-5 rounded-full bg-[#1a1a1a] border border-white/[0.05] flex items-center justify-center">
+                      <span className="text-[10px] text-muted-foreground/60">
+                        app.operion.online
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Mock dashboard content */}
-                <div className="p-5 sm:p-8 space-y-5">
-                  {/* Top row: briefing + stats */}
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="flex-1">
-                      <div className="h-3 w-28 rounded-full bg-violet-400/20 mb-3" />
-                      <div className="h-6 w-3/4 rounded-full bg-white/[0.06] mb-2" />
-                      <div className="h-5 w-1/2 rounded-full bg-white/[0.04]" />
-                    </div>
-                    <div className="hidden sm:flex gap-3">
-                      <div className="w-20 h-20 rounded-xl bg-[#111111] border border-white/[0.04] flex flex-col items-center justify-center">
-                        <div className="h-5 w-10 rounded bg-violet-400/20 mb-1" />
-                        <div className="h-2 w-12 rounded bg-white/[0.04]" />
-                      </div>
-                      <div className="w-20 h-20 rounded-xl bg-[#111111] border border-white/[0.04] flex flex-col items-center justify-center">
-                        <div className="h-5 w-10 rounded bg-blue-400/20 mb-1" />
-                        <div className="h-2 w-12 rounded bg-white/[0.04]" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Priority items */}
-                  <div className="space-y-2">
-                    <div className="h-3 w-20 rounded-full bg-white/[0.04] mb-1" />
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-[#111111] border border-white/[0.03]"
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            i === 1
-                              ? "bg-red-400/60"
-                              : i === 2
-                                ? "bg-amber-400/60"
-                                : "bg-emerald-400/40"
-                          }`}
-                        />
-                        <div className="flex-1">
-                          <div
-                            className="h-3 rounded-full bg-white/[0.06]"
-                            style={{ width: `${85 - i * 15}%` }}
-                          />
-                        </div>
-                        <div className="h-3 w-14 rounded-full bg-white/[0.03]" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Entity cards row */}
-                  <div className="grid grid-cols-4 gap-3 pt-2">
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="rounded-lg bg-[#111111] border border-white/[0.03] p-3 space-y-2"
-                      >
-                        <div className="h-2 w-3/4 rounded-full bg-white/[0.06]" />
-                        <div className="h-8 w-full rounded bg-white/[0.02]" />
-                        <div className="flex gap-1">
-                          <div className="h-1.5 flex-1 rounded-full bg-violet-400/15" />
-                          <div className="h-1.5 w-6 rounded-full bg-white/[0.04]" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Screenshot with blur overlay */}
+                <div className="relative">
+                  <img
+                    src="/dashboard-preview.png"
+                    alt="Operion Dashboard"
+                    className="w-full"
+                  />
+                  {/* Blur overlay to obscure top bar branding */}
+                  <div className="absolute top-0 left-0 right-0 h-[40px] backdrop-blur-[8px] bg-[#0d0d0d]/30" />
                 </div>
               </div>
               <p className="text-center text-xs text-muted-foreground mt-4">
