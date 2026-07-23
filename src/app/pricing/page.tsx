@@ -7,10 +7,10 @@ import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap }
 const plans = [
   {
     name: "Starter",
-    price: "$49",
+    price: "$149",
     period: "/month",
     description: "For solo operators managing a small portfolio.",
-    href: "https://buy.stripe.com/aFaaEX7BX0LhgnSdZa1wY09",
+    href: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
     features: [
       { text: "Single user", included: true },
       { text: "Up to 3 entities", included: true },
@@ -27,10 +27,10 @@ const plans = [
   },
   {
     name: "Professional",
-    price: "$99",
+    price: "$349",
     period: "/month per seat",
     description: "For owners and teams running multiple entities.",
-    href: "https://buy.stripe.com/aFaaEXaO92Tpb3y7AM1wY0a",
+    href: "https://buy.stripe.com/7sY8wPbSdeC7efK08k1wY0e",
     features: [
       { text: "Unlimited users", included: true },
       { text: "Unlimited entities", included: true },

@@ -13,8 +13,8 @@ interface TrialStatus {
 }
 
 const STRIPE_LINKS = {
-  starter: "https://buy.stripe.com/aFaaEX7BX0LhgnSdZa1wY09",
-  professional: "https://buy.stripe.com/aFaaEXaO92Tpb3y7AM1wY0a",
+  starter: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
+  professional: "https://buy.stripe.com/7sY8wPbSdeC7efK08k1wY0e",
 }
 
 export function TrialBanner() {

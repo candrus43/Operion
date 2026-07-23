@@ -5,8 +5,8 @@ import { Sparkles, ShieldAlert, Zap, Users, Check, ArrowRight } from "lucide-rea
 import { Button } from "@/components/ui/button"
 
 const STRIPE_LINKS = {
-  starter: "https://buy.stripe.com/aFaaEX7BX0LhgnSdZa1wY09",
-  professional: "https://buy.stripe.com/aFaaEXaO92Tpb3y7AM1wY0a",
+  starter: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
+  professional: "https://buy.stripe.com/7sY8wPbSdeC7efK08k1wY0e",
 }
 
 export default function TrialExpiredPage() {
@@ -38,7 +38,7 @@ export default function TrialExpiredPage() {
                 Starter
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">$49</span>
+                <span className="text-3xl font-bold">$149</span>
                 <span className="text-muted-foreground text-sm">/month</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
@@ -81,7 +81,7 @@ export default function TrialExpiredPage() {
                 Professional
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">$99</span>
+                <span className="text-3xl font-bold">$349</span>
                 <span className="text-muted-foreground text-sm">/month per seat</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
