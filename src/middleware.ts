@@ -7,7 +7,8 @@ export default auth((req) => {
                      req.nextUrl.pathname.startsWith("/register")
   const isApiAuth = req.nextUrl.pathname.startsWith("/api/auth")
   const isPublicPage = req.nextUrl.pathname === "/" ||
-                       req.nextUrl.pathname === "/pricing"
+                       req.nextUrl.pathname === "/pricing" ||
+                       req.nextUrl.pathname === "/trial-expired"
 
   if (isApiAuth) return NextResponse.next()
 

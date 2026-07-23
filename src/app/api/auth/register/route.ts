@@ -41,6 +41,9 @@ export async function POST(req: Request) {
       data: {
         name: `${name}'s Organization`,
         slug,
+        trialStartDate: new Date(),
+        trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        subscriptionStatus: "TRIAL",
       },
     })
 

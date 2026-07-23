@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Upload,
   Plus,
+  Calendar,
 } from "lucide-react"
 
 function WelcomeEmptyState({ userName }: { userName: string }) {
@@ -156,6 +157,7 @@ export default async function DashboardPage() {
     waitingOnCount,
     docCount,
     contactCount,
+    org,
   ] = await Promise.all([
     prisma.entity.count({ where: { organizationId: orgId } }),
     prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
@@ -163,7 +165,22 @@ export default async function DashboardPage() {
     prisma.task.count({ where: { organizationId: orgId, status: "WAITING_ON" } }),
     prisma.document.count({ where: { organizationId: orgId } }),
     prisma.contact.count({ where: { organizationId: orgId } }),
+    prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { subscriptionStatus: true, trialEndDate: true },
+    }),
   ])
+
+  // Calculate trial days remaining
+  let trialDaysRemaining: number | null = null
+  let isTrial = false
+  if (org?.subscriptionStatus === "TRIAL" && org?.trialEndDate) {
+    isTrial = true
+    trialDaysRemaining = Math.ceil(
+      (org.trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    )
+    if (trialDaysRemaining < 0) trialDaysRemaining = 0
+  }
 
   const userName = session.user.name || "there"
 
@@ -187,6 +204,23 @@ export default async function DashboardPage() {
         <StatCard label="Waiting On" value={waitingOnCount} icon={Clock} accent="text-amber-400" />
         <StatCard label="Documents" value={docCount} icon={FileText} accent="text-sky-400" />
         <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" />
+        {isTrial && trialDaysRemaining !== null && (
+          <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+              <Calendar className="h-3.5 w-3.5" />
+              Trial
+            </div>
+            <div className={cn(
+              "text-2xl font-bold",
+              trialDaysRemaining <= 3 ? "text-amber-400" : "text-foreground"
+            )}>
+              {trialDaysRemaining}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {trialDaysRemaining === 1 ? "day left" : "days left"}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Row 3: Critical Tasks + Upcoming Deadlines */}

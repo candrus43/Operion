@@ -25,6 +25,7 @@ async function main() {
     data: {
       name: "Movement",
       slug: "movement",
+      subscriptionStatus: "ACTIVE",
     },
   })
   console.log(`  ✓ Organization: ${org.name}`)

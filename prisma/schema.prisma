@@ -8,18 +8,22 @@ datasource db {
 }
 
 model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  trialStartDate     DateTime?
+  trialEndDate       DateTime?
+  subscriptionStatus String    @default("TRIAL") // TRIAL, ACTIVE, EXPIRED, CANCELLED
+  stripeCustomerId   String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  users     User[]
-  entities  Entity[]
-  projects  Project[]
-  tasks     Task[]
-  documents Document[]
-  contacts  Contact[]
+  users         User[]
+  entities      Entity[]
+  projects      Project[]
+  tasks         Task[]
+  documents     Document[]
+  contacts      Contact[]
   meetings      Meeting[]
   notifications Notification[]
   comments      Comment[]
