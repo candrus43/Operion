@@ -48,6 +48,16 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
   const [showShortcut, setShowShortcut] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Organization name
+  const [orgName, setOrgName] = useState("Operion")
+
+  useEffect(() => {
+    fetch("/api/organization")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data?.name) setOrgName(data.name) })
+      .catch(() => {})
+  }, [])
+
   // Notifications
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -274,7 +284,7 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
         {/* Org Switcher Placeholder */}
         <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
           <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          Movement
+          {orgName}
         </Button>
 
         {/* User Menu */}
