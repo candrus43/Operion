@@ -25,6 +25,7 @@ async function main() {
     data: {
       name: "Movement",
       slug: "movement",
+      subscriptionTier: "ENTERPRISE",
       subscriptionStatus: "ACTIVE",
     },
   })

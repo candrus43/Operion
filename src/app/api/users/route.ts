@@ -18,3 +18,9 @@ export async function GET() {
 
   return NextResponse.json(users)
 }
+
+// TODO: When adding POST (user creation/invite), enforce tier user caps here:
+// - Fetch org.subscriptionTier
+// - SOLO: max 1 user, TEAM: max 5 users, ENTERPRISE: unlimited
+// - Return 403 if limit reached, with upgrade message
+// - See GET /api/organization for TIER_LIMITS reference

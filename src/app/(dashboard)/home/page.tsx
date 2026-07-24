@@ -168,9 +168,17 @@ export default async function DashboardPage() {
     prisma.contact.count({ where: { organizationId: orgId } }),
     prisma.organization.findUnique({
       where: { id: orgId },
-      select: { subscriptionStatus: true, trialEndDate: true },
+      select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true },
     }),
   ])
+
+  const tier = org?.subscriptionTier || "SOLO"
+  const tierLabel = tier === "ENTERPRISE" ? "Enterprise Plan" : tier === "TEAM" ? "Team Plan" : "Solo Plan"
+  const tierBadgeColors: Record<string, string> = {
+    SOLO: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+    TEAM: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    ENTERPRISE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  }
 
   // Calculate trial days remaining
   let trialDaysRemaining: number | null = null
@@ -196,6 +204,29 @@ export default async function DashboardPage() {
       <Suspense fallback={<div className="rounded-2xl bg-[#111111] h-64 animate-pulse" />}>
         <AIBriefing orgId={orgId} userName={userName} />
       </Suspense>
+
+      {/* Tier badge + entity limit warning */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className={cn(
+          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium",
+          tierBadgeColors[tier]
+        )}>
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+          {tierLabel}
+        </span>
+        {tier === "SOLO" && entityCount >= 3 && (
+          <div className="flex items-center gap-3 rounded-lg bg-amber-500/5 border border-amber-500/15 px-4 py-2.5 text-sm">
+            <span className="text-amber-400">⚠</span>
+            <span className="text-amber-300/80">You've reached your entity limit.</span>
+            <Link
+              href="/pricing"
+              className="ml-2 shrink-0 text-xs font-medium text-amber-400 hover:text-amber-300 underline underline-offset-2"
+            >
+              Upgrade to add more →
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* Row 2: Stat Cards */}
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">

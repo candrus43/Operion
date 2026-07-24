@@ -11,6 +11,7 @@ model Organization {
   id                 String    @id @default(cuid())
   name               String
   slug               String    @unique
+  subscriptionTier   String    @default("SOLO") // SOLO, TEAM, ENTERPRISE
   trialStartDate     DateTime?
   trialEndDate       DateTime?
   subscriptionStatus String    @default("TRIAL") // TRIAL, ACTIVE, EXPIRED, CANCELLED

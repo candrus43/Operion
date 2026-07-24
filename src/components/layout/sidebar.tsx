@@ -54,6 +54,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [tier, setTier] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -66,6 +67,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     fetch("/api/settings/logo")
       .then((res) => res.json())
       .then((data) => setLogoUrl(data.logoUrl))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/organization")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data?.tier) setTier(data.tier) })
       .catch(() => {})
   }, [])
 
@@ -133,7 +141,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Main Navigation */}
       <nav className="flex-1 space-y-1 p-2 overflow-y-auto">
-        {mainNavItems.map((item) => {
+        {mainNavItems
+          .filter((item) => {
+            // Hide EA Workspace for SOLO tier
+            if (item.href === "/ea" && tier === "SOLO") return false
+            return true
+          })
+          .map((item) => {
           const isActive = pathname === item.href || 
             (item.href !== "/" && pathname.startsWith(item.href))
           const Icon = item.icon
