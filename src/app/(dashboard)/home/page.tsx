@@ -6,7 +6,6 @@ import Link from "next/link"
 import { AIBriefing } from "@/components/dashboard/ai-briefing"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
 import { DashboardSkeleton } from "@/components/dashboard/skeletons"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
   Building2,
@@ -107,18 +106,20 @@ function WelcomeEmptyState({ userName }: { userName: string }) {
 
       {/* Quick actions */}
       <div className="flex flex-wrap items-center gap-3">
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/entities/new">
-            <Plus className="h-4 w-4" />
-            Add your first entity
-          </Link>
-        </Button>
-        <Button asChild variant="outline" size="lg" className="gap-2 border-[#262626] bg-[#1a1a1a] hover:bg-[#222]">
-          <Link href="/import">
-            <Upload className="h-4 w-4" />
-            Import data
-          </Link>
-        </Button>
+        <Link
+          href="/entities/new"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+        >
+          <Plus className="h-4 w-4" />
+          Add your first entity
+        </Link>
+        <Link
+          href="/import"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-foreground h-11 px-8"
+        >
+          <Upload className="h-4 w-4" />
+          Import data
+        </Link>
       </div>
 
       {/* Skip link */}

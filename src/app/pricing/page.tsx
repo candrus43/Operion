@@ -1,7 +1,4 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap } from "lucide-react"
 
 const plans = [
@@ -47,6 +44,39 @@ const plans = [
   },
 ]
 
+const features = [
+  {
+    icon: Zap,
+    title: "AI-Powered",
+    description: "Get daily briefings, smart task suggestions, and priority recommendations.",
+  },
+  {
+    icon: Building2,
+    title: "Multi-Entity",
+    description: "Manage businesses, hotels, properties, and investments in one place.",
+  },
+  {
+    icon: Search,
+    title: "Unified Search",
+    description: "Search across tasks, projects, documents, and contacts instantly.",
+  },
+  {
+    icon: Users,
+    title: "Team Ready",
+    description: "Invite EAs, managers, and staff with role-based permissions.",
+  },
+  {
+    icon: Briefcase,
+    title: "EA Workspace",
+    description: "Dedicated command center for executive assistants to manage priorities.",
+  },
+  {
+    icon: Sparkles,
+    title: "14-Day Trial",
+    description: "Try all Professional features free. No credit card required.",
+  },
+]
+
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -63,42 +93,41 @@ export default function PricingPage() {
             Start with a 14-day free trial. No credit card required. Upgrade when you&apos;re ready.
           </p>
           <div className="pt-4">
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/register">
-                Start Free Trial
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90"
+            >
+              Start Free Trial
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
         {/* Pricing Cards */}
         <div className="grid gap-8 lg:grid-cols-2 max-w-3xl mx-auto">
           {plans.map((plan) => (
-            <Card
+            <div
               key={plan.name}
-              className={`relative border-0 bg-[#111111] shadow-2xl ${
-                plan.highlighted
-                  ? "ring-2 ring-primary/30 scale-[1.02]"
-                  : ""
+              className={`relative rounded-xl border-0 bg-[#111111] shadow-2xl${
+                plan.highlighted ? " ring-2 ring-primary/30 scale-[1.02]" : ""
               }`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-3 left-0 right-0 flex justify-center">
-                  <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs px-3 py-0.5">
+                  <span className="inline-flex items-center rounded-full bg-primary text-primary-foreground text-xs px-3 py-0.5 font-medium">
                     Most popular
-                  </Badge>
+                  </span>
                 </div>
               )}
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+              <div className="p-6 pb-4">
+                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
                 <div className="mt-3">
                   <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
                   <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
+              </div>
+              <div className="px-6 pb-4 space-y-3">
                 <ul className="space-y-2.5">
                   {plan.features.map((feature) => (
                     <li
@@ -118,24 +147,23 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  asChild
-                  className="w-full gap-2"
-                  variant={plan.highlighted ? "default" : "outline"}
+              </div>
+              <div className="px-6 pb-6">
+                <a
+                  href={plan.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors ${
+                    plan.highlighted
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                  }`}
                 >
-                  <a
-                    href={plan.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Subscribe to {plan.name}
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                </Button>
-              </CardFooter>
-            </Card>
+                  Subscribe to {plan.name}
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
           ))}
         </div>
 
@@ -145,38 +173,7 @@ export default function PricingPage() {
             Everything you need to run your portfolio
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: Zap,
-                title: "AI-Powered",
-                description: "Get daily briefings, smart task suggestions, and priority recommendations.",
-              },
-              {
-                icon: Building2,
-                title: "Multi-Entity",
-                description: "Manage businesses, hotels, properties, and investments in one place.",
-              },
-              {
-                icon: Search,
-                title: "Unified Search",
-                description: "Search across tasks, projects, documents, and contacts instantly.",
-              },
-              {
-                icon: Users,
-                title: "Team Ready",
-                description: "Invite EAs, managers, and staff with role-based permissions.",
-              },
-              {
-                icon: Briefcase,
-                title: "EA Workspace",
-                description: "Dedicated command center for executive assistants to manage priorities.",
-              },
-              {
-                icon: Sparkles,
-                title: "14-Day Trial",
-                description: "Try all Professional features free. No credit card required.",
-              },
-            ].map((item) => (
+            {features.map((item) => (
               <div
                 key={item.title}
                 className="rounded-xl bg-[#111111] border border-white/[0.04] p-5"
@@ -198,18 +195,20 @@ export default function PricingPage() {
             <p className="text-muted-foreground mb-6">
               Join entrepreneurs who trust Operion as their AI Chief of Staff.
             </p>
-            <div className="flex items-center justify-center gap-3">
-              <Button asChild size="lg" className="gap-2">
-                <Link href="/register">
-                  Start Free Trial
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]">
-                <Link href="/login">
-                  Sign in
-                </Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90"
+              >
+                Start Free Trial
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]"
+              >
+                Sign in
+              </Link>
             </div>
           </div>
         </div>

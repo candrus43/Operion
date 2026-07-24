@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { Sparkles, ShieldAlert, Zap, Users, Check, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 const STRIPE_LINKS = {
   starter: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
@@ -61,12 +60,15 @@ export default function TrialExpiredPage() {
               ))}
             </ul>
 
-            <Button className="w-full" size="lg" asChild>
-              <a href={STRIPE_LINKS.starter} target="_blank" rel="noopener noreferrer">
-                Upgrade to Starter
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
+            <a
+              href={STRIPE_LINKS.starter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full"
+            >
+              Upgrade to Starter
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
           </div>
 
           {/* Professional */}
@@ -105,12 +107,15 @@ export default function TrialExpiredPage() {
               ))}
             </ul>
 
-            <Button className="w-full bg-amber-500 hover:bg-amber-400 text-black" size="lg" asChild>
-              <a href={STRIPE_LINKS.professional} target="_blank" rel="noopener noreferrer">
-                Upgrade to Professional
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
+            <a
+              href={STRIPE_LINKS.professional}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-500 hover:bg-amber-400 text-black h-11 px-8 w-full"
+            >
+              Upgrade to Professional
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
           </div>
         </div>
 
