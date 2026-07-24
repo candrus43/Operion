@@ -340,8 +340,10 @@ export default function LandingPage() {
                     alt="Operion Dashboard"
                     className="w-full"
                   />
-                  {/* Blur overlay to obscure top bar branding */}
-                  <div className="absolute top-0 left-0 right-0 h-[40px] backdrop-blur-[8px] bg-[#0d0d0d]/30" />
+                  {/* Topbar cover — hides demo user name and org branding */}
+                  <div className="absolute top-0 left-0 right-0 h-[44px] bg-[#080808] rounded-t-lg z-10 flex items-center justify-center">
+                    <span className="text-[10px] text-muted-foreground/40 font-mono">app.operion.online</span>
+                  </div>
                 </div>
               </div>
               <p className="text-center text-xs text-muted-foreground mt-4">
