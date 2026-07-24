@@ -113,7 +113,7 @@ export default function PricingPage() {
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-            <Sparkles className="h-6 w-6 text-primary" />
+            <img src="/logo.svg" className="h-6 w-6" alt="Operion" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Simple, transparent pricing

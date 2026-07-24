@@ -14,7 +14,6 @@ import {
   Clock,
   FileText,
   Users,
-  Sparkles,
   ArrowRight,
   Upload,
   Plus,
@@ -60,7 +59,7 @@ function WelcomeEmptyState({ userName }: { userName: string }) {
       <div className="relative mb-8">
         <div className="absolute inset-0 rounded-full bg-amber-500/10 blur-3xl scale-150" />
         <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-blue-500/20 ring-1 ring-white/[0.06]">
-          <Sparkles className="h-9 w-9 text-amber-400" />
+          <img src="/logo.svg" className="h-9 w-9" alt="Operion" />
         </div>
       </div>
 
