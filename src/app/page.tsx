@@ -1,7 +1,6 @@
 import Link from "next/link"
 import {
   ArrowRight,
-  Sparkles,
   Building2,
   Search,
   Zap,
@@ -12,9 +11,7 @@ import {
   Shield,
   Download,
   Plug,
-  BarChart3,
   Bell,
-  Layers,
   Play,
 } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
@@ -129,9 +126,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground group-hover:bg-violet-400 transition-colors duration-300">
-                  <Sparkles className="h-4 w-4 text-background" />
-                </div>
+                <img src="/logo.svg" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
                 <span className="text-base font-semibold tracking-tight">
                   Operion
                 </span>
@@ -160,7 +155,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-3xl text-center space-y-8">
             <ScrollReveal>
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-[#111111]/80 backdrop-blur-sm px-3 py-1 text-xs text-muted-foreground">
-                <Sparkles className="h-3 w-3 text-violet-400" />
+                <img src="/logo.svg" alt="" className="h-3 w-3" />
                 AI Chief of Staff for entrepreneurs
               </div>
             </ScrollReveal>
@@ -377,7 +372,7 @@ export default function LandingPage() {
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full bg-violet-500/[0.03] blur-[80px] pointer-events-none" />
               <div className="relative">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-400/10 mb-6">
-                  <Sparkles className="h-6 w-6 text-violet-400" />
+                  <img src="/logo.svg" alt="" className="h-6 w-6" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight sm:text-3xl mb-3">
                   Ready to see everything in one place?
@@ -412,9 +407,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground/[0.08]">
-                  <Sparkles className="h-3 w-3 text-foreground/50" />
-                </div>
+                <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-50" />
                 <span className="text-xs text-muted-foreground">Operion</span>
               </div>
               <div className="flex items-center gap-6">

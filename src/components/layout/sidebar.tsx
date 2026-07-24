@@ -96,10 +96,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               />
             ) : (
               <>
+                <img src="/logo.svg" alt="Operion" className="h-7 w-7 shrink-0" />
                 <span className="text-lg font-bold tracking-tight">Operion</span>
-                <span className="rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-medium text-sidebar-accent-foreground/70">
-                  AI
-                </span>
               </>
             )}
           </Link>
@@ -113,7 +111,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 className="h-6 w-6 object-contain"
               />
             ) : (
-              <span className="text-lg font-bold">O</span>
+              <img src="/logo.svg" alt="Operion" className="h-6 w-6" />
             )}
           </Link>
         )}

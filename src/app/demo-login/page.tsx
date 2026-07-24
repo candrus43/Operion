@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles, Monitor, ArrowRight } from "lucide-react"
+import { Sparkles, ArrowRight } from "lucide-react"
 
 export default function DemoLoginPage() {
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function DemoLoginPage() {
         {/* Brand */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-500/20">
-            <Monitor className="h-6 w-6 text-violet-400" />
+            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Explore the Demo</h1>

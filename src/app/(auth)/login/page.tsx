@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Sparkles, CheckCircle2, Monitor } from "lucide-react"
+import { CheckCircle2, Monitor } from "lucide-react"
 
 function LoginForm() {
   const router = useRouter()
@@ -72,7 +72,7 @@ function LoginForm() {
             </div>
           ) : (
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-              <Sparkles className="h-6 w-6 text-primary" />
+              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
             </div>
           )}
           <div>
@@ -217,7 +217,7 @@ function LoginSkeleton() {
             </div>
           ) : (
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-              <Sparkles className="h-6 w-6 text-primary" />
+              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
             </div>
           )}
           <div>

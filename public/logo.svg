@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="logo-grad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <linearGradient id="logo-grad-reverse" x1="56" y1="8" x2="8" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer arc top-left (violet): sweeping from top around to bottom-right -->
+  <path d="M 12 32 A 20 20 0 0 1 32 12"
+        stroke="url(#logo-grad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+
+  <!-- Outer arc bottom-right (blue): continues the sweep -->
+  <path d="M 32 52 A 20 20 0 0 1 52 32"
+        stroke="url(#logo-grad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+
+  <!-- Middle arc crossing (reverse gradient): bottom-left to top-right -->
+  <path d="M 12 32 A 20 20 0 0 0 32 52"
+        stroke="url(#logo-grad-reverse)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.85"/>
+
+  <path d="M 32 12 A 20 20 0 0 0 52 32"
+        stroke="url(#logo-grad-reverse)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.85"/>
+
+  <!-- Inner concentric arc — oversight / focal point -->
+  <path d="M 22 32 A 10 10 0 0 1 32 22"
+        stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <path d="M 32 42 A 10 10 0 0 1 42 32"
+        stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Central dot — AI eye / focal point -->
+  <circle cx="32" cy="32" r="2.5" fill="url(#logo-grad)" opacity="0.9"/>
+
+  <!-- Thin connecting pulse ring -->
+  <circle cx="32" cy="32" r="16" stroke="url(#logo-grad)" stroke-width="0.75" fill="none" opacity="0.3"/>
+</svg>
