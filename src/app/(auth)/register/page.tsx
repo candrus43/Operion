@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export default function RegisterPage() {
   const router = useRouter()
   const [name, setName] = useState("")
+  const [organizationName, setOrganizationName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -24,7 +25,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, organizationName, email, password }),
     })
 
     if (!res.ok) {
@@ -71,6 +72,17 @@ export default function RegisterPage() {
                   placeholder="John Smith"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
+                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="organizationName">Company / Organization</Label>
+                <Input
+                  id="organizationName"
+                  placeholder="Acme Holdings"
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
                   required
                   className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
                 />

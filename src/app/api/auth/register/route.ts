@@ -13,7 +13,7 @@ function slugify(name: string): string {
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json()
+    const { name, organizationName, email, password } = await req.json()
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 })
@@ -28,8 +28,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email already registered" }, { status: 409 })
     }
 
+    // Use provided organization name, or fall back to user name
+    const orgName = organizationName?.trim() || `${name}'s Organization`
+
     // Create a unique organization for this user
-    const baseSlug = slugify(name) || "my-org"
+    const baseSlug = slugify(orgName) || "my-org"
     let slug = baseSlug
     let suffix = 1
     while (await prisma.organization.findUnique({ where: { slug } })) {
@@ -39,7 +42,7 @@ export async function POST(req: Request) {
 
     const org = await prisma.organization.create({
       data: {
-        name: `${name}'s Organization`,
+        name: orgName,
         slug,
         trialStartDate: new Date(),
         trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
