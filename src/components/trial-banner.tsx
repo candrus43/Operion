@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { X, ArrowRight, Clock, AlertTriangle, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
 interface TrialStatus {
   status: string
@@ -13,8 +12,8 @@ interface TrialStatus {
 }
 
 const STRIPE_LINKS = {
-  starter: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
-  professional: "https://buy.stripe.com/7sY8wPbSdeC7efK08k1wY0e",
+  solo: "https://buy.stripe.com/fZucN5cWhgKf5Je08k1wY0f",
+  team: "https://buy.stripe.com/8x27sLg8teC75Je9IU1wY0g",
 }
 
 export function TrialBanner() {
@@ -59,7 +58,7 @@ export function TrialBanner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href={STRIPE_LINKS.professional}
+            href={STRIPE_LINKS.team}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 bg-red-600 hover:bg-red-500 text-white transition-colors"
@@ -87,7 +86,7 @@ export function TrialBanner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href={STRIPE_LINKS.starter}
+            href={STRIPE_LINKS.solo}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 border border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40 transition-colors"
@@ -121,7 +120,7 @@ export function TrialBanner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href={STRIPE_LINKS.starter}
+            href={STRIPE_LINKS.solo}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-md h-7 px-3 text-xs text-muted-foreground hover:text-foreground transition-colors"

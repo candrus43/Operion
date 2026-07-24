@@ -1,46 +1,66 @@
 import Link from "next/link"
-import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap } from "lucide-react"
+import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, Mail } from "lucide-react"
 
 const plans = [
   {
-    name: "Starter",
-    price: "$149",
+    name: "Solo",
+    price: "$249",
     period: "/month",
     description: "For solo operators managing a small portfolio.",
-    href: "https://buy.stripe.com/eVqdR909v2TpefK08k1wY0d",
+    href: "https://buy.stripe.com/fZucN5cWhgKf5Je08k1wY0f",
     features: [
-      { text: "Single user", included: true },
+      { text: "1 user seat", included: true },
       { text: "Up to 3 entities", included: true },
-      { text: "Core AI briefing", included: true },
+      { text: "AI daily briefing", included: true },
       { text: "Task & project management", included: true },
-      { text: "Document center", included: true },
-      { text: "Unlimited entities", included: false },
-      { text: "Full AI assistant", included: false },
+      { text: "Document & contact center", included: true },
+      { text: "AI chat & task suggestions", included: false },
       { text: "Document search", included: false },
       { text: "EA workspace", included: false },
       { text: "Advanced permissions", included: false },
+      { text: "Priority support", included: false },
     ],
     highlighted: false,
   },
   {
-    name: "Professional",
-    price: "$349",
-    period: "/month per seat",
+    name: "Team",
+    price: "$499",
+    period: "/month",
     description: "For owners and teams running multiple entities.",
-    href: "https://buy.stripe.com/7sY8wPbSdeC7efK08k1wY0e",
+    href: "https://buy.stripe.com/8x27sLg8teC75Je9IU1wY0g",
     features: [
-      { text: "Unlimited users", included: true },
-      { text: "Unlimited entities", included: true },
-      { text: "Core AI briefing", included: true },
-      { text: "Full AI assistant", included: true },
+      { text: "Up to 5 user seats", included: true },
+      { text: "Up to 25 entities", included: true },
+      { text: "AI daily briefing", included: true },
+      { text: "AI chat & task suggestions", included: true },
       { text: "Document search", included: true },
       { text: "EA workspace", included: true },
       { text: "Advanced permissions", included: true },
       { text: "Priority support", included: true },
       { text: "Task & project management", included: true },
-      { text: "Document center", included: true },
+      { text: "Document & contact center", included: true },
     ],
     highlighted: true,
+  },
+  {
+    name: "Enterprise",
+    price: "$999",
+    period: "/month",
+    description: "For organizations with advanced needs and scale.",
+    href: null,
+    features: [
+      { text: "Unlimited user seats", included: true },
+      { text: "Unlimited entities", included: true },
+      { text: "AI daily briefing", included: true },
+      { text: "AI chat & task suggestions", included: true },
+      { text: "Document search", included: true },
+      { text: "EA workspace", included: true },
+      { text: "Advanced permissions", included: true },
+      { text: "Priority support", included: true },
+      { text: "SSO & audit logs", included: true },
+      { text: "Dedicated tenant", included: true },
+    ],
+    highlighted: false,
   },
 ]
 
@@ -73,14 +93,14 @@ const features = [
   {
     icon: Sparkles,
     title: "14-Day Trial",
-    description: "Try all Professional features free. No credit card required.",
+    description: "Try all features free. No credit card required.",
   },
 ]
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-[#080808]">
-      <div className="mx-auto max-w-5xl px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
@@ -104,12 +124,12 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-8 lg:grid-cols-2 max-w-3xl mx-auto">
+        <div className="grid gap-8 lg:grid-cols-3 max-w-4xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-xl border-0 bg-[#111111] shadow-2xl${
-                plan.highlighted ? " ring-2 ring-primary/30 scale-[1.02]" : ""
+              className={`relative rounded-xl border-0 bg-[#111111] shadow-2xl flex flex-col${
+                plan.highlighted ? " ring-2 ring-primary/30 lg:scale-[1.04]" : ""
               }`}
             >
               {plan.highlighted && (
@@ -127,7 +147,7 @@ export default function PricingPage() {
                   <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
                 </div>
               </div>
-              <div className="px-6 pb-4 space-y-3">
+              <div className="px-6 pb-4 space-y-3 flex-1">
                 <ul className="space-y-2.5">
                   {plan.features.map((feature) => (
                     <li
@@ -149,19 +169,29 @@ export default function PricingPage() {
                 </ul>
               </div>
               <div className="px-6 pb-6">
-                <a
-                  href={plan.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors ${
-                    plan.highlighted
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                  }`}
-                >
-                  Subscribe to {plan.name}
-                  <ArrowRight className="h-4 w-4" />
-                </a>
+                {plan.href ? (
+                  <a
+                    href={plan.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors ${
+                      plan.highlighted
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                    }`}
+                  >
+                    Subscribe to {plan.name}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                ) : (
+                  <a
+                    href="mailto:hello@operion.ai"
+                    className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                  >
+                    <Mail className="h-4 w-4" />
+                    Contact us
+                  </a>
+                )}
               </div>
             </div>
           ))}
