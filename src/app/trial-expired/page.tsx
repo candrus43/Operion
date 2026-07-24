@@ -5,7 +5,9 @@ import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail }
 
 const STRIPE_LINKS = {
   solo: "https://buy.stripe.com/fZucN5cWhgKf5Je08k1wY0f",
+  soloSetup: "https://buy.stripe.com/bJe6oH09v65B9ZubR21wY0h",
   team: "https://buy.stripe.com/8x27sLg8teC75Je9IU1wY0g",
+  teamSetup: "https://buy.stripe.com/3cI8wPf4pctZ9Zu2gs1wY0i",
 }
 
 export default function TrialExpiredPage() {
@@ -36,9 +38,21 @@ export default function TrialExpiredPage() {
                 <Zap className="h-3 w-3" />
                 Solo
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">$249</span>
-                <span className="text-muted-foreground text-sm">/month</span>
+              <div className="space-y-2">
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Setup</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$2,500</span>
+                    <span className="text-muted-foreground text-sm">one-time</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Monthly</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$249</span>
+                    <span className="text-muted-foreground text-sm">/month</span>
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Single user, up to 3 entities, core AI briefing
@@ -60,15 +74,25 @@ export default function TrialExpiredPage() {
               ))}
             </ul>
 
-            <a
-              href={STRIPE_LINKS.solo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full"
-            >
-              Upgrade to Solo
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
+            <div className="space-y-2">
+              <a
+                href={STRIPE_LINKS.soloSetup}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full"
+              >
+                Start Setup
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+              <a
+                href={STRIPE_LINKS.solo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+              >
+                Monthly Billing
+              </a>
+            </div>
           </div>
 
           {/* Team */}
@@ -82,9 +106,21 @@ export default function TrialExpiredPage() {
                 <Sparkles className="h-3 w-3" />
                 Team
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">$499</span>
-                <span className="text-muted-foreground text-sm">/month</span>
+              <div className="space-y-2">
+                <div>
+                  <span className="text-[10px] font-semibold text-amber-400/60 uppercase tracking-wide">Setup</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$5,000</span>
+                    <span className="text-muted-foreground text-sm">one-time</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-amber-400/60 uppercase tracking-wide">Monthly</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$499</span>
+                    <span className="text-muted-foreground text-sm">/month</span>
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Up to 5 users, 25 entities, full AI assistant, EA workspace
@@ -107,15 +143,25 @@ export default function TrialExpiredPage() {
               ))}
             </ul>
 
-            <a
-              href={STRIPE_LINKS.team}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-500 hover:bg-amber-400 text-black h-11 px-8 w-full"
-            >
-              Upgrade to Team
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
+            <div className="space-y-2">
+              <a
+                href={STRIPE_LINKS.teamSetup}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-500 hover:bg-amber-400 text-black h-11 px-8 w-full"
+              >
+                Start Setup
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+              <a
+                href={STRIPE_LINKS.team}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+              >
+                Monthly Billing
+              </a>
+            </div>
           </div>
 
           {/* Enterprise */}
@@ -125,9 +171,21 @@ export default function TrialExpiredPage() {
                 <Building2 className="h-3 w-3" />
                 Enterprise
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">$999</span>
-                <span className="text-muted-foreground text-sm">/month</span>
+              <div className="space-y-2">
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Setup</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$10,000+</span>
+                    <span className="text-muted-foreground text-sm">one-time</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Monthly</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">$999</span>
+                    <span className="text-muted-foreground text-sm">/month</span>
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Unlimited everything, SSO, dedicated tenant, custom support
@@ -150,13 +208,15 @@ export default function TrialExpiredPage() {
               ))}
             </ul>
 
-            <a
-              href="mailto:hello@operion.ai"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
-            >
-              <Mail className="h-4 w-4" />
-              Contact us
-            </a>
+            <div className="space-y-2">
+              <a
+                href="mailto:hello@operion.ai"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+              >
+                <Mail className="h-4 w-4" />
+                Contact us
+              </a>
+            </div>
           </div>
         </div>
 

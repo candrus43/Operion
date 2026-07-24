@@ -4,6 +4,9 @@ import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, 
 const plans = [
   {
     name: "Solo",
+    setupFee: "$2,500",
+    setupPeriod: "one-time",
+    setupHref: "https://buy.stripe.com/bJe6oH09v65B9ZubR21wY0h",
     price: "$249",
     period: "/month",
     description: "For solo operators managing a small portfolio.",
@@ -24,10 +27,13 @@ const plans = [
   },
   {
     name: "Team",
+    setupFee: "$5,000",
+    setupPeriod: "one-time",
+    setupHref: "https://buy.stripe.com/3cI8wPf4pctZ9Zu2gs1wY0i",
     price: "$499",
     period: "/month",
     description: "For owners and teams running multiple entities.",
-    href: "https://buy.stripe.com/8x27sLg8teC75Je9IU1wY0g",
+    href: "https://buy.stripe.com/8x27sLg8teC5Je9IU1wY0g",
     features: [
       { text: "Up to 5 user seats", included: true },
       { text: "Up to 25 entities", included: true },
@@ -44,6 +50,9 @@ const plans = [
   },
   {
     name: "Enterprise",
+    setupFee: "$10,000+",
+    setupPeriod: "one-time",
+    setupHref: null,
     price: "$999",
     period: "/month",
     description: "For organizations with advanced needs and scale.",
@@ -142,9 +151,21 @@ export default function PricingPage() {
               <div className="p-6 pb-4">
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-                <div className="mt-3">
-                  <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
+                <div className="mt-3 space-y-0.5">
+                  <div>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Setup</span>
+                    <div>
+                      <span className="text-3xl font-bold tracking-tight">{plan.setupFee}</span>
+                      <span className="text-sm text-muted-foreground ml-1">{plan.setupPeriod}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Monthly</span>
+                    <div>
+                      <span className="text-2xl font-bold tracking-tight">{plan.price}</span>
+                      <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="px-6 pb-4 space-y-3 flex-1">
@@ -168,10 +189,10 @@ export default function PricingPage() {
                   ))}
                 </ul>
               </div>
-              <div className="px-6 pb-6">
-                {plan.href ? (
+              <div className="px-6 pb-6 space-y-2">
+                {plan.setupHref ? (
                   <a
-                    href={plan.href}
+                    href={plan.setupHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors ${
@@ -180,8 +201,26 @@ export default function PricingPage() {
                         : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
                     }`}
                   >
-                    Subscribe to {plan.name}
+                    Start Setup
                     <ArrowRight className="h-4 w-4" />
+                  </a>
+                ) : (
+                  <a
+                    href="mailto:hello@operion.ai"
+                    className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                  >
+                    <Mail className="h-4 w-4" />
+                    Contact us
+                  </a>
+                )}
+                {plan.href ? (
+                  <a
+                    href={plan.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]`}
+                  >
+                    Monthly Billing
                   </a>
                 ) : (
                   <a
