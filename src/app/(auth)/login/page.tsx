@@ -62,22 +62,22 @@ function LoginForm() {
       <div className="w-full max-w-sm space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
-          {logoUrl ? (
-            <div className="inline-flex items-center justify-center h-12">
-              <img
-                src={logoUrl}
-                alt="Logo"
-                className="h-10 max-w-[200px] object-contain"
-              />
-            </div>
-          ) : (
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
-            </div>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {isDemo ? "Explore the Demo" : "Welcome to Operion"}
+        {logoUrl ? (
+          <Link href="/" className="inline-flex items-center justify-center h-12">
+            <img
+              src={logoUrl}
+              alt="Logo"
+              className="h-10 max-w-[200px] object-contain"
+            />
+          </Link>
+        ) : (
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
+            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
+          </Link>
+        )}
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {isDemo ? "Explore the Demo" : "Welcome to Operion"}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {isDemo ? "No sign-up required — click Sign in to explore" : "AI Chief of Staff for your portfolio"}
@@ -208,17 +208,17 @@ function LoginSkeleton() {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           {logoUrl ? (
-            <div className="inline-flex items-center justify-center h-12">
+            <Link href="/" className="inline-flex items-center justify-center h-12">
               <img
                 src={logoUrl}
                 alt="Logo"
                 className="h-10 max-w-[200px] object-contain"
               />
-            </div>
+            </Link>
           ) : (
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+            <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
               <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
-            </div>
+            </Link>
           )}
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Welcome to Operion</h1>

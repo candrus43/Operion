@@ -40,9 +40,9 @@ export default function DemoLoginPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-500/20">
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 transition-colors">
             <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
-          </div>
+          </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Explore the Demo</h1>
             <p className="text-sm text-muted-foreground mt-1">
