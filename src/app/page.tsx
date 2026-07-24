@@ -13,6 +13,10 @@ import {
   Plug,
   Bell,
   Play,
+  Users,
+  ClipboardList,
+  Clock,
+  HelpCircle,
 } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
 
@@ -100,6 +104,51 @@ const trustPoints = [
     title: "Export anytime",
     description:
       "Download all your organization data as JSON — no lock-in, ever.",
+  },
+  {
+    icon: Clock,
+    title: "14-day free trial",
+    description:
+      "Try everything with no credit card required. Cancel anytime.",
+  },
+]
+
+const personas = [
+  {
+    icon: Building2,
+    title: "Multi-entity owners",
+    description:
+      "Running hotels, gas stations, and investments? See everything in one place.",
+  },
+  {
+    icon: Users,
+    title: "Executive Assistants",
+    description:
+      "Stop chasing updates. Your daily priority queue tells you what needs attention.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Operations Managers",
+    description:
+      "Track projects, deadlines, and dependencies across every entity.",
+  },
+]
+
+const faqItems = [
+  {
+    question: "Can I import my existing spreadsheets?",
+    answer:
+      "Yes. Import CSV, Excel, or ICS files in one click.",
+  },
+  {
+    question: "How is this different from SmartSheets or Monday?",
+    answer:
+      "Those are tools you feed data into. Operion is an AI Chief of Staff that feeds you decisions.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Enterprise-grade encryption, isolated per organization. Your data belongs to you — never shared, sold, or used to train AI.",
   },
 ]
 
@@ -345,7 +394,7 @@ export default function LandingPage() {
                 Your data belongs to you
               </h2>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3 max-w-3xl mx-auto">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-4xl mx-auto">
               {trustPoints.map((point) => (
                 <div
                   key={point.title}
@@ -363,6 +412,89 @@ export default function LandingPage() {
             </div>
           </section>
         </ScrollReveal>
+
+        {/* Who It's For */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Who it&apos;s for
+              </h2>
+              <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm">
+                Purpose-built for the people who keep multiple businesses running.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid gap-6 sm:grid-cols-3 max-w-4xl mx-auto">
+            {personas.map((persona, i) => (
+              <ScrollReveal key={persona.title} delay={i * 100}>
+                <div className="card-glow group rounded-xl bg-[#111111] border border-white/[0.04] p-6 text-center cursor-default">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/[0.04] mx-auto mb-4 group-hover:bg-violet-400/10 group-hover:scale-110 transition-all duration-300">
+                    <persona.icon className="h-6 w-6 text-foreground/50 group-hover:text-violet-400 transition-colors duration-300" />
+                  </div>
+                  <h3 className="text-sm font-semibold mb-2">{persona.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-[240px] mx-auto">
+                    {persona.description}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </section>
+
+        {/* Social Proof / Trust Bar */}
+        <ScrollReveal>
+          <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+            <div className="rounded-xl bg-[#0d0d0d] border border-white/[0.04] max-w-4xl mx-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center divide-y sm:divide-y-0 sm:divide-x divide-white/[0.04]">
+                {trustPoints.map((point) => (
+                  <div
+                    key={point.title}
+                    className="flex items-center gap-3 px-6 py-4 w-full sm:w-auto justify-center"
+                  >
+                    <point.icon className="h-4 w-4 text-foreground/40 shrink-0" />
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {point.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* FAQ */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Frequently asked questions
+              </h2>
+              <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm">
+                Quick answers to common questions.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="max-w-2xl mx-auto space-y-3">
+            {faqItems.map((faq, i) => (
+              <ScrollReveal key={faq.question} delay={i * 80}>
+                <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5 card-glow cursor-default">
+                  <div className="flex items-start gap-3">
+                    <HelpCircle className="h-4 w-4 text-violet-400/70 mt-0.5 shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-semibold mb-1.5">{faq.question}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </section>
 
         {/* CTA */}
         <ScrollReveal>
