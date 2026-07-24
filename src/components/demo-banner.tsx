@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Monitor, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 export function DemoBanner() {
   const { data: session, status } = useSession()
@@ -23,16 +22,13 @@ export function DemoBanner() {
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <Button
-          size="sm"
-          className="h-7 text-xs bg-violet-600 hover:bg-violet-500 text-white border-0"
-          asChild
+        <Link
+          href="/register"
+          className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-7 px-3 bg-violet-600 hover:bg-violet-500 text-white transition-colors"
         >
-          <Link href="/register">
-            Start your 14-day free trial
-            <ArrowRight className="ml-1.5 h-3 w-3" />
-          </Link>
-        </Button>
+          Start your 14-day free trial
+          <ArrowRight className="ml-1.5 h-3 w-3" />
+        </Link>
       </div>
     </div>
   )

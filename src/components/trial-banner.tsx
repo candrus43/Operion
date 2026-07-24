@@ -58,16 +58,15 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button
-            size="sm"
-            className="h-8 text-xs bg-red-600 hover:bg-red-500 text-white border-0"
-            asChild
+          <a
+            href={STRIPE_LINKS.professional}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 bg-red-600 hover:bg-red-500 text-white transition-colors"
           >
-            <a href={STRIPE_LINKS.professional} target="_blank" rel="noopener noreferrer">
-              Upgrade Now
-              <ArrowRight className="ml-1.5 h-3 w-3" />
-            </a>
-          </Button>
+            Upgrade Now
+            <ArrowRight className="ml-1.5 h-3 w-3" />
+          </a>
         </div>
       </div>
     )
@@ -87,17 +86,15 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 text-xs border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40"
-            asChild
+          <a
+            href={STRIPE_LINKS.starter}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 border border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40 transition-colors"
           >
-            <a href={STRIPE_LINKS.starter} target="_blank" rel="noopener noreferrer">
-              Upgrade
-              <ArrowRight className="ml-1.5 h-3 w-3" />
-            </a>
-          </Button>
+            Upgrade
+            <ArrowRight className="ml-1.5 h-3 w-3" />
+          </a>
           <Button
             variant="ghost"
             size="icon"
@@ -123,16 +120,14 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 text-xs text-muted-foreground hover:text-foreground"
-            asChild
+          <a
+            href={STRIPE_LINKS.starter}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md h-7 px-3 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <a href={STRIPE_LINKS.starter} target="_blank" rel="noopener noreferrer">
-              Upgrade
-            </a>
-          </Button>
+            Upgrade
+          </a>
           <Button
             variant="ghost"
             size="icon"
