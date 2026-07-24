@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
-  return NextResponse.redirect(new URL("/demo-login", "http://localhost:3000"))
+export async function GET(req: NextRequest) {
+  const url = new URL("/demo-login", req.url)
+  return NextResponse.redirect(url)
 }
