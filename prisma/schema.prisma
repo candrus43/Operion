@@ -240,3 +240,10 @@ model AuditLog {
   organization   Organization @relation(fields: [organizationId], references: [id])
   user           User         @relation(fields: [userId], references: [id])
 }
+
+model StripeEvent {
+  id        String   @id
+  type      String
+  createdAt DateTime @default(now())
+  processedAt DateTime @default(now())
+}

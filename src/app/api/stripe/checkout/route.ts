@@ -69,6 +69,10 @@ export async function POST(request: Request) {
     const sessionConfig: any = {
       customer: stripeCustomerId,
       client_reference_id: org.id,
+      metadata: {
+        plan,
+        orgId: org.id,
+      },
       line_items: [
         {
           price: priceId,

@@ -12,8 +12,9 @@ export default auth((req) => {
                        req.nextUrl.pathname === "/trial-expired"
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
+  const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
 
-  if (isApiAuth) return NextResponse.next()
+  if (isApiAuth || isStripeWebhook) return NextResponse.next()
 
   if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
