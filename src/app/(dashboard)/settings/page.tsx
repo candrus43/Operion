@@ -7,14 +7,19 @@ import { LogoUploader } from "./logo-uploader"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Download, Loader2 } from "lucide-react"
+import { Download, Loader2, CreditCard, ExternalLink } from "lucide-react"
 
 export default function SettingsPage() {
   const { data: session, status } = useSession()
   const [exporting, setExporting] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
 
   if (status === "loading") return null
   if (!session?.user) redirect("/login")
+
+  const stripeCustomerId = session.user.stripeCustomerId
+  const subscriptionStatus = session.user.subscriptionStatus
+  const hasSubscription = Boolean(stripeCustomerId)
 
   const handleExport = async () => {
     setExporting(true)
@@ -34,6 +39,23 @@ export default function SettingsPage() {
       console.error("Export failed:", err)
     } finally {
       setExporting(false)
+    }
+  }
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true)
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" })
+      if (!res.ok) {
+        const data = await res.json()
+        console.error("Portal error:", data.error)
+        return
+      }
+      const { url } = await res.json()
+      window.location.href = url
+    } catch (err) {
+      console.error("Portal redirect failed:", err)
+      setPortalLoading(false)
     }
   }
 
@@ -61,6 +83,37 @@ export default function SettingsPage() {
           <LogoUploader initialLogoUrl={null} />
         </CardContent>
       </Card>
+
+      {/* Billing Section */}
+      {hasSubscription && (
+        <Card className="border-[#262626] bg-[#111111]">
+          <CardHeader>
+            <CardTitle className="text-lg">Billing</CardTitle>
+            <CardDescription>
+              Manage your subscription, payment methods, and view invoices. Your plan is{" "}
+              <span className="text-white font-medium">
+                {subscriptionStatus === "ACTIVE" ? "active" : subscriptionStatus?.toLowerCase() ?? "active"}
+              </span>.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleManageBilling}
+              disabled={portalLoading}
+              variant="outline"
+              className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+            >
+              {portalLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <CreditCard className="h-4 w-4 mr-2" />
+              )}
+              {portalLoading ? "Opening portal..." : "Manage Billing"}
+              {!portalLoading && <ExternalLink className="h-3 w-3 ml-1.5 opacity-50" />}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Data Export Section */}
       <Card className="border-[#262626] bg-[#111111]">

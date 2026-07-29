@@ -59,6 +59,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role ?? "STAFF"
         token.organizationId = user.organizationId ?? ""
         token.id = user.id ?? ""
+
+        // Fetch org billing info on sign-in so it's available in the session
+        try {
+          const org = await prisma.organization.findUnique({
+            where: { id: user.organizationId as string },
+            select: { stripeCustomerId: true, subscriptionStatus: true },
+          })
+          if (org) {
+            token.stripeCustomerId = org.stripeCustomerId ?? undefined
+            token.subscriptionStatus = org.subscriptionStatus
+          }
+        } catch {
+          // Non-fatal: session just won't have billing info
+        }
       }
       return token
     },
@@ -67,6 +81,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id
         session.user.role = token.role
         session.user.organizationId = token.organizationId
+        session.user.stripeCustomerId = token.stripeCustomerId
+        session.user.subscriptionStatus = token.subscriptionStatus
       }
       return session
     },
