@@ -1,7 +1,3 @@
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface SendEmailParams {
   to: string;
   subject: string;
@@ -10,6 +6,16 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, body }: SendEmailParams) {
   try {
+    // Dynamic import — won't fail at module load if resend isn't installed or key is missing
+    const { Resend } = await import("resend");
+    const apiKey = process.env.RESEND_API_KEY;
+
+    if (!apiKey) {
+      console.error("[EMAIL] RESEND_API_KEY not set — skipping send");
+      return;
+    }
+
+    const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from: "Operion <hello@operion.online>",
       to: [to],
