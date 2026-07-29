@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -16,6 +16,7 @@ model Organization {
   trialEndDate       DateTime?
   subscriptionStatus String    @default("TRIAL") // TRIAL, ACTIVE, EXPIRED, CANCELLED
   stripeCustomerId   String?
+  stripeSubscriptionId String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
