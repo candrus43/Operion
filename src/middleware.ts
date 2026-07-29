@@ -7,6 +7,7 @@ export default auth((req) => {
                      req.nextUrl.pathname.startsWith("/register") ||
                      req.nextUrl.pathname === "/demo-login"
   const isApiAuth = req.nextUrl.pathname.startsWith("/api/auth")
+  const isRegisterApi = req.nextUrl.pathname === "/api/register"
   const isPublicPage = req.nextUrl.pathname === "/" ||
                        req.nextUrl.pathname === "/pricing" ||
                        req.nextUrl.pathname === "/trial-expired"
@@ -16,10 +17,10 @@ export default auth((req) => {
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
 
   // Skip enforcement for public routes, auth, etc.
-  const isExemptRoute = isApiAuth || isStripeWebhook || isStripeApi || 
+  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || 
                         isAuthPage || isPublicPage || isDemoRoute
 
-  if (isApiAuth || isStripeWebhook) return NextResponse.next()
+  if (isApiAuth || isRegisterApi || isStripeWebhook) return NextResponse.next()
 
   if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
