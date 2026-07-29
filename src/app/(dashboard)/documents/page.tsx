@@ -6,15 +6,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { FileText, Plus, ExternalLink, Building2, FolderKanban, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import DocumentTypeFilter from "@/components/documents/document-type-filter"
 
 const DOC_TYPES = [
   "CONTRACT", "PURCHASE_AGREEMENT", "LEASE", "INSURANCE",
@@ -95,17 +89,7 @@ export default async function DocumentsPage({
       {/* Type filter */}
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">Filter by type:</span>
-        <Select defaultValue="all">
-          <SelectTrigger className="w-[180px] bg-[#111111] border-0">
-            <SelectValue placeholder="All Types" />
-          </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
-            <SelectItem value="all">All Types</SelectItem>
-            {DOC_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>{typeLabels[t]}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <DocumentTypeFilter currentType={typeFilter} />
         {/* Client-side filter using search params */}
         <Link href={`/documents?type=all`}>
           <Button variant="ghost" size="sm" className={cn("text-xs", typeFilter === "all" && "bg-[#1a1a1a]")}>

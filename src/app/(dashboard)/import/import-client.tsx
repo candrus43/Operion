@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -1202,7 +1203,7 @@ export function ImportClient() {
                         Import More Files
                       </Button>
                       <Button variant="ghost" size="sm" asChild>
-                        <a href="/dashboard">Go to Dashboard →</a>
+                        <Link href="/home">Go to Dashboard →</Link>
                       </Button>
                     </div>
                   </CardContent>

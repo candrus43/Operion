@@ -105,14 +105,14 @@ export async function GET(req: NextRequest) {
       title: d.name,
       subtitle: d.type.replace(/_/g, " "),
       type: "document" as const,
-      link: `/documents`,
+      link: `/documents/${d.id}`,
     })),
     contacts: contacts.map(c => ({
       id: c.id,
       title: c.name,
       subtitle: c.company || "Contact",
       type: "contact" as const,
-      link: `/contacts`,
+      link: `/contacts/${c.id}`,
     })),
   }
 
