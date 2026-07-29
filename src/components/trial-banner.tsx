@@ -15,30 +15,6 @@ export function TrialBanner() {
   const [trial, setTrial] = useState<TrialStatus | null>(null)
   const [dismissed, setDismissed] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [checkingOut, setCheckingOut] = useState(false)
-
-  async function redirectToCheckout(plan: "SOLO" | "TEAM", mode: "setup" | "monthly") {
-    setCheckingOut(true)
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, mode }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        alert(data.error || "Checkout failed")
-        setCheckingOut(false)
-        return
-      }
-      if (data.url) {
-        window.location.href = data.url
-      }
-    } catch {
-      setCheckingOut(false)
-    }
-  }
-
   useEffect(() => {
     const fetchTrial = async () => {
       try {
@@ -75,14 +51,13 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => redirectToCheckout("TEAM", "monthly")}
-            disabled={checkingOut}
-            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-50"
+          <a
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 bg-red-600 hover:bg-red-500 text-white transition-colors"
           >
-            {checkingOut ? "Redirecting..." : "Upgrade Now"}
+            Upgrade Now
             <ArrowRight className="ml-1.5 h-3 w-3" />
-          </button>
+          </a>
         </div>
       </div>
     )
@@ -102,14 +77,13 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => redirectToCheckout("TEAM", "monthly")}
-            disabled={checkingOut}
-            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 border border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40 transition-colors disabled:opacity-50"
+          <a
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 border border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40 transition-colors"
           >
-            {checkingOut ? "Redirecting..." : "Upgrade"}
+            Upgrade
             <ArrowRight className="ml-1.5 h-3 w-3" />
-          </button>
+          </a>
           <Button
             variant="ghost"
             size="icon"
@@ -134,13 +108,12 @@ export function TrialBanner() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => redirectToCheckout("TEAM", "monthly")}
-            disabled={checkingOut}
-            className="inline-flex items-center justify-center rounded-md h-7 px-3 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          <a
+            href="/pricing"
+            className="inline-flex items-center justify-center rounded-md h-7 px-3 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            {checkingOut ? "Redirecting..." : "Upgrade"}
-          </button>
+            Upgrade
+          </a>
           <Button
             variant="ghost"
             size="icon"
