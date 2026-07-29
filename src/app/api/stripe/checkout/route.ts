@@ -82,44 +82,36 @@ export async function POST(request: Request) {
 
     const isSetup = mode === "setup"
 
-    // Build line items: setup fee always included; monthly also includes subscription with 30-day trial
-    const lineItems: any[] = [
-      {
-        price: setupPriceId,
-        quantity: 1,
-      },
-    ]
-
-    if (!isSetup) {
-      lineItems.push({
-        price: monthlyPriceId,
-        quantity: 1,
-      })
+    if (isSetup) {
+      // Standalone setup fee payment
+      const sessionConfig: any = {
+        customer: stripeCustomerId,
+        client_reference_id: org.id,
+        metadata: { plan, orgId: org.id },
+        line_items: [{ price: setupPriceId, quantity: 1 }],
+        mode: "payment",
+        success_url: `${origin}/dashboard?checkout=success`,
+        cancel_url: `${origin}/pricing?checkout=cancelled`,
+      }
+      const checkoutSession = await stripe.checkout.sessions.create(sessionConfig)
+      return NextResponse.json({ url: checkoutSession.url })
     }
 
-    const sessionConfig: any = {
+    // Monthly: setup fee as payment, then subscription with 30-day trial
+    // Create a payment checkout for the setup fee that redirects to subscription on success
+    const subscriptionUrl = `${origin}/api/stripe/subscribe?plan=${plan}&customerId=${stripeCustomerId}&orgId=${org.id}`
+
+    const paymentSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       client_reference_id: org.id,
-      metadata: {
-        plan,
-        orgId: org.id,
-      },
-      line_items: lineItems,
-      mode: isSetup ? "payment" : "subscription",
-      success_url: `${origin}/dashboard?checkout=success`,
+      metadata: { plan, orgId: org.id, step: "setup" },
+      line_items: [{ price: setupPriceId, quantity: 1 }],
+      mode: "payment",
+      success_url: subscriptionUrl,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
-    }
+    })
 
-    // Monthly checkout: setup fee paid now, subscription starts with 30-day trial
-    if (!isSetup) {
-      sessionConfig.subscription_data = {
-        trial_period_days: 30,
-      }
-    }
-
-    const checkoutSession = await stripe.checkout.sessions.create(sessionConfig)
-
-    return NextResponse.json({ url: checkoutSession.url })
+    return NextResponse.json({ url: paymentSession.url })
   } catch (error: any) {
     console.error("Checkout session error:", error)
     return NextResponse.json(
