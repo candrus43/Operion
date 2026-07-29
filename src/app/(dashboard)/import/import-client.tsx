@@ -25,6 +25,8 @@ import {
   Download,
   AlertCircle,
   Table2,
+  Sparkles,
+  Brain,
 } from "lucide-react"
 import { toast } from "sonner"
 import * as XLSX from "xlsx"
@@ -228,6 +230,19 @@ export function ImportClient() {
   const [dragOver, setDragOver] = useState(false)
   const [icsDragOver, setIcsDragOver] = useState(false)
 
+  // AI import state
+  const [aiFiles, setAiFiles] = useState<File[]>([])
+  const [aiImporting, setAiImporting] = useState(false)
+  const [aiProgress, setAiProgress] = useState("")
+  const [aiResult, setAiResult] = useState<{
+    summary: { entities: number; contacts: number; projects: number; tasks: number }
+    created: { entities: { id: string; name: string }[]; contacts: any[]; projects: { id: string; name: string }[]; tasks: { id: string; title: string }[] }
+    errors?: string[]
+  } | null>(null)
+  const [aiError, setAiError] = useState<string | null>(null)
+  const [aiDragOver, setAiDragOver] = useState(false)
+  const aiInputRef = useRef<HTMLInputElement>(null)
+
   // ── CSV/Excel file handling ──────────────────────────────────
   const parseFile = useCallback((file: File) => {
     setFile(file)
@@ -404,6 +419,105 @@ export function ImportClient() {
     setIcsResult(null)
   }
 
+  // ── AI import handling ────────────────────────────────────────
+  const handleAiFiles = useCallback((files: File[]) => {
+    const validFiles = files.filter(f => {
+      const name = f.name.toLowerCase()
+      return name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".csv")
+    })
+    if (validFiles.length === 0) {
+      toast.error("Please upload CSV, XLSX, or XLS files")
+      return
+    }
+    if (validFiles.length !== files.length) {
+      toast.warning("Some files were skipped — only CSV, XLSX, or XLS files are accepted")
+    }
+    setAiFiles(prev => [...prev, ...validFiles])
+    setAiResult(null)
+    setAiError(null)
+  }, [])
+
+  const handleAiDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setAiDragOver(false)
+    const droppedFiles = Array.from(e.dataTransfer.files)
+    handleAiFiles(droppedFiles)
+  }, [handleAiFiles])
+
+  const handleAiSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || [])
+    handleAiFiles(selectedFiles)
+    // Reset input so re-selecting the same file works
+    e.target.value = ""
+  }, [handleAiFiles])
+
+  const removeAiFile = useCallback((index: number) => {
+    setAiFiles(prev => prev.filter((_, i) => i !== index))
+    setAiResult(null)
+    setAiError(null)
+  }, [])
+
+  const resetAi = () => {
+    setAiFiles([])
+    setAiResult(null)
+    setAiError(null)
+    setAiProgress("")
+  }
+
+  const handleAiImport = async () => {
+    if (aiFiles.length === 0) return
+    setAiImporting(true)
+    setAiResult(null)
+    setAiError(null)
+
+    try {
+      // Step 1: Parse files
+      setAiProgress("Parsing files...")
+      const formData = new FormData()
+      for (const file of aiFiles) {
+        formData.append("files", file)
+      }
+
+      // Step 2: AI analysis
+      setAiProgress("AI analyzing your spreadsheet data...")
+      const res = await fetch("/api/import/ai", {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.details || data.error || "AI import failed")
+      }
+
+      // Step 3: Creating records
+      setAiProgress("Creating records in database...")
+
+      setAiResult(data)
+
+      const summary = data.summary
+      const total = summary.entities + summary.contacts + summary.projects + summary.tasks
+      const parts: string[] = []
+      if (summary.entities > 0) parts.push(`${summary.entities} entities`)
+      if (summary.contacts > 0) parts.push(`${summary.contacts} contacts`)
+      if (summary.projects > 0) parts.push(`${summary.projects} projects`)
+      if (summary.tasks > 0) parts.push(`${summary.tasks} tasks`)
+      
+      if (total > 0) {
+        toast.success(`Created ${parts.join(", ")}`)
+      } else {
+        toast.warning("No records were created. The AI didn't find recognizable data.")
+      }
+    } catch (err: any) {
+      setAiError(err.message || "AI import failed")
+      toast.error(err.message || "AI import failed")
+    } finally {
+      setAiImporting(false)
+      setAiProgress("")
+    }
+  }
+
   const icsInputRef = useRef<HTMLInputElement>(null)
 
   // ── Render ────────────────────────────────────────────────────
@@ -434,6 +548,10 @@ export function ImportClient() {
           <TabsTrigger value="ics" className="data-[state=active]:bg-[#1a1a1a]">
             <Calendar className="h-4 w-4 mr-2" />
             Calendar (ICS)
+          </TabsTrigger>
+          <TabsTrigger value="ai" className="data-[state=active]:bg-[#1a1a1a]">
+            <Sparkles className="h-4 w-4 mr-2" />
+            AI Import
           </TabsTrigger>
         </TabsList>
 
@@ -890,6 +1008,242 @@ export function ImportClient() {
               <div className="text-center py-6">
                 <p className="text-sm text-muted-foreground">
                   Upload a .ics file to import calendar events from Outlook or other calendar apps.
+                </p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* ── AI Import Tab ───────────────────────────────────── */}
+        <TabsContent value="ai" className="mt-0">
+          <div className="space-y-6 pt-4">
+            {/* Upload zone */}
+            {!aiImporting && !aiResult && !aiError && (
+              <Card className="border-0 bg-[#111111]">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">AI-Powered Import</CardTitle>
+                  <CardDescription>
+                    Upload Excel or CSV files and let AI automatically detect entities, contacts, projects, and tasks.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Drop zone */}
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setAiDragOver(true) }}
+                    onDragLeave={() => setAiDragOver(false)}
+                    onDrop={handleAiDrop}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-10 transition-colors ${
+                      aiDragOver
+                        ? "border-purple-400/50 bg-purple-400/5"
+                        : "border-white/[0.06] hover:border-white/[0.12]"
+                    }`}
+                  >
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10 mb-4">
+                      <Brain className="h-7 w-7 text-purple-400" />
+                    </div>
+                    <p className="text-sm font-medium">Drop spreadsheets here</p>
+                    <p className="text-xs text-muted-foreground mt-1 mb-4">
+                      .csv, .xlsx, or .xls — AI will figure out the rest
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => aiInputRef.current?.click()}
+                    >
+                      <Upload className="h-3.5 w-3.5 mr-2" />
+                      Choose Files
+                    </Button>
+                    <input
+                      ref={aiInputRef}
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      multiple
+                      onChange={handleAiSelect}
+                      className="hidden"
+                    />
+                  </div>
+
+                  {/* File list */}
+                  {aiFiles.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {aiFiles.length} file{aiFiles.length > 1 ? "s" : ""} selected
+                      </p>
+                      {aiFiles.map((file, i) => (
+                        <div key={i} className="flex items-center justify-between rounded-xl bg-[#1a1a1a] p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
+                              <FileSpreadsheet className="h-4 w-4 text-purple-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{file.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {(file.size / 1024).toFixed(1)} KB
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeAiFile(i)}
+                            className="text-muted-foreground hover:text-red-400"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {aiFiles.length > 0 && (
+                    <Button
+                      onClick={handleAiImport}
+                      className="w-full gap-2 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Analyze &amp; Import
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Progress */}
+            {aiImporting && (
+              <Card className="border-0 bg-[#111111]">
+                <CardContent className="py-10">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10">
+                      <Loader2 className="h-7 w-7 text-purple-400 animate-spin" />
+                    </div>
+                    <p className="text-sm font-medium">{aiProgress || "Processing..."}</p>
+                    <p className="text-xs text-muted-foreground">
+                      This may take a moment while the AI analyzes your data
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Success */}
+            {aiResult && !aiImporting && (
+              <>
+                <Card className="border-0 bg-[#111111]">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium">Import Complete</CardTitle>
+                    <CardDescription>
+                      AI analyzed your spreadsheet{aiFiles.length > 1 ? "s" : ""} and created the following records.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Summary grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {aiResult.summary.entities > 0 && (
+                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10">
+                            <Table2 className="h-4 w-4 text-indigo-400" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-indigo-400">{aiResult.summary.entities}</p>
+                            <p className="text-[11px] text-muted-foreground">Entities</p>
+                          </div>
+                        </div>
+                      )}
+                      {aiResult.summary.contacts > 0 && (
+                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/10">
+                            <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-cyan-400">{aiResult.summary.contacts}</p>
+                            <p className="text-[11px] text-muted-foreground">Contacts</p>
+                          </div>
+                        </div>
+                      )}
+                      {aiResult.summary.projects > 0 && (
+                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
+                            <ArrowRight className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-amber-400">{aiResult.summary.projects}</p>
+                            <p className="text-[11px] text-muted-foreground">Projects</p>
+                          </div>
+                        </div>
+                      )}
+                      {aiResult.summary.tasks > 0 && (
+                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          </div>
+                          <div>
+                            <p className="text-lg font-bold text-emerald-400">{aiResult.summary.tasks}</p>
+                            <p className="text-[11px] text-muted-foreground">Tasks</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {aiResult.errors && aiResult.errors.length > 0 && (
+                      <div className="rounded-lg bg-[#1a1a1a] p-4 space-y-2 max-h-48 overflow-y-auto">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">Warnings</p>
+                        {aiResult.errors.map((err, i) => (
+                          <div key={i} className="flex items-start gap-2 text-xs">
+                            <AlertCircle className="h-3.5 w-3.5 text-amber-400 mt-0.5 shrink-0" />
+                            <span className="text-foreground/60">{err}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 pt-2">
+                      <Button onClick={resetAi} variant="outline" size="sm" className="gap-2">
+                        <Upload className="h-3.5 w-3.5" />
+                        Import More Files
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <a href="/dashboard">Go to Dashboard →</a>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* Error */}
+            {aiError && !aiImporting && (
+              <Card className="border-0 bg-[#111111]">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium text-red-400">Import Failed</CardTitle>
+                  <CardDescription>
+                    Something went wrong while processing your files.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-lg bg-red-500/5 border border-red-500/10 p-4">
+                    <div className="flex items-start gap-2">
+                      <XCircle className="h-4 w-4 text-red-400 mt-0.5 shrink-0" />
+                      <p className="text-sm text-red-300/80">{aiError}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button onClick={handleAiImport} className="gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      Retry
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={resetAi}>
+                      Try Different Files
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Empty state */}
+            {!aiImporting && !aiResult && !aiError && aiFiles.length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-sm text-muted-foreground">
+                  Drop any spreadsheet and let AI parse it automatically — no column mapping needed.
                 </p>
               </div>
             )}
