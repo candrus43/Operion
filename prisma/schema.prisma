@@ -17,6 +17,10 @@ model Organization {
   subscriptionStatus String    @default("TRIAL") // TRIAL, ACTIVE, EXPIRED, CANCELLED
   stripeCustomerId   String?
   stripeSubscriptionId String?
+  googleRefreshToken  String?
+  googleAccessToken   String?
+  googleTokenExpiry   Int?
+  googleConnected     Boolean  @default(false)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
