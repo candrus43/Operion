@@ -217,23 +217,23 @@ const features = [
                 {plan.plan ? (
                   <>
                     <button
-                      onClick={() => redirectToCheckout(plan.plan!, "setup")}
-                      disabled={checkingOut === `${plan.plan}_setup`}
+                      onClick={() => redirectToCheckout(plan.plan!, "monthly")}
+                      disabled={checkingOut === `${plan.plan}_monthly`}
                       className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
                         plan.highlighted
                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
                           : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
                       }`}
                     >
-                      {checkingOut === `${plan.plan}_setup` ? "Redirecting..." : "Start Setup"}
+                      {checkingOut === `${plan.plan}_monthly` ? "Redirecting..." : "Monthly Billing"}
                       <ArrowRight className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => redirectToCheckout(plan.plan!, "monthly")}
-                      disabled={checkingOut === `${plan.plan}_monthly`}
+                      onClick={() => redirectToCheckout(plan.plan!, "setup")}
+                      disabled={checkingOut === `${plan.plan}_setup`}
                       className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
                     >
-                      {checkingOut === `${plan.plan}_monthly` ? "Redirecting..." : "Monthly Billing"}
+                      {checkingOut === `${plan.plan}_setup` ? "Redirecting..." : "Start Setup"}
                     </button>
                   </>
                 ) : (
