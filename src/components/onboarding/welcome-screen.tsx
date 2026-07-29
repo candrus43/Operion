@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
-import { useSession, signIn } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import {
   Globe,
@@ -376,9 +376,9 @@ export function WelcomeScreen({ userName }: { userName: string }) {
       {/* Option cards */}
       <div className="grid gap-3 w-full max-w-md mb-10">
         {/* Connect Google — primary card */}
-        <button
-          onClick={() => signIn("google")}
-          className="group relative rounded-xl bg-[#111111] border border-amber-500/20 p-5 text-left hover:bg-[#151515] hover:border-amber-500/30 transition-all w-full overflow-hidden"
+        <a
+          href="/api/auth/signin/google?callbackUrl=/home"
+          className="group relative rounded-xl bg-[#111111] border border-amber-500/20 p-5 text-left hover:bg-[#151515] hover:border-amber-500/30 transition-all w-full overflow-hidden block"
         >
           {/* Subtle highlight ring */}
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-500/5 to-transparent" />
@@ -397,12 +397,12 @@ export function WelcomeScreen({ userName }: { userName: string }) {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all -translate-x-1 group-hover:translate-x-0" />
           </div>
-        </button>
+        </a>
 
         {/* Connect Microsoft */}
-        <button
-          onClick={() => signIn("microsoft-entra-id")}
-          className="group relative rounded-xl bg-[#111111] border border-[#0078D4]/20 p-5 text-left hover:bg-[#151515] hover:border-[#0078D4]/30 transition-all w-full overflow-hidden"
+        <a
+          href="/api/auth/signin/microsoft?callbackUrl=/home"
+          className="group relative rounded-xl bg-[#111111] border border-[#0078D4]/20 p-5 text-left hover:bg-[#151515] hover:border-[#0078D4]/30 transition-all w-full overflow-hidden block"
         >
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0078D4]/5 to-transparent" />
           <div className="relative flex items-center gap-4">
@@ -415,7 +415,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all -translate-x-1 group-hover:translate-x-0" />
           </div>
-        </button>
+        </a>
 
         {/* Upload spreadsheet */}
         <button

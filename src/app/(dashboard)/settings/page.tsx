@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useSession, signIn } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { LogoUploader } from "./logo-uploader"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -223,15 +223,13 @@ export default function SettingsPage() {
                   </Button>
                 </>
               ) : (
-                <Button
-                  onClick={() => signIn("google")}
-                  variant="outline"
-                  size="sm"
-                  className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                <a
+                  href="/api/auth/signin/google?callbackUrl=/settings"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-9 px-3"
                 >
                   <Link className="mr-2 h-4 w-4" />
                   Connect Google
-                </Button>
+                </a>
               )}
             </div>
           </div>
