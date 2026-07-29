@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils"
-import { TrendingUp, AlertTriangle, Zap } from "lucide-react"
+import Link from "next/link"
+import { TrendingUp, AlertTriangle, Zap, ArrowUpRight } from "lucide-react"
 
 interface HealthScoreProps {
   score: number
@@ -81,12 +82,36 @@ export function HealthScore({ score, deductions, weeklyCompleted, className }: H
           {/* Deductions */}
           {deductions.length > 0 && (
             <div className="mt-3 space-y-1.5">
-              {deductions.map((d, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <AlertTriangle className="h-3 w-3 text-amber-400 shrink-0" />
-                  <span>{d}</span>
-                </div>
-              ))}
+              {deductions.map((d, i) => {
+                const deductionRoute = d.includes("overdue task")
+                  ? "/tasks?status=overdue"
+                  : d.includes("stalled project")
+                  ? "/projects"
+                  : d.includes("unassigned task")
+                  ? "/tasks?assignee=none"
+                  : null
+
+                if (deductionRoute) {
+                  return (
+                    <Link
+                      key={i}
+                      href={deductionRoute}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground/70 transition-colors group cursor-pointer"
+                    >
+                      <AlertTriangle className="h-3 w-3 text-amber-400 shrink-0" />
+                      <span>{d}</span>
+                      <ArrowUpRight className="h-3 w-3 text-muted-foreground/20 group-hover:text-foreground/40 transition-colors shrink-0" />
+                    </Link>
+                  )
+                }
+
+                return (
+                  <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <AlertTriangle className="h-3 w-3 text-amber-400 shrink-0" />
+                    <span>{d}</span>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>

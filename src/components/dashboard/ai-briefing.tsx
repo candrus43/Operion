@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 import {
   Sparkles,
   AlertTriangle,
@@ -215,24 +216,45 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
 
           {/* Alerts */}
           <div className="grid gap-2 sm:grid-cols-2">
-            {alerts.map((alert, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 text-xs",
-                  alert.includes("past due") || alert.includes("behind")
-                    ? "bg-red-500/5 text-red-400 border border-red-500/10"
-                    : alert.includes("stalled")
-                    ? "bg-orange-500/5 text-orange-400 border border-orange-500/10"
-                    : alert.includes("Nothing")
-                    ? "bg-emerald-500/5 text-emerald-400 border border-emerald-500/10"
-                    : "bg-amber-500/5 text-amber-400 border border-amber-500/10"
-                )}
-              >
-                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                <span>{alert}</span>
-              </div>
-            ))}
+            {alerts.map((alert, i) => {
+              const alertRoute = alert.includes("past due")
+                ? "/tasks?status=overdue"
+                : alert.includes("behind schedule")
+                ? "/projects"
+                : alert.includes("stalled")
+                ? "/projects"
+                : alert.includes("critical")
+                ? "/tasks?priority=CRITICAL"
+                : null
+
+              const alertClasses = cn(
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors group cursor-pointer",
+                alert.includes("past due") || alert.includes("behind")
+                  ? "bg-red-500/5 text-red-400 border border-red-500/10 hover:bg-red-500/10"
+                  : alert.includes("stalled")
+                  ? "bg-orange-500/5 text-orange-400 border border-orange-500/10 hover:bg-orange-500/10"
+                  : alert.includes("Nothing")
+                  ? "bg-emerald-500/5 text-emerald-400 border border-emerald-500/10"
+                  : "bg-amber-500/5 text-amber-400 border border-amber-500/10 hover:bg-amber-500/10"
+              )
+
+              if (alertRoute) {
+                return (
+                  <Link key={i} href={alertRoute} className={alertClasses}>
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{alert}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 text-current/30 group-hover:text-current/60 transition-colors shrink-0 ml-auto" />
+                  </Link>
+                )
+              }
+
+              return (
+                <div key={i} className={alertClasses}>
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  <span>{alert}</span>
+                </div>
+              )
+            })}
           </div>
 
           {/* Recommended Focus */}
@@ -248,8 +270,9 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
                 </p>
               ) : (
                 focusItems.map((item, i) => (
-                  <div
+                  <Link
                     key={item.id}
+                    href={`/tasks/${item.id}`}
                     className="flex items-center gap-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.05] transition-colors px-3 py-2 group cursor-pointer"
                   >
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-foreground/5 text-[10px] font-semibold text-muted-foreground">
@@ -286,7 +309,7 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
                       </div>
                     </div>
                     <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-foreground/50 transition-colors shrink-0" />
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
