@@ -13,16 +13,17 @@ export default auth((req) => {
                        req.nextUrl.pathname === "/trial-expired"
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
+  const isDebugRoute = req.nextUrl.pathname.startsWith("/api/debug")
   const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
 
   // Skip enforcement for public routes, auth, etc.
   const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || 
-                        isAuthPage || isPublicPage || isDemoRoute
+                        isAuthPage || isPublicPage || isDemoRoute || isDebugRoute
 
   if (isApiAuth || isRegisterApi || isStripeWebhook) return NextResponse.next()
 
-  if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute) {
+  if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute && !isDebugRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
