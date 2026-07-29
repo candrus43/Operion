@@ -48,8 +48,17 @@ export async function POST(request: Request) {
 
     const stripe = getStripe()
 
-    // Create or retrieve Stripe customer
+    // Create or retrieve Stripe customer — handle mode mismatch
     let stripeCustomerId = org.stripeCustomerId
+    if (stripeCustomerId) {
+      try {
+        // Verify the customer is accessible with current key
+        await stripe.customers.retrieve(stripeCustomerId)
+      } catch {
+        // Customer doesn't exist in this mode — clear it and create new
+        stripeCustomerId = null
+      }
+    }
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
         name: org.name,
