@@ -1,30 +1,36 @@
-/**
- * Email utility for Operion.
- *
- * Currently logs to console with [EMAIL] prefix.
- * To connect a real provider (Resend, SendGrid, etc.), replace the body
- * of sendEmail() — the rest of the app calls this one function.
- */
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface SendEmailParams {
-  to: string
-  subject: string
-  body: string
+  to: string;
+  subject: string;
+  body: string;
 }
 
 export async function sendEmail({ to, subject, body }: SendEmailParams) {
-  console.log("[EMAIL] ========================================")
-  console.log(`[EMAIL] To:      ${to}`)
-  console.log(`[EMAIL] Subject: ${subject}`)
-  console.log(`[EMAIL] Body:    ${body}`)
-  console.log("[EMAIL] ========================================")
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Operion <hello@operion.online>",
+      to: [to],
+      subject,
+      text: body,
+    });
 
-  // TODO: replace with real email provider
-  // e.g. await resend.emails.send({ from, to, subject, html: body })
+    if (error) {
+      console.error("[EMAIL] Resend error:", error);
+      return;
+    }
+
+    console.log("[EMAIL] Sent:", data?.id);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send:", err);
+    // Never throw — email failure should not break the caller
+  }
 }
 
 export async function sendWelcomeEmail(to: string, name: string) {
-  const subject = "Welcome to Operion — your AI Chief of Staff"
+  const subject = "Welcome to Operion — your AI Chief of Staff";
   const body = [
     `Hi ${name},`,
     "",
@@ -34,12 +40,12 @@ export async function sendWelcomeEmail(to: string, name: string) {
     "across your companies, properties, and investments, with AI that",
     "tells you what needs attention before you ask.",
     "",
-    "Get started: https://operion.ctonew.app/login",
+    "Get started: https://operion.online/login",
     "",
     "Need help? Just reply to this email.",
     "",
     "— The Operion Team",
-  ].join("\n")
+  ].join("\n");
 
-  await sendEmail({ to, subject, body })
+  await sendEmail({ to, subject, body });
 }
