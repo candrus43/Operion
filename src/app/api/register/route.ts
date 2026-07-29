@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/db"
-import { sendWelcomeEmail } from "@/lib/email"
 
 function slugify(name: string): string {
   return name
@@ -63,10 +62,15 @@ export async function POST(req: Request) {
       },
     })
 
-    // Send welcome email (fire-and-forget — don't block registration on email failure)
-    sendWelcomeEmail(email, name).catch((err) =>
-      console.error("Failed to send welcome email:", err)
-    )
+    // Send welcome email (fully dynamic — keeps resend out of build)
+    try {
+      const { sendWelcomeEmail } = await import("@/lib/email")
+      sendWelcomeEmail(email, name).catch((err) =>
+        console.error("Failed to send welcome email:", err)
+      )
+    } catch {
+      // Non-critical — registration succeeded
+    }
 
     return NextResponse.json({
       id: user.id,
