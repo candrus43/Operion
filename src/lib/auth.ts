@@ -5,9 +5,11 @@ import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 import { compare } from "bcryptjs"
 import { prisma } from "./db"
 
+const isSecure = process.env.NODE_ENV === "production" || (process.env.NEXTAUTH_URL || "").startsWith("https://")
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  useSecureCookies: true,
+  useSecureCookies: isSecure,
   cookies: {
     sessionToken: {
       name: `__Secure-authjs.session-token`,
@@ -15,7 +17,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: true,
+        secure: isSecure,
       },
     },
     callbackUrl: {
@@ -23,7 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       options: {
         sameSite: "lax",
         path: "/",
-        secure: true,
+        secure: isSecure,
       },
     },
     csrfToken: {
@@ -32,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: true,
+        secure: isSecure,
       },
     },
   },
@@ -105,7 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       // Debug: log sign-in attempt
-      console.log("[AUTH signIn] provider:", account?.provider, "email:", user?.email, "user.id:", user?.id)
+      // console.log("[AUTH signIn] provider:", account?.provider, "email:", user?.email, "user.id:", user?.id)
 
       if (account?.provider === "google") {
         // Ensure organization exists (or link user to existing org by email)
@@ -117,13 +119,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           if (existingUser) {
             // Link the Google account to the existing user
-            console.log("[AUTH signIn] Existing user found, id:", existingUser.id)
+            // console.log("[AUTH signIn] Existing user found, id:", existingUser.id)
             // Set user id to existing db user id so JWT callback can use it
             ;(user as any).dbId = existingUser.id
             ;(user as any).role = existingUser.role
             ;(user as any).organizationId = existingUser.organizationId
           } else {
-            console.log("[AUTH signIn] New Google user — no existing DB user for email:", user.email)
+            // console.log("[AUTH signIn] New Google user — no existing DB user for email:", user.email)
             // For now, allow sign-in even without DB user (JWT-only session)
             // The user will need onboarding to create an organization
           }
@@ -139,12 +141,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           })
 
           if (existingUser) {
-            console.log("[AUTH signIn] Existing user found for Microsoft, id:", existingUser.id)
+            // console.log("[AUTH signIn] Existing user found for Microsoft, id:", existingUser.id)
             ;(user as any).dbId = existingUser.id
             ;(user as any).role = existingUser.role
             ;(user as any).organizationId = existingUser.organizationId
           } else {
-            console.log("[AUTH signIn] New Microsoft user — no existing DB user for email:", user.email)
+            // console.log("[AUTH signIn] New Microsoft user — no existing DB user for email:", user.email)
           }
         } catch (e) {
           console.error("[AUTH signIn] Error looking up user for Microsoft:", e)
@@ -154,7 +156,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true // Allow all sign-ins
     },
     async jwt({ token, user, account, trigger }) {
-      console.log("[AUTH jwt] ENTER — trigger:", trigger, "hasUser:", !!user, "hasAccount:", !!account, "provider:", account?.provider)
+      // console.log("[AUTH jwt] ENTER — trigger:", trigger, "hasUser:", !!user, "hasAccount:", !!account, "provider:", account?.provider)
 
       if (user) {
         // Use db-linked id if available (set in signIn callback), otherwise use the OAuth sub
@@ -163,7 +165,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.organizationId = (user as any).organizationId ?? ""
         token.email = user.email ?? ""
 
-        console.log("[AUTH jwt] user block — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
+        // console.log("[AUTH jwt] user block — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
 
         // Fetch org billing info on sign-in so it's available in the session
         if (token.organizationId) {
@@ -182,7 +184,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               token.subscriptionStatus = org.subscriptionStatus
               token.googleConnected = org.googleConnected
               token.microsoftConnected = org.microsoftConnected
-              console.log("[AUTH jwt] org fetch OK — subscriptionStatus:", org.subscriptionStatus, "googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
+              // console.log("[AUTH jwt] org fetch OK — subscriptionStatus:", org.subscriptionStatus, "googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
             }
           } catch (e) {
             console.error("[AUTH jwt] org fetch failed:", e)
@@ -196,7 +198,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.googleTokenExpiry = account.expires_at
           token.googleConnected = true
 
-          console.log("[AUTH jwt] Google tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
+          // console.log("[AUTH jwt] Google tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
 
           // Persist refresh token to database
           if (account.refresh_token && token.organizationId) {
@@ -210,7 +212,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                   googleConnected: true,
                 },
               })
-              console.log("[AUTH jwt] Google tokens persisted to DB")
+              // console.log("[AUTH jwt] Google tokens persisted to DB")
             } catch (e) {
               console.error("[AUTH jwt] Failed to store Google tokens:", e)
             }
@@ -224,7 +226,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.microsoftTokenExpiry = account.expires_at
           token.microsoftConnected = true
 
-          console.log("[AUTH jwt] Microsoft tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
+          // console.log("[AUTH jwt] Microsoft tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
 
           // Persist refresh token to database
           if (account.refresh_token && token.organizationId) {
@@ -238,7 +240,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                   microsoftConnected: true,
                 },
               })
-              console.log("[AUTH jwt] Microsoft tokens persisted to DB")
+              // console.log("[AUTH jwt] Microsoft tokens persisted to DB")
             } catch (e) {
               console.error("[AUTH jwt] Failed to store Microsoft tokens:", e)
             }
@@ -254,18 +256,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (org) {
             token.googleConnected = org.googleConnected
             token.microsoftConnected = org.microsoftConnected
-            console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
+            // console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
           }
         } catch (e) {
           console.error("[AUTH jwt] Org re-fetch failed:", e)
         }
       }
 
-      console.log("[AUTH jwt] EXIT — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
+      // console.log("[AUTH jwt] EXIT — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       return token
     },
     async session({ session, token }) {
-      console.log("[AUTH session] ENTER — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
+      // console.log("[AUTH session] ENTER — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
@@ -275,7 +277,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.googleConnected = token.googleConnected ?? false
         session.user.microsoftConnected = token.microsoftConnected ?? false
       }
-      console.log("[AUTH session] EXIT — session.user:", JSON.stringify(session.user))
+      // console.log("[AUTH session] EXIT — session.user:", JSON.stringify(session.user))
       return session
     },
   },

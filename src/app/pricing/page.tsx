@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, Mail } from "lucide-react"
+import { toast } from "sonner"
 
 export default function PricingPage() {
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
@@ -17,7 +18,7 @@ export default function PricingPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        alert(data.error || "Checkout failed")
+        toast.error(data.error || "Checkout failed")
         setCheckingOut(null)
         return
       }

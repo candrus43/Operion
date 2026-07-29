@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect, notFound } from "next/navigation"
+import { revalidatePath } from "next/cache"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -378,9 +379,12 @@ export default async function TaskDetailPage({
                   "use server"
                   const { auth } = await import("@/lib/auth")
                   const { prisma } = await import("@/lib/db")
+                  const { revalidatePath: rp } = await import("next/cache")
                   const s = await auth()
                   if (!s?.user) return
                   await prisma.task.update({ where: { id: task.id }, data: { status: "IN_PROGRESS" } })
+                  rp("/tasks")
+                  rp(`/tasks/${task.id}`)
                 }}>
                   <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
                     <PlayCircle className="h-4 w-4 text-blue-400" />
@@ -393,9 +397,12 @@ export default async function TaskDetailPage({
                   "use server"
                   const { auth } = await import("@/lib/auth")
                   const { prisma } = await import("@/lib/db")
+                  const { revalidatePath: rp } = await import("next/cache")
                   const s = await auth()
                   if (!s?.user) return
                   await prisma.task.update({ where: { id: task.id }, data: { status: "DONE" } })
+                  rp("/tasks")
+                  rp(`/tasks/${task.id}`)
                 }}>
                   <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -408,9 +415,12 @@ export default async function TaskDetailPage({
                   "use server"
                   const { auth } = await import("@/lib/auth")
                   const { prisma } = await import("@/lib/db")
+                  const { revalidatePath: rp } = await import("next/cache")
                   const s = await auth()
                   if (!s?.user) return
                   await prisma.task.update({ where: { id: task.id }, data: { status: "BLOCKED" } })
+                  rp("/tasks")
+                  rp(`/tasks/${task.id}`)
                 }}>
                   <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
                     <Ban className="h-4 w-4 text-red-400" />
@@ -423,9 +433,12 @@ export default async function TaskDetailPage({
                   "use server"
                   const { auth } = await import("@/lib/auth")
                   const { prisma } = await import("@/lib/db")
+                  const { revalidatePath: rp } = await import("next/cache")
                   const s = await auth()
                   if (!s?.user) return
                   await prisma.task.update({ where: { id: task.id }, data: { status: "WAITING_ON" } })
+                  rp("/tasks")
+                  rp(`/tasks/${task.id}`)
                 }}>
                   <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
                     <Clock className="h-4 w-4 text-amber-400" />
