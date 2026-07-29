@@ -125,8 +125,7 @@ export function TrialBanner() {
         <div className="flex items-center gap-2 min-w-0">
           <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           <p className="text-xs text-muted-foreground">
-            14-day free trial ·{" "}
-            <span className="text-foreground/70 font-medium">{daysRemaining} days left</span>
+            {daysRemaining} {daysRemaining === 1 ? "day" : "days"} left in your free trial
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

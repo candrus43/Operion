@@ -13,6 +13,11 @@ export default auth((req) => {
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
   const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
+  const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
+
+  // Skip enforcement for public routes, auth, etc.
+  const isExemptRoute = isApiAuth || isStripeWebhook || isStripeApi || 
+                        isAuthPage || isPublicPage || isDemoRoute
 
   if (isApiAuth || isStripeWebhook) return NextResponse.next()
 
@@ -27,6 +32,14 @@ export default auth((req) => {
   // Redirect authenticated users from landing page to dashboard
   if (isAuth && req.nextUrl.pathname === "/") {
     return NextResponse.redirect(new URL("/home", req.url))
+  }
+
+  // Redirect expired users to trial-expired page (skip exempt routes)
+  if (isAuth && !isExemptRoute) {
+    const subscriptionStatus = req.auth?.user?.subscriptionStatus
+    if (subscriptionStatus === "EXPIRED") {
+      return NextResponse.redirect(new URL("/trial-expired", req.url))
+    }
   }
 
   return NextResponse.next()
