@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 import { compare } from "bcryptjs"
 import { prisma } from "./db"
 
@@ -45,6 +46,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           access_type: "offline",
           response_type: "code",
           scope: "openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/drive.readonly",
+        },
+      },
+    }),
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID!,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET!,
+      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
+      authorization: {
+        params: {
+          scope: "openid email profile Mail.Read Calendars.Read Files.Read offline_access",
         },
       },
     }),
@@ -121,6 +132,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
+      if (account?.provider === "microsoft-entra-id") {
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+          })
+
+          if (existingUser) {
+            console.log("[AUTH signIn] Existing user found for Microsoft, id:", existingUser.id)
+            ;(user as any).dbId = existingUser.id
+            ;(user as any).role = existingUser.role
+            ;(user as any).organizationId = existingUser.organizationId
+          } else {
+            console.log("[AUTH signIn] New Microsoft user — no existing DB user for email:", user.email)
+          }
+        } catch (e) {
+          console.error("[AUTH signIn] Error looking up user for Microsoft:", e)
+        }
+      }
+
       return true // Allow all sign-ins
     },
     async jwt({ token, user, account, trigger }) {
@@ -144,13 +174,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 stripeCustomerId: true,
                 subscriptionStatus: true,
                 googleConnected: true,
+                microsoftConnected: true,
               },
             })
             if (org) {
               token.stripeCustomerId = org.stripeCustomerId ?? undefined
               token.subscriptionStatus = org.subscriptionStatus
               token.googleConnected = org.googleConnected
-              console.log("[AUTH jwt] org fetch OK — subscriptionStatus:", org.subscriptionStatus, "googleConnected:", org.googleConnected)
+              token.microsoftConnected = org.microsoftConnected
+              console.log("[AUTH jwt] org fetch OK — subscriptionStatus:", org.subscriptionStatus, "googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
             }
           } catch (e) {
             console.error("[AUTH jwt] org fetch failed:", e)
@@ -184,16 +216,45 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           }
         }
+
+        // Store Microsoft tokens when connecting
+        if (account && account.provider === "microsoft-entra-id") {
+          token.microsoftAccessToken = account.access_token
+          token.microsoftRefreshToken = account.refresh_token
+          token.microsoftTokenExpiry = account.expires_at
+          token.microsoftConnected = true
+
+          console.log("[AUTH jwt] Microsoft tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
+
+          // Persist refresh token to database
+          if (account.refresh_token && token.organizationId) {
+            try {
+              await prisma.organization.update({
+                where: { id: token.organizationId as string },
+                data: {
+                  microsoftRefreshToken: account.refresh_token,
+                  microsoftAccessToken: account.access_token,
+                  microsoftTokenExpiry: account.expires_at,
+                  microsoftConnected: true,
+                },
+              })
+              console.log("[AUTH jwt] Microsoft tokens persisted to DB")
+            } catch (e) {
+              console.error("[AUTH jwt] Failed to store Microsoft tokens:", e)
+            }
+          }
+        }
       } else if (token.organizationId) {
         // Re-fetch googleConnected status from DB so disconnects take effect
         try {
           const org = await prisma.organization.findUnique({
             where: { id: token.organizationId as string },
-            select: { googleConnected: true },
+            select: { googleConnected: true, microsoftConnected: true },
           })
           if (org) {
             token.googleConnected = org.googleConnected
-            console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected)
+            token.microsoftConnected = org.microsoftConnected
+            console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
           }
         } catch (e) {
           console.error("[AUTH jwt] Org re-fetch failed:", e)
@@ -212,6 +273,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.stripeCustomerId = token.stripeCustomerId
         session.user.subscriptionStatus = token.subscriptionStatus
         session.user.googleConnected = token.googleConnected ?? false
+        session.user.microsoftConnected = token.microsoftConnected ?? false
       }
       console.log("[AUTH session] EXIT — session.user:", JSON.stringify(session.user))
       return session

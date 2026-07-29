@@ -16,6 +16,7 @@ export default function SettingsPage() {
   const [exporting, setExporting] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
+  const [disconnectingMicrosoft, setDisconnectingMicrosoft] = useState(false)
 
   if (status === "loading") return null
   if (!session?.user) redirect("/login")
@@ -79,7 +80,25 @@ export default function SettingsPage() {
     }
   }
 
+  const handleMicrosoftDisconnect = async () => {
+    setDisconnectingMicrosoft(true)
+    try {
+      const res = await fetch("/api/connections/microsoft/disconnect", {
+        method: "POST",
+      })
+      if (!res.ok) throw new Error("Disconnect failed")
+      toast.success("Microsoft account disconnected")
+      await update()
+    } catch (err) {
+      console.error("Microsoft disconnect failed:", err)
+      toast.error("Failed to disconnect Microsoft account")
+    } finally {
+      setDisconnectingMicrosoft(false)
+    }
+  }
+
   const googleConnected = session.user.googleConnected ?? false
+  const microsoftConnected = session.user.microsoftConnected ?? false
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -142,7 +161,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-lg">Connected Accounts</CardTitle>
           <CardDescription>
-            Connect your Google account to enable Gmail, Calendar, and Drive
+            Connect your Google or Microsoft account to enable email, calendar, and file
             integrations across Operion.
           </CardDescription>
         </CardHeader>
@@ -213,6 +232,62 @@ export default function SettingsPage() {
                   <Link className="mr-2 h-4 w-4" />
                   Connect Google
                 </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Microsoft */}
+          <div className="flex items-center justify-between rounded-lg border border-[#262626] bg-[#0d0d0d] p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1a1a1a]">
+                <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
+                  <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
+                  <path d="M20 1H11V10H20V1Z" fill="#7FBA00"/>
+                  <path d="M20 11H11V20H20V11Z" fill="#00A4EF"/>
+                  <path d="M10 11H1V20H10V11Z" fill="#FFB900"/>
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">Microsoft</p>
+                <p className="text-xs text-muted-foreground">
+                  {microsoftConnected
+                    ? "Outlook, Calendar, OneDrive"
+                    : "Connect to access Outlook, Calendar & OneDrive"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {microsoftConnected ? (
+                <>
+                  <Badge
+                    variant="outline"
+                    className="border-green-500/30 bg-green-500/10 text-green-400"
+                  >
+                    <Check className="mr-1 h-3 w-3" />
+                    Connected
+                  </Badge>
+                  <Button
+                    onClick={handleMicrosoftDisconnect}
+                    disabled={disconnectingMicrosoft}
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
+                  >
+                    {disconnectingMicrosoft ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Unlink className="h-4 w-4" />
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <a
+                  href="/api/auth/signin/microsoft?callbackUrl=/settings"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-9 px-3"
+                >
+                  <Link className="mr-2 h-4 w-4" />
+                  Connect Microsoft
+                </a>
               )}
             </div>
           </div>

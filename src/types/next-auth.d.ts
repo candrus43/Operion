@@ -10,6 +10,7 @@ declare module "next-auth" {
       stripeCustomerId?: string
       subscriptionStatus?: string
       googleConnected?: boolean
+      microsoftConnected?: boolean
     } & DefaultSession["user"]
   }
 
@@ -30,5 +31,9 @@ declare module "next-auth/jwt" {
     googleRefreshToken?: string
     googleTokenExpiry?: number
     googleConnected?: boolean
+    microsoftAccessToken?: string
+    microsoftRefreshToken?: string
+    microsoftTokenExpiry?: number
+    microsoftConnected?: boolean
   }
 }

@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Loader2,
   Check,
+  Mail,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DiscoveryFeed, type DiscoveryItem } from "./discovery-feed"
@@ -393,6 +394,24 @@ export function WelcomeScreen({ userName }: { userName: string }) {
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">Gmail · Calendar · Drive</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all -translate-x-1 group-hover:translate-x-0" />
+          </div>
+        </button>
+
+        {/* Connect Microsoft */}
+        <button
+          onClick={() => signIn("microsoft-entra-id")}
+          className="group relative rounded-xl bg-[#111111] border border-[#0078D4]/20 p-5 text-left hover:bg-[#151515] hover:border-[#0078D4]/30 transition-all w-full overflow-hidden"
+        >
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0078D4]/5 to-transparent" />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0078D4]/10">
+              <Mail className="h-5 w-5 text-[#0078D4]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold">Connect Microsoft</h3>
+              <p className="text-xs text-muted-foreground">Outlook · Calendar · OneDrive</p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all -translate-x-1 group-hover:translate-x-0" />
           </div>
