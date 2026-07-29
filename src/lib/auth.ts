@@ -6,6 +6,35 @@ import { prisma } from "./db"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
+  useSecureCookies: true,
+  cookies: {
+    sessionToken: {
+      name: `__Secure-authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-authjs.callback-url`,
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: `__Host-authjs.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -60,31 +89,72 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async signIn({ user, account, profile }) {
+      // Debug: log sign-in attempt
+      console.log("[AUTH signIn] provider:", account?.provider, "email:", user?.email, "user.id:", user?.id)
+
+      if (account?.provider === "google") {
+        // Ensure organization exists (or link user to existing org by email)
+        try {
+          // Check if there's an existing user with this email
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+          })
+
+          if (existingUser) {
+            // Link the Google account to the existing user
+            console.log("[AUTH signIn] Existing user found, id:", existingUser.id)
+            // Set user id to existing db user id so JWT callback can use it
+            ;(user as any).dbId = existingUser.id
+            ;(user as any).role = existingUser.role
+            ;(user as any).organizationId = existingUser.organizationId
+          } else {
+            console.log("[AUTH signIn] New Google user — no existing DB user for email:", user.email)
+            // For now, allow sign-in even without DB user (JWT-only session)
+            // The user will need onboarding to create an organization
+          }
+        } catch (e) {
+          console.error("[AUTH signIn] Error looking up user:", e)
+        }
+      }
+
+      return true // Allow all sign-ins
+    },
+    async jwt({ token, user, account, trigger }) {
+      console.log("[AUTH jwt] ENTER — trigger:", trigger, "hasUser:", !!user, "hasAccount:", !!account, "provider:", account?.provider)
+
       if (user) {
-        token.role = user.role ?? "STAFF"
-        token.organizationId = user.organizationId ?? ""
-        token.id = user.id ?? ""
+        // Use db-linked id if available (set in signIn callback), otherwise use the OAuth sub
+        token.id = (user as any).dbId || user.id || ""
+        token.role = (user as any).role ?? "STAFF"
+        token.organizationId = (user as any).organizationId ?? ""
+        token.email = user.email ?? ""
+
+        console.log("[AUTH jwt] user block — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
 
         // Fetch org billing info on sign-in so it's available in the session
-        try {
-          const org = await prisma.organization.findUnique({
-            where: { id: user.organizationId as string },
-            select: {
-              stripeCustomerId: true,
-              subscriptionStatus: true,
-              googleConnected: true,
-            },
-          })
-          if (org) {
-            token.stripeCustomerId = org.stripeCustomerId ?? undefined
-            token.subscriptionStatus = org.subscriptionStatus
-            token.googleConnected = org.googleConnected
+        if (token.organizationId) {
+          try {
+            const org = await prisma.organization.findUnique({
+              where: { id: token.organizationId as string },
+              select: {
+                stripeCustomerId: true,
+                subscriptionStatus: true,
+                googleConnected: true,
+              },
+            })
+            if (org) {
+              token.stripeCustomerId = org.stripeCustomerId ?? undefined
+              token.subscriptionStatus = org.subscriptionStatus
+              token.googleConnected = org.googleConnected
+              console.log("[AUTH jwt] org fetch OK — subscriptionStatus:", org.subscriptionStatus, "googleConnected:", org.googleConnected)
+            }
+          } catch (e) {
+            console.error("[AUTH jwt] org fetch failed:", e)
           }
-        } catch {
-          // Non-fatal: session just won't have billing info
         }
 
         // Store Google tokens when connecting
@@ -94,11 +164,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.googleTokenExpiry = account.expires_at
           token.googleConnected = true
 
+          console.log("[AUTH jwt] Google tokens stored in JWT. hasRefreshToken:", !!account.refresh_token)
+
           // Persist refresh token to database
-          if (account.refresh_token) {
+          if (account.refresh_token && token.organizationId) {
             try {
               await prisma.organization.update({
-                where: { id: user.organizationId as string },
+                where: { id: token.organizationId as string },
                 data: {
                   googleRefreshToken: account.refresh_token,
                   googleAccessToken: account.access_token,
@@ -106,8 +178,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                   googleConnected: true,
                 },
               })
+              console.log("[AUTH jwt] Google tokens persisted to DB")
             } catch (e) {
-              console.error("Failed to store Google tokens:", e)
+              console.error("[AUTH jwt] Failed to store Google tokens:", e)
             }
           }
         }
@@ -120,14 +193,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           })
           if (org) {
             token.googleConnected = org.googleConnected
+            console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected)
           }
-        } catch {
-          // Non-fatal
+        } catch (e) {
+          console.error("[AUTH jwt] Org re-fetch failed:", e)
         }
       }
+
+      console.log("[AUTH jwt] EXIT — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       return token
     },
     async session({ session, token }) {
+      console.log("[AUTH session] ENTER — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
@@ -136,6 +213,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.subscriptionStatus = token.subscriptionStatus
         session.user.googleConnected = token.googleConnected ?? false
       }
+      console.log("[AUTH session] EXIT — session.user:", JSON.stringify(session.user))
       return session
     },
   },
