@@ -103,7 +103,7 @@ export function TrialBanner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={() => redirectToCheckout("SOLO", "monthly")}
+            onClick={() => redirectToCheckout("TEAM", "monthly")}
             disabled={checkingOut}
             className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-8 px-4 border border-amber-700/50 bg-amber-900/20 text-amber-200 hover:bg-amber-900/40 transition-colors disabled:opacity-50"
           >
@@ -135,7 +135,7 @@ export function TrialBanner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={() => redirectToCheckout("SOLO", "monthly")}
+            onClick={() => redirectToCheckout("TEAM", "monthly")}
             disabled={checkingOut}
             className="inline-flex items-center justify-center rounded-md h-7 px-3 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
           >
