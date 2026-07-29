@@ -62,15 +62,8 @@ export async function POST(req: Request) {
       },
     })
 
-    // Send welcome email (fully dynamic — keeps resend out of build)
-    try {
-      const { sendWelcomeEmail } = await import("@/lib/email")
-      sendWelcomeEmail(email, name).catch((err) =>
-        console.error("Failed to send welcome email:", err)
-      )
-    } catch {
-      // Non-critical — registration succeeded
-    }
+    // TODO: Re-enable welcome email once Resend build issue is resolved
+    // Requires making Turbopack ignore the resend module during build
 
     return NextResponse.json({
       id: user.id,
