@@ -215,21 +215,23 @@ const features = [
               </div>
               <div className="px-6 pb-6 space-y-2">
                 {plan.plan ? (
-                  <button
-                    onClick={() => redirectToCheckout(plan.plan!)}
-                    disabled={checkingOut === plan.plan}
-                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
-                      plan.highlighted
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                    }`}
-                  >
-                    {checkingOut === plan.plan ? "Redirecting..." : "Subscribe"}
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <p className="text-xs text-muted-foreground text-center">
-                    {plan.setupFee} setup billed today · monthly starts in 30 days
-                  </p>
+                  <>
+                    <button
+                      onClick={() => redirectToCheckout(plan.plan!)}
+                      disabled={checkingOut === plan.plan}
+                      className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
+                        plan.highlighted
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                      }`}
+                    >
+                      {checkingOut === plan.plan ? "Redirecting..." : "Subscribe"}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      {plan.setupFee} setup billed today · monthly starts in 30 days
+                    </p>
+                  </>
                 ) : (
                   <a
                     href="mailto:hello@operion.ai"
