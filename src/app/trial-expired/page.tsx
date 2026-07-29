@@ -1,16 +1,28 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail } from "lucide-react"
 
-const STRIPE_LINKS = {
-  solo: "https://buy.stripe.com/fZucN5cWhgKf5Je08k1wY0f",
-  soloSetup: "https://buy.stripe.com/bJe6oH09v65B9ZubR21wY0h",
-  team: "https://buy.stripe.com/8x27sLg8teC75Je9IU1wY0g",
-  teamSetup: "https://buy.stripe.com/3cI8wPf4pctZ9Zu2gs1wY0i",
-}
-
 export default function TrialExpiredPage() {
+  const [checkingOut, setCheckingOut] = useState<string | null>(null)
+
+  async function redirectToCheckout(plan: "SOLO" | "TEAM", mode: "setup" | "monthly") {
+    setCheckingOut(`${plan}_${mode}`)
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, mode }),
+      })
+      const { url } = await res.json()
+      if (url) {
+        window.location.href = url
+      }
+    } catch {
+      setCheckingOut(null)
+    }
+  }
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
       <div className="w-full max-w-5xl space-y-10">
@@ -75,23 +87,21 @@ export default function TrialExpiredPage() {
             </ul>
 
             <div className="space-y-2">
-              <a
-                href={STRIPE_LINKS.soloSetup}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => redirectToCheckout("SOLO", "setup")}
+                disabled={checkingOut === "SOLO_setup"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full"
               >
-                Start Setup
+                {checkingOut === "SOLO_setup" ? "Redirecting..." : "Start Setup"}
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-              <a
-                href={STRIPE_LINKS.solo}
-                target="_blank"
-                rel="noopener noreferrer"
+              </button>
+              <button
+                onClick={() => redirectToCheckout("SOLO", "monthly")}
+                disabled={checkingOut === "SOLO_monthly"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
               >
-                Monthly Billing
-              </a>
+                {checkingOut === "SOLO_monthly" ? "Redirecting..." : "Monthly Billing"}
+              </button>
             </div>
           </div>
 
@@ -144,23 +154,21 @@ export default function TrialExpiredPage() {
             </ul>
 
             <div className="space-y-2">
-              <a
-                href={STRIPE_LINKS.teamSetup}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => redirectToCheckout("TEAM", "setup")}
+                disabled={checkingOut === "TEAM_setup"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-500 hover:bg-amber-400 text-black h-11 px-8 w-full"
               >
-                Start Setup
+                {checkingOut === "TEAM_setup" ? "Redirecting..." : "Start Setup"}
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-              <a
-                href={STRIPE_LINKS.team}
-                target="_blank"
-                rel="noopener noreferrer"
+              </button>
+              <button
+                onClick={() => redirectToCheckout("TEAM", "monthly")}
+                disabled={checkingOut === "TEAM_monthly"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
               >
-                Monthly Billing
-              </a>
+                {checkingOut === "TEAM_monthly" ? "Redirecting..." : "Monthly Billing"}
+              </button>
             </div>
           </div>
 

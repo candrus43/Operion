@@ -1,16 +1,38 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, Mail } from "lucide-react"
 
-const plans = [
+export default function PricingPage() {
+  const [checkingOut, setCheckingOut] = useState<string | null>(null)
+
+  async function redirectToCheckout(plan: "SOLO" | "TEAM", mode: "setup" | "monthly") {
+    setCheckingOut(`${plan}_${mode}`)
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, mode }),
+      })
+      const { url } = await res.json()
+      if (url) {
+        window.location.href = url
+      }
+    } catch {
+      setCheckingOut(null)
+    }
+  }
+
+  const plans = [
   {
     name: "Solo",
     setupFee: "$2,500",
     setupPeriod: "one-time",
-    setupHref: "https://buy.stripe.com/bJe6oH09v65B9ZubR21wY0h",
+    plan: "SOLO" as const,
     price: "$249",
     period: "/month",
     description: "For solo operators managing a small portfolio.",
-    href: "https://buy.stripe.com/fZucN5cWhgKf5Je08k1wY0f",
     features: [
       { text: "1 user seat", included: true },
       { text: "Up to 3 entities", included: true },
@@ -29,11 +51,10 @@ const plans = [
     name: "Team",
     setupFee: "$5,000",
     setupPeriod: "one-time",
-    setupHref: "https://buy.stripe.com/3cI8wPf4pctZ9Zu2gs1wY0i",
+    plan: "TEAM" as const,
     price: "$499",
     period: "/month",
     description: "For owners and teams running multiple entities.",
-    href: "https://buy.stripe.com/8x27sLg8teC5Je9IU1wY0g",
     features: [
       { text: "Up to 5 user seats", included: true },
       { text: "Up to 25 entities", included: true },
@@ -52,11 +73,10 @@ const plans = [
     name: "Enterprise",
     setupFee: "$10,000+",
     setupPeriod: "one-time",
-    setupHref: null,
+    plan: null,
     price: "$999",
     period: "/month",
     description: "For organizations with advanced needs and scale.",
-    href: null,
     features: [
       { text: "Unlimited user seats", included: true },
       { text: "Unlimited entities", included: true },
@@ -106,7 +126,6 @@ const features = [
   },
 ]
 
-export default function PricingPage() {
   return (
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
@@ -190,38 +209,28 @@ export default function PricingPage() {
                 </ul>
               </div>
               <div className="px-6 pb-6 space-y-2">
-                {plan.setupHref ? (
-                  <a
-                    href={plan.setupHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors ${
-                      plan.highlighted
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                    }`}
-                  >
-                    Start Setup
-                    <ArrowRight className="h-4 w-4" />
-                  </a>
-                ) : (
-                  <a
-                    href="mailto:hello@operion.ai"
-                    className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                  >
-                    <Mail className="h-4 w-4" />
-                    Contact us
-                  </a>
-                )}
-                {plan.href ? (
-                  <a
-                    href={plan.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]`}
-                  >
-                    Monthly Billing
-                  </a>
+                {plan.plan ? (
+                  <>
+                    <button
+                      onClick={() => redirectToCheckout(plan.plan!, "setup")}
+                      disabled={checkingOut === `${plan.plan}_setup`}
+                      className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
+                        plan.highlighted
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                      }`}
+                    >
+                      {checkingOut === `${plan.plan}_setup` ? "Redirecting..." : "Start Setup"}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => redirectToCheckout(plan.plan!, "monthly")}
+                      disabled={checkingOut === `${plan.plan}_monthly`}
+                      className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                    >
+                      {checkingOut === `${plan.plan}_monthly` ? "Redirecting..." : "Monthly Billing"}
+                    </button>
+                  </>
                 ) : (
                   <a
                     href="mailto:hello@operion.ai"
