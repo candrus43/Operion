@@ -7,13 +7,13 @@ import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, 
 export default function PricingPage() {
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
 
-  async function redirectToCheckout(plan: "SOLO" | "TEAM", mode: "setup" | "monthly") {
-    setCheckingOut(`${plan}_${mode}`)
+  async function redirectToCheckout(plan: "SOLO" | "TEAM") {
+    setCheckingOut(plan)
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, mode }),
+        body: JSON.stringify({ plan, mode: "monthly" }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -215,27 +215,21 @@ const features = [
               </div>
               <div className="px-6 pb-6 space-y-2">
                 {plan.plan ? (
-                  <>
-                    <button
-                      onClick={() => redirectToCheckout(plan.plan!, "monthly")}
-                      disabled={checkingOut === `${plan.plan}_monthly`}
-                      className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
-                        plan.highlighted
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                          : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                      }`}
-                    >
-                      {checkingOut === `${plan.plan}_monthly` ? "Redirecting..." : "Monthly Billing"}
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => redirectToCheckout(plan.plan!, "setup")}
-                      disabled={checkingOut === `${plan.plan}_setup`}
-                      className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
-                    >
-                      {checkingOut === `${plan.plan}_setup` ? "Redirecting..." : "Start Setup"}
-                    </button>
-                  </>
+                  <button
+                    onClick={() => redirectToCheckout(plan.plan!)}
+                    disabled={checkingOut === plan.plan}
+                    className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
+                      plan.highlighted
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                    }`}
+                  >
+                    {checkingOut === plan.plan ? "Redirecting..." : "Subscribe"}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {plan.setupFee} setup billed today · monthly starts in 30 days
+                  </p>
                 ) : (
                   <a
                     href="mailto:hello@operion.ai"

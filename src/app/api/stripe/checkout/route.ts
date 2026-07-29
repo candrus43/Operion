@@ -30,10 +30,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid mode. Must be setup or monthly" }, { status: 400 })
     }
 
-    const priceKey = `${plan}_${mode.toUpperCase()}`
-    const priceId = PRICE_ID_MAP[priceKey]
-    if (!priceId) {
-      return NextResponse.json({ error: `No price found for ${priceKey}` }, { status: 400 })
+    // Validate both prices exist
+    const setupPriceKey = `${plan}_SETUP`
+    const monthlyPriceKey = `${plan}_MONTHLY`
+    const setupPriceId = PRICE_ID_MAP[setupPriceKey]
+    const monthlyPriceId = PRICE_ID_MAP[monthlyPriceKey]
+
+    if (!setupPriceId || !monthlyPriceId) {
+      return NextResponse.json(
+        { error: `Missing price for ${plan}` },
+        { status: 400 }
+      )
     }
 
     // Find the org
@@ -75,6 +82,21 @@ export async function POST(request: Request) {
 
     const isSetup = mode === "setup"
 
+    // Build line items: setup fee always included; monthly also includes subscription with 30-day trial
+    const lineItems: any[] = [
+      {
+        price: setupPriceId,
+        quantity: 1,
+      },
+    ]
+
+    if (!isSetup) {
+      lineItems.push({
+        price: monthlyPriceId,
+        quantity: 1,
+      })
+    }
+
     const sessionConfig: any = {
       customer: stripeCustomerId,
       client_reference_id: org.id,
@@ -82,15 +104,17 @@ export async function POST(request: Request) {
         plan,
         orgId: org.id,
       },
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: isSetup ? "payment" : "subscription",
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
+    }
+
+    // Monthly checkout: setup fee paid now, subscription starts with 30-day trial
+    if (!isSetup) {
+      sessionConfig.subscription_data = {
+        trial_period_days: 30,
+      }
     }
 
     const checkoutSession = await stripe.checkout.sessions.create(sessionConfig)
