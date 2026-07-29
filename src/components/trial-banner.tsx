@@ -25,9 +25,14 @@ export function TrialBanner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan, mode }),
       })
-      const { url } = await res.json()
-      if (url) {
-        window.location.href = url
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error || "Checkout failed")
+        setCheckingOut(false)
+        return
+      }
+      if (data.url) {
+        window.location.href = data.url
       }
     } catch {
       setCheckingOut(false)
