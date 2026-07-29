@@ -5,7 +5,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { AIBriefing } from "@/components/dashboard/ai-briefing"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
-import { DashboardSkeleton } from "@/components/dashboard/skeletons"
+import { HealthScore } from "@/components/dashboard/health-score"
+import { WelcomeScreen } from "@/components/onboarding/welcome-screen"
 import { cn } from "@/lib/utils"
 import {
   Building2,
@@ -14,127 +15,8 @@ import {
   Clock,
   FileText,
   Users,
-  ArrowRight,
-  Upload,
-  Plus,
   Calendar,
 } from "lucide-react"
-
-function WelcomeEmptyState({ userName }: { userName: string }) {
-  const firstName = userName?.split(" ")[0] || "there"
-
-  const steps = [
-    {
-      step: 1,
-      title: "Add your first entity",
-      description: "Add a business, hotel, property, or investment you manage.",
-      href: "/entities/new",
-      icon: Building2,
-      accent: "text-blue-400",
-      bgAccent: "bg-blue-500/10",
-    },
-    {
-      step: 2,
-      title: "Create a project",
-      description: "Track acquisitions, renovations, or operational initiatives.",
-      href: "/projects/new",
-      icon: FolderKanban,
-      accent: "text-emerald-400",
-      bgAccent: "bg-emerald-500/10",
-    },
-    {
-      step: 3,
-      title: "Invite your team",
-      description: "Bring in your EA, operations manager, or staff to collaborate.",
-      href: "/settings",
-      icon: Users,
-      accent: "text-violet-400",
-      bgAccent: "bg-violet-500/10",
-    },
-  ]
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
-      {/* Decorative glow */}
-      <div className="relative mb-8">
-        <div className="absolute inset-0 rounded-full bg-amber-500/10 blur-3xl scale-150" />
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-blue-500/20 ring-1 ring-white/[0.06]">
-          <img src="/logo.svg" className="h-9 w-9" alt="Operion" />
-        </div>
-      </div>
-
-      <h1 className="text-3xl font-bold tracking-tight mb-2">
-        Welcome to Operion
-      </h1>
-      <p className="text-lg text-amber-400 font-medium mb-3">
-        Nice to meet you, {firstName}
-      </p>
-      <p className="text-muted-foreground max-w-md mb-10 leading-relaxed">
-        Your AI Chief of Staff is ready. Follow the steps below to get your workspace set up.
-      </p>
-
-      {/* Onboarding Steps */}
-      <div className="grid gap-4 sm:grid-cols-3 max-w-3xl w-full mb-10">
-        {steps.map((item, idx) => (
-          <Link
-            key={item.title}
-            href={item.href}
-            className="group relative rounded-xl bg-[#111111] border border-white/[0.04] p-6 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all"
-          >
-            {/* Step number badge */}
-            <div className="absolute -top-3 -left-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#080808] border border-white/[0.06]">
-              <span className="text-xs font-bold text-muted-foreground">{item.step}</span>
-            </div>
-
-            <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl mb-4", item.bgAccent)}>
-              <item.icon className={cn("h-5 w-5", item.accent)} />
-            </div>
-            <h3 className="text-sm font-semibold mb-1.5 group-hover:text-foreground transition-colors">
-              {item.title}
-            </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
-
-            {/* Arrow on hover */}
-            <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground/0 group-hover:text-primary transition-all">
-              Get started
-              <ArrowRight className="h-3 w-3" />
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Quick actions */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href="/entities/new"
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
-        >
-          <Plus className="h-4 w-4" />
-          Add your first entity
-        </Link>
-        <Link
-          href="/import"
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-foreground h-11 px-8"
-        >
-          <Upload className="h-4 w-4" />
-          Import data
-        </Link>
-      </div>
-
-      {/* Skip link */}
-      <p className="mt-8 text-xs text-muted-foreground">
-        Already have data?{" "}
-        <Link href="/import" className="text-foreground hover:underline font-medium">
-          Import it here
-        </Link>
-        {" "}or explore the{" "}
-        <Link href="/ai" className="text-foreground hover:underline font-medium">
-          AI Assistant
-        </Link>
-      </p>
-    </div>
-  )
-}
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -148,6 +30,8 @@ export default async function DashboardPage() {
       </div>
     )
   }
+
+  const userName = session.user.name || "there"
 
   // Quick counts for stat cards
   const [
@@ -171,6 +55,114 @@ export default async function DashboardPage() {
     }),
   ])
 
+  // Show guided onboarding if org has no entities yet
+  if (entityCount === 0) {
+    return <WelcomeScreen userName={userName} />
+  }
+
+  // ── Health Score Calculation ──────────────────────────────────
+  const now = new Date()
+  const sevenDaysAgo = new Date(now)
+  sevenDaysAgo.setDate(now.getDate() - 7)
+  const fourteenDaysAgo = new Date(now)
+  fourteenDaysAgo.setDate(now.getDate() - 14)
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() - now.getDay())
+  weekStart.setHours(0, 0, 0, 0)
+
+  const [
+    overdueTasks,
+    stalledProjectsRaw,
+    unassignedOldTasks,
+    recentlyCompleted,
+    weeklyCompleted,
+  ] = await Promise.all([
+    // Overdue tasks: past due date, not DONE
+    prisma.task.count({
+      where: {
+        organizationId: orgId,
+        dueDate: { lt: now },
+        status: { not: "DONE" },
+      },
+    }),
+    // Stalled projects: ACTIVE or ON_HOLD, no task updated/completed in 14 days
+    // We check if the project has ANY task with updatedAt > 14 days ago
+    prisma.project.findMany({
+      where: {
+        organizationId: orgId,
+        status: { in: ["ACTIVE", "ON_HOLD"] },
+      },
+      include: {
+        tasks: {
+          where: {
+            updatedAt: { gte: fourteenDaysAgo },
+          },
+          select: { id: true },
+        },
+      },
+    }),
+    // Unassigned tasks > 7 days old
+    prisma.task.count({
+      where: {
+        organizationId: orgId,
+        assigneeId: null,
+        status: { not: "DONE" },
+        createdAt: { lt: sevenDaysAgo },
+      },
+    }),
+    // Tasks completed in last 7 days
+    prisma.task.count({
+      where: {
+        organizationId: orgId,
+        status: "DONE",
+        updatedAt: { gte: sevenDaysAgo },
+      },
+    }),
+    // Tasks completed this week
+    prisma.task.count({
+      where: {
+        organizationId: orgId,
+        status: "DONE",
+        updatedAt: { gte: weekStart },
+      },
+    }),
+  ])
+
+  // Calculate stalled projects: those with no recently updated tasks
+  const stalledProjectCount = stalledProjectsRaw.filter(p => p.tasks.length === 0).length
+
+  // Compute health score
+  let healthScore = 100
+  const deductions: string[] = []
+
+  // -5 for each overdue task (max -25)
+  const overduePenalty = Math.min(overdueTasks * 5, 25)
+  if (overdueTasks > 0) {
+    healthScore -= overduePenalty
+    deductions.push(`${overdueTasks} overdue task${overdueTasks > 1 ? "s" : ""}`)
+  }
+
+  // -5 for each stalled project
+  if (stalledProjectCount > 0) {
+    healthScore -= stalledProjectCount * 5
+    deductions.push(`${stalledProjectCount} stalled project${stalledProjectCount > 1 ? "s" : ""}`)
+  }
+
+  // -3 for each unassigned task > 7 days
+  if (unassignedOldTasks > 0) {
+    healthScore -= unassignedOldTasks * 3
+    deductions.push(`${unassignedOldTasks} unassigned task${unassignedOldTasks > 1 ? "s" : ""}`)
+  }
+
+  // +2 for each completed task in last 7 days
+  if (recentlyCompleted > 0) {
+    healthScore += recentlyCompleted * 2
+  }
+
+  // Cap at 0-100
+  healthScore = Math.max(0, Math.min(100, healthScore))
+
+  // ── Tier / Trial Info ─────────────────────────────────────────
   const tier = org?.subscriptionTier || "SOLO"
   const tierLabel = tier === "ENTERPRISE" ? "Enterprise Plan" : tier === "TEAM" ? "Team Plan" : "Solo Plan"
   const tierBadgeColors: Record<string, string> = {
@@ -179,7 +171,6 @@ export default async function DashboardPage() {
     ENTERPRISE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   }
 
-  // Calculate trial days remaining
   let trialDaysRemaining: number | null = null
   let isTrial = false
   if (org?.subscriptionStatus === "TRIAL" && org?.trialEndDate) {
@@ -188,13 +179,6 @@ export default async function DashboardPage() {
       (org.trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     )
     if (trialDaysRemaining < 0) trialDaysRemaining = 0
-  }
-
-  const userName = session.user.name || "there"
-
-  // Show guided onboarding if org has no entities yet
-  if (entityCount === 0) {
-    return <WelcomeEmptyState userName={userName} />
   }
 
   return (
@@ -216,7 +200,7 @@ export default async function DashboardPage() {
         {tier === "SOLO" && entityCount >= 3 && (
           <div className="flex items-center gap-3 rounded-lg bg-amber-500/5 border border-amber-500/15 px-4 py-2.5 text-sm">
             <span className="text-amber-400">⚠</span>
-            <span className="text-amber-300/80">You've reached your entity limit.</span>
+            <span className="text-amber-300/80">You&apos;ve reached your entity limit.</span>
             <Link
               href="/pricing"
               className="ml-2 shrink-0 text-xs font-medium text-amber-400 hover:text-amber-300 underline underline-offset-2"
@@ -227,14 +211,25 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Row 2: Stat Cards */}
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Entities" value={entityCount} icon={Building2} accent="text-blue-400" />
-        <StatCard label="Active Projects" value={activeProjectCount} icon={FolderKanban} accent="text-emerald-400" />
-        <StatCard label="Open Tasks" value={openTaskCount} icon={CheckSquare} accent="text-violet-400" />
-        <StatCard label="Waiting On" value={waitingOnCount} icon={Clock} accent="text-amber-400" />
-        <StatCard label="Documents" value={docCount} icon={FileText} accent="text-sky-400" />
-        <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" />
+      {/* Row 2: Health Score + Stat Cards */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
+        {/* Health Score takes 2 columns on large screens */}
+        <div className="lg:col-span-2">
+          <HealthScore
+            score={healthScore}
+            deductions={deductions}
+            weeklyCompleted={weeklyCompleted}
+          />
+        </div>
+        {/* Stat cards take remaining 5 columns */}
+        <div className="lg:col-span-5 grid gap-4 grid-cols-2 sm:grid-cols-3">
+          <StatCard label="Entities" value={entityCount} icon={Building2} accent="text-blue-400" />
+          <StatCard label="Active Projects" value={activeProjectCount} icon={FolderKanban} accent="text-emerald-400" />
+          <StatCard label="Open Tasks" value={openTaskCount} icon={CheckSquare} accent="text-violet-400" />
+          <StatCard label="Waiting On" value={waitingOnCount} icon={Clock} accent="text-amber-400" />
+          <StatCard label="Documents" value={docCount} icon={FileText} accent="text-sky-400" />
+          <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" />
+        </div>
         {isTrial && trialDaysRemaining !== null && (
           <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
