@@ -72,6 +72,8 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error("Registration error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error)
+    // TEMP: return real error for debugging
+    return NextResponse.json({ error: `Internal server error: ${message}` }, { status: 500 })
   }
 }
