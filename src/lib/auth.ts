@@ -260,16 +260,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
       } else if (token.organizationId) {
-        // Re-fetch googleConnected status from DB so disconnects take effect
+        // Re-fetch billing + connection status from DB so webhook updates propagate
         try {
           const org = await prisma.organization.findUnique({
             where: { id: token.organizationId as string },
-            select: { googleConnected: true, microsoftConnected: true },
+            select: {
+              googleConnected: true,
+              microsoftConnected: true,
+              subscriptionStatus: true,
+              subscriptionTier: true,
+            },
           })
           if (org) {
             token.googleConnected = org.googleConnected
             token.microsoftConnected = org.microsoftConnected
-            // console.log("[AUTH jwt] Re-fetched googleConnected:", org.googleConnected, "microsoftConnected:", org.microsoftConnected)
+            token.subscriptionStatus = org.subscriptionStatus
+            token.subscriptionTier = org.subscriptionTier
           }
         } catch (e) {
           console.error("[AUTH jwt] Org re-fetch failed:", e)
@@ -287,6 +293,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.organizationId = token.organizationId
         session.user.stripeCustomerId = token.stripeCustomerId
         session.user.subscriptionStatus = token.subscriptionStatus
+        session.user.subscriptionTier = token.subscriptionTier
         session.user.googleConnected = token.googleConnected ?? false
         session.user.microsoftConnected = token.microsoftConnected ?? false
         ;(session.user as any).hasPassword = token.hasPassword ?? false
