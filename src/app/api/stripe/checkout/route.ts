@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         metadata: { plan, orgId: org.id },
         line_items: [{ price: setupPriceId, quantity: 1 }],
         mode: "payment",
-        success_url: `${origin}/dashboard?checkout=success`,
+        success_url: `${origin}/home?checkout=success`,
         cancel_url: `${origin}/pricing?checkout=cancelled`,
       }
       const checkoutSession = await stripe.checkout.sessions.create(sessionConfig)

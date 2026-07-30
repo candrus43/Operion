@@ -7,6 +7,7 @@ import { AIBriefing } from "@/components/dashboard/ai-briefing"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
 import { HealthScore } from "@/components/dashboard/health-score"
 import { WelcomeScreen } from "@/components/onboarding/welcome-screen"
+import { CheckoutSuccessToast } from "@/components/dashboard/checkout-success-toast"
 import { cn } from "@/lib/utils"
 import { generateNotifications } from "@/lib/notifications"
 import {
@@ -19,7 +20,11 @@ import {
   Calendar,
 } from "lucide-react"
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { checkout?: string }
+}) {
   const session = await auth()
   if (!session?.user) redirect("/login")
 
@@ -190,6 +195,10 @@ export default async function DashboardPage() {
     ENTERPRISE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   }
 
+  // ── Checkout success handling ──────────────────────────────────
+  const showCheckoutSuccess = searchParams?.checkout === "success"
+  const planName = tier === "TEAM" ? "Team" : "Solo"
+
   let trialDaysRemaining: number | null = null
   let isTrial = false
   if (org?.subscriptionStatus === "TRIAL" && org?.trialEndDate) {
@@ -202,6 +211,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Checkout success toast */}
+      {showCheckoutSuccess && <CheckoutSuccessToast planName={planName} />}
+
       {/* Row 1: AI Daily Briefing */}
       <Suspense fallback={<div className="rounded-2xl bg-[#111111] h-64 animate-pulse" />}>
         <AIBriefing orgId={orgId} userName={userName} />
