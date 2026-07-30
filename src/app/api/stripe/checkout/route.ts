@@ -103,7 +103,7 @@ export async function POST(request: Request) {
 
     // Monthly: setup fee as payment, then subscription with 30-day trial
     // Create a payment checkout for the setup fee that redirects to subscription on success
-    const subscriptionUrl = `${origin}/api/stripe/subscribe?plan=${plan}&customerId=${stripeCustomerId}&orgId=${org.id}`
+    const subscriptionUrl = `${origin}/api/stripe/subscribe?plan=${plan}&customerId=${stripeCustomerId}`
 
     const paymentSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,

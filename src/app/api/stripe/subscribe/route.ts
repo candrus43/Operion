@@ -11,9 +11,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const plan = searchParams.get("plan") as "SOLO" | "TEAM"
     const customerId = searchParams.get("customerId")
-    const orgId = searchParams.get("orgId")
 
-    if (!plan || !customerId || !orgId) {
+    if (!plan || !customerId) {
       return NextResponse.redirect(
         new URL("/pricing?checkout=error", request.url).toString()
       )
@@ -32,12 +31,19 @@ export async function GET(request: Request) {
       )
     }
 
-    // Only apply trial if the org is still in trial status
-    const org = await prisma.organization.findUnique({
-      where: { id: orgId },
-      select: { subscriptionStatus: true },
+    // Look up org by Stripe customer ID instead of orgId to avoid exposing orgId in URLs
+    const org = await prisma.organization.findFirst({
+      where: { stripeCustomerId: customerId },
+      select: { id: true, subscriptionStatus: true },
     })
-    const isTrial = org?.subscriptionStatus === "TRIAL"
+
+    if (!org) {
+      return NextResponse.redirect(
+        new URL("/pricing?checkout=error", request.url).toString()
+      )
+    }
+
+    const isTrial = org.subscriptionStatus === "TRIAL"
 
     const stripe = getStripe()
     const origin = request.headers.get("origin") || process.env.NEXTAUTH_URL || "http://localhost:3000"
@@ -49,8 +55,8 @@ export async function GET(request: Request) {
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      client_reference_id: orgId,
-      metadata: { plan, orgId, step: "subscription" },
+      client_reference_id: org.id,
+      metadata: { plan, orgId: org.id, step: "subscription" },
       line_items: [{ price: monthlyPriceId, quantity: 1 }],
       mode: "subscription",
       ...(Object.keys(subscriptionData).length > 0 && { subscription_data: subscriptionData }),
