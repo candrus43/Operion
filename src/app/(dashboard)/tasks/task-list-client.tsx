@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, Calendar, ArrowUpDown, ArrowUp, ArrowDown, ChevronRight } from "lucide-react"
+import { Search, Calendar, ArrowUpDown, ArrowUp, ArrowDown, ChevronRight, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -43,6 +43,8 @@ interface TaskListClientProps {
   users: User[]
   entities: Entity[]
   projects: Project[]
+  currentUserId?: string
+  initialMineFilter?: boolean
 }
 
 const priorityColor = (p: string) => {
@@ -68,12 +70,14 @@ const statusColor = (s: string) => {
 type SortField = "title" | "status" | "priority" | "dueDate" | "createdAt"
 type SortDir = "asc" | "desc"
 
-export function TaskListClient({ tasks: initialTasks, users, entities, projects }: TaskListClientProps) {
+export function TaskListClient({ tasks: initialTasks, users, entities, projects, currentUserId, initialMineFilter }: TaskListClientProps) {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
-  const [assigneeFilter, setAssigneeFilter] = useState("all")
+  const [assigneeFilter, setAssigneeFilter] = useState(
+    initialMineFilter && currentUserId ? currentUserId : "all"
+  )
   const [sortField, setSortField] = useState<SortField>("dueDate")
   const [sortDir, setSortDir] = useState<SortDir>("asc")
 
@@ -211,6 +215,23 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects 
             ))}
           </SelectContent>
         </Select>
+        {currentUserId && (
+          <Button
+            variant={assigneeFilter === currentUserId ? "default" : "outline"}
+            size="sm"
+            className={`gap-1.5 text-xs ${
+              assigneeFilter === currentUserId
+                ? ""
+                : "bg-[#111111] border-0 text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() =>
+              setAssigneeFilter(assigneeFilter === currentUserId ? "all" : currentUserId)
+            }
+          >
+            <User className="h-3 w-3" />
+            My Tasks
+          </Button>
+        )}
       </div>
 
       {/* Table - Desktop */}
