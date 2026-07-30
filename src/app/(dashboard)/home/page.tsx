@@ -31,6 +31,15 @@ export default async function DashboardPage() {
     )
   }
 
+  // Enforce trial expiration at page level
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true },
+  })
+  if (org?.subscriptionStatus === "EXPIRED") {
+    redirect("/trial-expired")
+  }
+
   const userName = session.user.name || "there"
 
   // Quick counts for stat cards
@@ -41,7 +50,6 @@ export default async function DashboardPage() {
     waitingOnCount,
     docCount,
     contactCount,
-    org,
   ] = await Promise.all([
     prisma.entity.count({ where: { organizationId: orgId } }),
     prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
@@ -49,10 +57,6 @@ export default async function DashboardPage() {
     prisma.task.count({ where: { organizationId: orgId, status: "WAITING_ON" } }),
     prisma.document.count({ where: { organizationId: orgId } }),
     prisma.contact.count({ where: { organizationId: orgId } }),
-    prisma.organization.findUnique({
-      where: { id: orgId },
-      select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true },
-    }),
   ])
 
   // Show guided onboarding if org has no entities yet

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
+import { prisma } from "@/lib/db"
 
 export async function GET(request: Request) {
   try {
@@ -27,8 +28,20 @@ export async function GET(request: Request) {
       )
     }
 
+    // Only apply trial if the org is still in trial status
+    const org = await prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { subscriptionStatus: true },
+    })
+    const isTrial = org?.subscriptionStatus === "TRIAL"
+
     const stripe = getStripe()
     const origin = request.headers.get("origin") || process.env.NEXTAUTH_URL || "http://localhost:3000"
+
+    const subscriptionData: Record<string, any> = {}
+    if (isTrial) {
+      subscriptionData.trial_period_days = 30
+    }
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -36,9 +49,7 @@ export async function GET(request: Request) {
       metadata: { plan, orgId, step: "subscription" },
       line_items: [{ price: monthlyPriceId, quantity: 1 }],
       mode: "subscription",
-      subscription_data: {
-        trial_period_days: 30,
-      },
+      ...(Object.keys(subscriptionData).length > 0 && { subscription_data: subscriptionData }),
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
     })
