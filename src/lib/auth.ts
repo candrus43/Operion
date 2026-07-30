@@ -191,6 +191,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
 
+        // Fetch hasPassword status
+        if (token.id) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { passwordHash: true },
+            })
+            token.hasPassword = Boolean(dbUser?.passwordHash)
+          } catch (e) {
+            console.error("[AUTH jwt] hasPassword fetch failed:", e)
+          }
+        }
+
         // Store Google tokens when connecting
         if (account && account.provider === "google") {
           token.googleAccessToken = account.access_token
@@ -276,6 +289,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.subscriptionStatus = token.subscriptionStatus
         session.user.googleConnected = token.googleConnected ?? false
         session.user.microsoftConnected = token.microsoftConnected ?? false
+        ;(session.user as any).hasPassword = token.hasPassword ?? false
       }
       // console.log("[AUTH session] EXIT — session.user:", JSON.stringify(session.user))
       return session
