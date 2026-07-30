@@ -136,6 +136,14 @@ function LoginForm() {
                   required
                   className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
                 />
+                <div className="flex justify-end">
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing in..." : "Sign in"}

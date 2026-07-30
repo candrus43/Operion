@@ -10,7 +10,9 @@ export default auth((req) => {
   const isRegisterApi = req.nextUrl.pathname === "/api/register"
   const isPublicPage = req.nextUrl.pathname === "/" ||
                        req.nextUrl.pathname === "/pricing" ||
-                       req.nextUrl.pathname === "/trial-expired"
+                       req.nextUrl.pathname === "/trial-expired" ||
+                       req.nextUrl.pathname.startsWith("/forgot-password") ||
+                       req.nextUrl.pathname.startsWith("/reset-password")
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
   const isDebugRoute = req.nextUrl.pathname.startsWith("/api/debug")
