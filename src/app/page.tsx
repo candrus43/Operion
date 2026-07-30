@@ -18,72 +18,76 @@ import {
   Clock,
   HelpCircle,
   Check,
+  Home,
+  Briefcase,
+  Building,
 } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
 
-const stats = [
-  { value: "5+", label: "Entities managed" },
-  { value: "100+", label: "Projects tracked" },
-  { value: "AI", label: "Powered insights" },
+const entityTypes = [
+  { icon: Building2, label: "LLCs & C-Corps" },
+  { icon: Home, label: "Real estate & properties" },
+  { icon: Briefcase, label: "Investment portfolios" },
+  { icon: Building, label: "Operating businesses" },
 ]
 
 const steps = [
   {
     icon: Plug,
-    title: "Connect your entities",
+    title: "Drop in what you already have",
     description:
-      "Add your businesses, properties, and investments. Operion pulls in tasks, projects, and documents — no migration needed.",
+      "Import spreadsheets, connect accounts. Operion maps your portfolio in minutes — no migration needed.",
   },
   {
     icon: Brain,
-    title: "AI analyzes your portfolio",
+    title: "AI finds what you'd miss",
     description:
-      "Our AI scans across every entity, flags risks, tracks deadlines, and identifies what needs your attention.",
+      "Cross-entity risk detection, deadline tracking, and priority scoring. No manual setup required.",
   },
   {
     icon: Bell,
-    title: "Get your daily briefing",
+    title: "Start every day with clarity",
     description:
-      "Log in to a prioritized summary of what matters. No noise, no digging — just the signal you need to run your portfolio.",
+      "Open Operion. Read your briefing. Know exactly what needs your attention today — before you even ask.",
   },
 ]
 
 const features = [
   {
     icon: Brain,
-    title: "AI Daily Briefing",
+    title: "Start every day knowing what to do",
     description:
       "Log in and your AI Chief of Staff tells you what needs attention — before you even ask.",
   },
   {
     icon: Building2,
-    title: "Multi-Entity Management",
+    title: "One view across all your businesses",
     description:
-      "Manage businesses, hotels, properties, and investments across your entire portfolio.",
+      "Manage LLCs, properties, operating companies, and investments from a single dashboard.",
   },
   {
     icon: LayoutDashboard,
-    title: "EA Workspace",
+    title: "Your assistant's command center",
     description:
-      "Dedicated command center for executive assistants to manage priorities, tasks, and communications.",
+      "Dedicated workspace for executive assistants to manage priorities, tasks, and communications.",
   },
   {
     icon: Search,
-    title: "Cross-Entity Search",
+    title: "Find anything, anywhere, instantly",
     description:
-      "Search across every task, project, document, and contact — instantly, from one place.",
+      "Search across every task, project, document, and contact — across every entity, in one query.",
   },
   {
     icon: FileText,
-    title: "Document Center",
+    title: "Contracts, leases, filings — organized",
     description:
-      "Organize contracts, leases, and filings by entity type with structured categorization.",
+      "All your documents structured by entity type. No more digging through folders and email attachments.",
   },
   {
     icon: Zap,
-    title: "Smart Task Suggestions",
+    title: "AI recommends your next move",
     description:
-      "AI recommends next actions based on deadlines, dependencies, and portfolio activity.",
+      "Smart suggestions based on deadlines, dependencies, and activity across your entire portfolio.",
   },
 ]
 
@@ -129,18 +133,19 @@ const personas = [
   },
   {
     icon: ClipboardList,
-    title: "Operations Managers",
+    title: "Fractional executives",
     description:
-      "Track projects, deadlines, and dependencies across every entity.",
+      "Portfolio operators, family offices, and COOs managing across multiple orgs.",
   },
 ]
 
 const pricingPlans = [
   {
     name: "Solo",
+    setupFee: "$2,500",
     price: "$249",
     period: "/month",
-    description: "For solo operators managing a small portfolio.",
+    description: "For solo operators managing a portfolio of entities.",
     features: [
       "1 user seat",
       "Unlimited entities",
@@ -149,16 +154,18 @@ const pricingPlans = [
       "Document & contact center",
       "Document search",
       "EA workspace",
+      "White-glove setup included",
     ],
     excluded: [
       "Multi-user access",
-      "Advanced permissions",
+      "Role-based permissions",
       "Dedicated tenant",
     ],
     highlighted: false,
   },
   {
     name: "Team",
+    setupFee: "$5,000",
     price: "$499",
     period: "/month",
     description: "For owners and teams running multiple entities.",
@@ -174,6 +181,7 @@ const pricingPlans = [
       "Role-based permissions",
       "Dedicated tenant",
       "Priority support",
+      "White-glove setup included",
     ],
     excluded: [],
     highlighted: true,
@@ -182,19 +190,39 @@ const pricingPlans = [
 
 const faqItems = [
   {
-    question: "Can I import my existing spreadsheets?",
+    question: "What does the setup fee include?",
     answer:
-      "Yes. Import CSV, Excel, or ICS files in one click.",
+      "White-glove onboarding. We configure your entities, import your spreadsheets, map your document structure, and train your team — so you walk into a fully operational dashboard from day one.",
   },
   {
-    question: "How is this different from SmartSheets or Monday?",
+    question: "How long does onboarding take?",
     answer:
-      "Those are tools you feed data into. Operion is an AI Chief of Staff that feeds you decisions.",
+      "Most organizations are fully operational within 5 business days. Complex portfolios with 20+ entities and custom workflows may take up to 10 days.",
+  },
+  {
+    question: "Can I import my existing spreadsheets?",
+    answer:
+      "Yes. Import CSV, Excel, or ICS files in one click. Our setup team handles bulk imports as part of your onboarding.",
+  },
+  {
+    question: "How is this different from SmartSheets, Monday, or Airtable?",
+    answer:
+      "Those are tools you feed data into — blank canvases you have to build and maintain. Operion is an AI Chief of Staff that feeds you decisions. It scans across entities, surfaces risks, and tells you what to do next without any manual configuration.",
+  },
+  {
+    question: "Can my assistant and accountant have their own access?",
+    answer:
+      "Yes. Team plan includes up to 5 seats with role-based permissions. Your EA gets a full workspace; your accountant can be limited to document and entity access.",
   },
   {
     question: "Is my data secure?",
     answer:
       "Enterprise-grade encryption, isolated per organization. Your data belongs to you — never shared, sold, or used to train AI.",
+  },
+  {
+    question: "Can I export my data if I leave?",
+    answer:
+      "Yes. Export all your organization data as JSON at any time — no lock-in, ever.",
   },
 ]
 
@@ -228,6 +256,12 @@ export default function LandingPage() {
               </Link>
               <div className="flex items-center gap-3">
                 <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium text-muted-foreground hover:text-foreground h-9 px-3 transition-colors"
+                >
+                  Pricing
+                </Link>
+                <Link
                   href="/login"
                   className="inline-flex items-center justify-center rounded-md text-sm font-medium text-muted-foreground hover:text-foreground h-9 px-3 transition-colors"
                 >
@@ -237,7 +271,7 @@ export default function LandingPage() {
                   href="/api/demo"
                   className="inline-flex items-center justify-center gap-1.5 rounded-md bg-foreground text-background text-sm font-medium h-9 px-4 transition-all hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
                 >
-                  Try the Demo
+                  Explore the Product
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -257,17 +291,17 @@ export default function LandingPage() {
 
             <ScrollReveal delay={100}>
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-[1.1]">
-                Your entire portfolio.
+                Your AI Chief of Staff
                 <br />
-                <span className="gradient-text">One dashboard. Zero noise.</span>
+                <span className="gradient-text">for every business you run.</span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
               <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed sm:text-lg">
-                Operion doesn&apos;t just organize your businesses — it runs
-                alongside you. AI surfaces what matters, catches what you&apos;d
-                miss, and tells you what to do next.
+                Operion scans every entity, surfaces risks, and tells you what to
+                do next — so you can run your entire portfolio from one dashboard,
+                without anything falling through the cracks.
               </p>
             </ScrollReveal>
 
@@ -278,7 +312,7 @@ export default function LandingPage() {
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground text-background text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-foreground/90 hover:shadow-[0_0_30px_rgba(250,250,250,0.12)]"
                 >
                   <Play className="h-4 w-4" />
-                  Try the Demo
+                  Explore the Product
                 </Link>
                 <Link
                   href="/pricing"
@@ -289,27 +323,28 @@ export default function LandingPage() {
                 </Link>
               </div>
               <p className="text-xs text-muted-foreground pt-3">
-                No sign-up · Explore the full product instantly
+                14-day free trial · No credit card required
               </p>
             </ScrollReveal>
           </div>
         </section>
 
-        {/* Stats Banner */}
+        {/* Entity Types — replaces stats */}
         <ScrollReveal>
           <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-            <div className="mx-auto max-w-xl">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                {stats.map((stat) => (
+            <div className="mx-auto max-w-2xl">
+              <p className="text-center text-xs text-muted-foreground mb-4 tracking-wide uppercase">
+                Built for operators who manage
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {entityTypes.map((item) => (
                   <div
-                    key={stat.label}
-                    className="flex items-center gap-3 rounded-xl border border-white/[0.05] bg-[#111111]/60 backdrop-blur-sm px-5 py-3 w-full sm:w-auto justify-center animate-pulse-glow"
+                    key={item.label}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.05] bg-[#111111]/60 backdrop-blur-sm px-5 py-3"
                   >
-                    <span className="text-xl font-bold tracking-tight text-violet-300">
-                      {stat.value}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {stat.label}
+                    <item.icon className="h-4 w-4 text-violet-400/70 shrink-0" />
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {item.label}
                     </span>
                   </div>
                 ))}
@@ -336,7 +371,6 @@ export default function LandingPage() {
             {steps.map((step, i) => (
               <ScrollReveal key={step.title} delay={i * 100}>
                 <div className="relative text-center group">
-                  {/* Step connector line */}
                   {i < steps.length - 1 && (
                     <div className="hidden sm:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-px bg-white/[0.06]">
                       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/[0.08]" />
@@ -434,6 +468,33 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Done-for-you setup */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+          <ScrollReveal>
+            <div className="mx-auto max-w-2xl">
+              <div className="rounded-2xl bg-gradient-to-b from-[#111111] to-[#0d0d0d] border border-white/[0.06] p-8 sm:p-12 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[150px] rounded-full bg-violet-500/[0.04] blur-[60px] pointer-events-none" />
+                <div className="relative">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-400/10 mb-5">
+                    <Plug className="h-6 w-6 text-violet-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold tracking-tight sm:text-3xl mb-3">
+                    We set everything up for you
+                  </h2>
+                  <p className="text-muted-foreground max-w-lg mx-auto text-sm leading-relaxed">
+                    Your setup fee includes white-glove onboarding. We configure your entities,
+                    import your spreadsheets, organize your documents, and train your team.
+                    You walk into a fully operational AI Chief of Staff — not an empty tool
+                    you have to build yourself. That&apos;s the difference between Operion
+                    and a SmartSheet or Airtable you configure from scratch.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+
         {/* Pricing */}
         <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
           <ScrollReveal>
@@ -442,7 +503,8 @@ export default function LandingPage() {
                 Simple, transparent pricing
               </h2>
               <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm">
-                Start with a 14-day free trial. No credit card required.
+                Start with a 14-day free trial. No credit card required. Setup fees include
+                white-glove onboarding.
               </p>
             </div>
           </ScrollReveal>
@@ -465,9 +527,21 @@ export default function LandingPage() {
                   <div className="p-6 pb-4">
                     <h3 className="text-xl font-semibold">{plan.name}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-                    <div className="mt-4">
-                      <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
-                      <span className="text-sm text-muted-foreground ml-1.5">{plan.period}</span>
+                    <div className="mt-3 space-y-0.5">
+                      <div>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Setup</span>
+                        <div>
+                          <span className="text-2xl font-bold tracking-tight">{plan.setupFee}</span>
+                          <span className="text-sm text-muted-foreground ml-1">one-time</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Monthly</span>
+                        <div>
+                          <span className="text-2xl font-bold tracking-tight">{plan.price}</span>
+                          <span className="text-sm text-muted-foreground ml-1">{plan.period}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="px-6 pb-4 flex-1">
@@ -638,8 +712,8 @@ export default function LandingPage() {
                   Ready to see everything in one place?
                 </h2>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto text-sm">
-                  Explore Operion instantly — no sign-up required. See how AI
-                  keeps your entire portfolio organized in one dashboard.
+                  Explore Operion with a pre-loaded portfolio. See how AI keeps
+                  your entire portfolio organized in one dashboard.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
@@ -647,7 +721,7 @@ export default function LandingPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground text-background text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-foreground/90 hover:shadow-[0_0_30px_rgba(250,250,250,0.12)]"
                   >
                     <Play className="h-4 w-4" />
-                    Try the Demo
+                    Explore the Product
                   </Link>
                   <Link
                     href="/pricing"
@@ -674,16 +748,16 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-6">
                 <Link
-                  href="/login"
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
                   href="/pricing"
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Pricing
+                </Link>
+                <Link
+                  href="/login"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign In
                 </Link>
                 <Link
                   href="/help"
