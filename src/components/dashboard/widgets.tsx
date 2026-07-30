@@ -342,17 +342,6 @@ interface ActivityFeedProps {
   orgId: string
 }
 
-type ActivityItem = {
-  type: "task" | "comment"
-  id: string
-  timestamp: Date
-  userName: string
-  taskTitle: string
-  taskId: string
-  description: string
-  projectName?: string
-}
-
 const timeAgo = (date: Date): string => {
   const diff = Date.now() - date.getTime()
   const mins = Math.floor(diff / 60000)
@@ -364,70 +353,99 @@ const timeAgo = (date: Date): string => {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
+/** Map entity types to an emoji for the activity feed */
+const entityEmoji: Record<string, string> = {
+  Task: "📝",
+  Comment: "💬",
+  Project: "📁",
+  Entity: "🏢",
+  Document: "📄",
+  Contact: "👤",
+  Meeting: "📅",
+  Notification: "🔔",
+  User: "👤",
+}
+
+/** Human-readable action labels */
+const actionLabel: Record<string, string> = {
+  CREATE: "created",
+  UPDATE: "updated",
+  DELETE: "deleted",
+}
+
+/**
+ * Build a navigation link for an audit log entry.
+ * Returns null for entities where we can't safely link (e.g. deleted items).
+ */
+function getAuditLink(entity: string, entityId: string, details: Record<string, any>): string | null {
+  switch (entity) {
+    case "Task":
+      return `/tasks/${entityId}`
+    case "Comment":
+      return details.taskId ? `/tasks/${details.taskId}` : null
+    case "Project":
+      return `/projects/${entityId}`
+    case "Entity":
+      return `/entities/${entityId}`
+    case "Document":
+      return `/documents/${entityId}`
+    case "Contact":
+      return `/contacts/${entityId}`
+    case "Meeting":
+      return `/meetings/${entityId}`
+    case "User":
+      return `/settings/team`
+    default:
+      return null
+  }
+}
+
+/** Extract a human-readable entity name from the details JSON */
+function getEntityName(entity: string, details: Record<string, any>): string {
+  // Comment stores taskTitle as the context
+  if (entity === "Comment") return details.taskTitle || "a task"
+  // User invites store invitedName
+  if (entity === "User" && details.invitedName) return details.invitedName
+  // Most entities store name or title
+  return details.title || details.name || "—"
+}
+
 export async function ActivityFeed({ orgId }: ActivityFeedProps) {
-  const [recentTasks, recentComments] = await Promise.all([
-    prisma.task.findMany({
-      where: { organizationId: orgId },
-      include: { assignee: true, project: true },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-    }),
-    prisma.comment.findMany({
-      where: { organizationId: orgId },
-      include: {
-        author: { select: { id: true, name: true } },
-        task: { select: { id: true, title: true, project: { select: { name: true } } } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-  ])
+  const logs = await prisma.auditLog.findMany({
+    where: { organizationId: orgId },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 15,
+  })
 
-  const getTaskDescription = (task: typeof recentTasks[0]): string => {
-    switch (task.status) {
-      case "DONE": return "marked complete"
-      case "IN_PROGRESS": return "started working on"
-      case "BLOCKED": return "marked blocked"
-      case "WAITING_ON": return "marked waiting on others"
-      default: return "updated"
+  // Map audit log entries to display items, skipping entries with no user
+  const items = logs.map((log) => {
+    let details: Record<string, any> = {}
+    try {
+      if (log.details) details = JSON.parse(log.details)
+    } catch {
+      // If details JSON is malformed, use empty object
     }
-  }
 
-  const getTaskEmoji = (task: typeof recentTasks[0]): string => {
-    switch (task.status) {
-      case "DONE": return "✅"
-      case "IN_PROGRESS": return "▶️"
-      case "BLOCKED": return "🚫"
-      case "WAITING_ON": return "⏳"
-      default: return "📝"
+    const name = getEntityName(log.entity, details)
+    const link = getAuditLink(log.entity, log.entityId, details)
+    const emoji = entityEmoji[log.entity] || "📋"
+    const verb = actionLabel[log.action] || log.action.toLowerCase()
+    const userName = log.user?.name?.split(" ")[0] || log.user?.email?.split("@")[0] || "Someone"
+
+    return {
+      id: log.id,
+      timestamp: log.createdAt,
+      userName,
+      emoji,
+      description: `${verb} ${log.entity.toLowerCase()}`,
+      entityName: name,
+      entityNameDisplay: name.length > 40 ? name.slice(0, 40) + "…" : name,
+      link,
     }
-  }
-
-  // Merge into unified timeline
-  const items: ActivityItem[] = [
-    ...recentTasks.map((t) => ({
-      type: "task" as const,
-      id: t.id,
-      timestamp: t.updatedAt,
-      userName: t.assignee?.name?.split(" ")[0] || "Someone",
-      taskTitle: t.title,
-      taskId: t.id,
-      description: getTaskDescription(t),
-      projectName: t.project?.name,
-    })),
-    ...recentComments.map((c) => ({
-      type: "comment" as const,
-      id: c.id,
-      timestamp: c.createdAt,
-      userName: c.author.name.split(" ")[0],
-      taskTitle: c.task.title,
-      taskId: c.task.id,
-      description: `commented on`,
-      projectName: c.task.project?.name,
-    })),
-  ]
-    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-    .slice(0, 8)
+  })
 
   return (
     <Card className="border-0 bg-[#111111]">
@@ -449,36 +467,48 @@ export async function ActivityFeed({ orgId }: ActivityFeedProps) {
             <p className="text-xs text-muted-foreground mt-1">Updates will appear here as your team works</p>
           </div>
         ) : (
-          items.map((item) => (
-            <Link
-              key={`${item.type}-${item.id}`}
-              href={`/tasks/${item.taskId}`}
-              className="flex items-start gap-3 rounded-lg hover:bg-[#1a1a1a] transition-colors px-3 py-2 group cursor-pointer"
-            >
-              <span className="text-sm shrink-0 mt-0.5">
-                {item.type === "comment" ? "💬" : "📝"}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs">
-                  <span className="font-medium text-foreground/80">
-                    {item.userName}
-                  </span>{" "}
-                  <span className="text-muted-foreground">{item.description}</span>{" "}
-                  <span className="font-medium text-foreground/70 truncate">
-                    &apos;{item.taskTitle}&apos;
-                  </span>
-                </p>
-                {item.projectName && (
-                  <p className="text-[10px] text-muted-foreground/40 mt-0.5">
-                    {item.projectName}
+          items.map((item) => {
+            const content = (
+              <>
+                <span className="text-sm shrink-0 mt-0.5">{item.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs">
+                    <span className="font-medium text-foreground/80">
+                      {item.userName}
+                    </span>{" "}
+                    <span className="text-muted-foreground">{item.description}:</span>{" "}
+                    <span className="font-medium text-foreground/70 truncate">
+                      {item.entityNameDisplay}
+                    </span>
                   </p>
-                )}
+                </div>
+                <span className="text-[10px] text-muted-foreground/40 shrink-0 mt-0.5">
+                  {timeAgo(item.timestamp)}
+                </span>
+              </>
+            )
+
+            if (item.link) {
+              return (
+                <Link
+                  key={item.id}
+                  href={item.link}
+                  className="flex items-start gap-3 rounded-lg hover:bg-[#1a1a1a] transition-colors px-3 py-2 group cursor-pointer"
+                >
+                  {content}
+                </Link>
+              )
+            }
+
+            return (
+              <div
+                key={item.id}
+                className="flex items-start gap-3 rounded-lg px-3 py-2"
+              >
+                {content}
               </div>
-              <span className="text-[10px] text-muted-foreground/40 shrink-0 mt-0.5">
-                {timeAgo(item.timestamp)}
-              </span>
-            </Link>
-          ))
+            )
+          })
         )}
       </CardContent>
     </Card>
