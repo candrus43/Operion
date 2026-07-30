@@ -77,6 +77,58 @@ export async function sendWelcomeEmail(user: { email: string; name: string }): P
   return sendEmail({ to: user.email, subject: "Welcome to Operion", html })
 }
 
+export interface TeamInviteParams {
+  email: string
+  name: string
+  orgName: string
+  invitedByName: string
+}
+
+export async function sendTeamInviteEmail({
+  email,
+  name,
+  orgName,
+  invitedByName,
+}: TeamInviteParams): Promise<boolean> {
+  const loginUrl = `${BASE_URL}/login`
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #080808; color: #e4e4e4; padding: 40px 20px;">
+  <div style="max-width: 480px; margin: 0 auto; background: #111111; border-radius: 12px; padding: 40px; border: 1px solid #262626;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 8px;">You've been invited to ${escapeHtml(orgName)}</h1>
+      <p style="color: #a1a1a1; font-size: 16px; margin: 0;">${escapeHtml(invitedByName)} invited you to join their Operion workspace</p>
+    </div>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      Hi ${escapeHtml(name)},
+    </p>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      You've been added as a team member in <strong style="color: #ffffff;">${escapeHtml(orgName)}</strong> on Operion. Log in below to access your AI-powered executive dashboard.
+    </p>
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${loginUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Log in to Operion</a>
+    </div>
+    <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center;">
+      Sign in using Google or Microsoft with this email address (${escapeHtml(email)}).
+    </p>
+  </div>
+</body>
+</html>`.trim()
+
+  return sendEmail({ to: email, subject: `${invitedByName} invited you to ${orgName} on Operion`, html })
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+}
+
 export async function sendPasswordResetEmail(
   user: { email: string; name: string },
   resetToken: string

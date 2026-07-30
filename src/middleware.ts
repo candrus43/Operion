@@ -30,12 +30,16 @@ export default auth((req) => {
   }
 
   if (isAuth && isAuthPage) {
-    return NextResponse.redirect(new URL("/home", req.url))
+    const role = (req.auth?.user as any)?.role
+    const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
+    return NextResponse.redirect(new URL(destination, req.url))
   }
 
   // Redirect authenticated users from landing page to dashboard
   if (isAuth && req.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/home", req.url))
+    const role = (req.auth?.user as any)?.role
+    const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
+    return NextResponse.redirect(new URL(destination, req.url))
   }
 
   // Redirect expired users to trial-expired page (skip exempt routes)
