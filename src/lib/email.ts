@@ -82,6 +82,7 @@ export interface TeamInviteParams {
   name: string
   orgName: string
   invitedByName: string
+  inviteToken?: string
 }
 
 export async function sendTeamInviteEmail({
@@ -89,8 +90,11 @@ export async function sendTeamInviteEmail({
   name,
   orgName,
   invitedByName,
+  inviteToken,
 }: TeamInviteParams): Promise<boolean> {
-  const loginUrl = `${BASE_URL}/login`
+  const acceptUrl = inviteToken
+    ? `${BASE_URL}/accept-invite?token=${inviteToken}`
+    : `${BASE_URL}/login`
   const html = `
 <!DOCTYPE html>
 <html>
@@ -105,18 +109,15 @@ export async function sendTeamInviteEmail({
       Hi ${escapeHtml(name)},
     </p>
     <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
-      You've been added as a team member in <strong style="color: #ffffff;">${escapeHtml(orgName)}</strong> on Operion. Log in below to access your AI-powered executive dashboard.
+      You've been added as a team member in <strong style="color: #ffffff;">${escapeHtml(orgName)}</strong> on Operion. Click below to accept the invitation and set up your account.
     </p>
     <div style="text-align: center; margin: 32px 0;">
-      <a href="${loginUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Log in to Operion</a>
+      <a href="${acceptUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Accept Invitation</a>
     </div>
     <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center;">
-      Sign in using Google or Microsoft with this email address (${escapeHtml(email)}).
+      This invitation was sent to ${escapeHtml(email)}. If you weren't expecting this, you can safely ignore it.
     </p>
-    <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center; margin-top: 12px;">
-      After signing in, you can set a password in Settings → Profile.
-    </p>
-    </div>
+  </div>
 </body>
 </html>`.trim()
 
