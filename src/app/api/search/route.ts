@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const query = q.trim()
 
-  const [tasks, projects, entities, documents, contacts] = await Promise.all([
+  const [tasks, projects, entities, documents, contacts, meetings] = await Promise.all([
     prisma.task.findMany({
       where: {
         organizationId: orgId,
@@ -57,7 +57,11 @@ export async function GET(req: NextRequest) {
     prisma.document.findMany({
       where: {
         organizationId: orgId,
-        name: { contains: query },
+        OR: [
+          { name: { contains: query } },
+          { url: { contains: query } },
+          { filePath: { contains: query } },
+        ],
       },
       select: { id: true, name: true, type: true },
       take: 5,
@@ -75,6 +79,18 @@ export async function GET(req: NextRequest) {
       select: { id: true, name: true, company: true },
       take: 5,
       orderBy: { name: "asc" },
+    }),
+    prisma.meeting.findMany({
+      where: {
+        organizationId: orgId,
+        OR: [
+          { title: { contains: query } },
+          { notes: { contains: query } },
+        ],
+      },
+      select: { id: true, title: true, date: true, location: true },
+      take: 5,
+      orderBy: { createdAt: "desc" },
     }),
   ])
 
@@ -113,6 +129,19 @@ export async function GET(req: NextRequest) {
       subtitle: c.company || "Contact",
       type: "contact" as const,
       link: `/contacts/${c.id}`,
+    })),
+    meetings: meetings.map(m => ({
+      id: m.id,
+      title: m.title,
+      subtitle: m.date
+        ? new Date(m.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "Meeting",
+      type: "meeting" as const,
+      link: `/meetings/${m.id}`,
     })),
   }
 
