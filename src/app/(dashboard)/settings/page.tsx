@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { LogoUploader } from "./logo-uploader"
+import { SettingsNav } from "./settings-nav"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,15 +30,17 @@ export default function SettingsPage() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileInitialized, setProfileInitialized] = useState(false)
 
+  // Initialize profile fields from session (in effect, not during render)
+  useEffect(() => {
+    if (session?.user && !profileInitialized) {
+      setProfileName(session.user.name || "")
+      setProfileEmail(session.user.email || "")
+      setProfileInitialized(true)
+    }
+  }, [session, profileInitialized])
+
   if (status === "loading") return null
   if (!session?.user) redirect("/login")
-
-  // Initialize profile fields from session
-  if (!profileInitialized) {
-    setProfileName(session.user.name || "")
-    setProfileEmail(session.user.email || "")
-    setProfileInitialized(true)
-  }
 
   const stripeCustomerId = session.user.stripeCustomerId
   const subscriptionStatus = session.user.subscriptionStatus
@@ -178,6 +181,7 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-8">
+      <SettingsNav />
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">

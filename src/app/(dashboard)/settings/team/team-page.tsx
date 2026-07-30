@@ -53,6 +53,7 @@ import {
   X,
 } from "lucide-react"
 import { toast } from "sonner"
+import { SettingsNav } from "../settings-nav"
 
 interface UserData {
   id: string
@@ -241,6 +242,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
 
   return (
     <div className="max-w-3xl space-y-8">
+      <SettingsNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Team</h1>
