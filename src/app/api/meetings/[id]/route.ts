@@ -2,6 +2,19 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -39,6 +52,7 @@ export async function PATCH(
 
   const { id } = await params
   const orgId = (session.user as any).organizationId
+  const userId = (session.user as any).id
   const body = await req.json()
   const { title, date, location, projectId, notes } = body
 
@@ -64,6 +78,16 @@ export async function PATCH(
     },
   })
 
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "UPDATE",
+    entity: "Meeting",
+    entityId: meeting.id,
+    details: JSON.stringify({ title: meeting.title, date: meeting.date }),
+  })
+
   return NextResponse.json(meeting)
 }
 
@@ -78,6 +102,7 @@ export async function DELETE(
 
   const { id } = await params
   const orgId = (session.user as any).organizationId
+  const userId = (session.user as any).id
 
   const existing = await prisma.meeting.findFirst({
     where: { id, organizationId: orgId },
@@ -86,6 +111,16 @@ export async function DELETE(
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+
+  // Store audit log before deleting
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "DELETE",
+    entity: "Meeting",
+    entityId: id,
+    details: JSON.stringify({ title: existing.title, date: existing.date }),
+  })
 
   await prisma.meeting.delete({ where: { id } })
 
