@@ -13,18 +13,20 @@ export default auth((req) => {
                        req.nextUrl.pathname === "/trial-expired" ||
                        req.nextUrl.pathname.startsWith("/forgot-password") ||
                        req.nextUrl.pathname.startsWith("/reset-password") ||
-                       req.nextUrl.pathname.startsWith("/accept-invite")
+                       req.nextUrl.pathname.startsWith("/accept-invite") ||
+                       req.nextUrl.pathname.startsWith("/support/access")
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
   const isDebugRoute = req.nextUrl.pathname.startsWith("/api/debug")
   const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
+  const isSupportAccessApi = req.nextUrl.pathname === "/api/support/access"
 
   // Skip enforcement for public routes, auth, etc.
-  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || 
+  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi ||
                         isAuthPage || isPublicPage || isDemoRoute || isDebugRoute
 
-  if (isApiAuth || isRegisterApi || isStripeWebhook) return NextResponse.next()
+  if (isApiAuth || isRegisterApi || isStripeWebhook || isSupportAccessApi) return NextResponse.next()
 
   if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute && !isDebugRoute) {
     return NextResponse.redirect(new URL("/login", req.url))

@@ -46,6 +46,7 @@ model Organization {
   comments      Comment[]
   auditLogs     AuditLog[]
   executiveNotes ExecutiveNote[]
+  supportTokens SupportAccessToken[]
 }
 
 model User {
@@ -284,12 +285,30 @@ model AuditLog {
   entity         String       // what was acted on (Task, Project, etc.)
   entityId       String       // id of the record
   details        String?      // optional JSON with change details
+  isSupportMode  Boolean      @default(false)
+  supportActorId String?
   createdAt      DateTime     @default(now())
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   user           User         @relation(fields: [userId], references: [id])
 
   @@index([organizationId])
+}
+
+model SupportAccessToken {
+  id             String    @id @default(cuid())
+  organizationId String
+  token          String    @unique
+  permissions    String    @default("READ") // READ, READ_WRITE
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  createdBy      String
+  createdAt      DateTime  @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([token])
 }
 
 model StripeEvent {

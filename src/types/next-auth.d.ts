@@ -12,12 +12,24 @@ declare module "next-auth" {
       subscriptionTier?: string
       googleConnected?: boolean
       microsoftConnected?: boolean
+      isSupportMode?: boolean
+      supportOrgId?: string
+      supportPermissions?: string
+      supportTokenId?: string
+      supportExpiresAt?: string
+      supportActorId?: string
     } & DefaultSession["user"]
   }
 
   interface User extends DefaultUser {
     role?: string
     organizationId?: string
+    isSupportMode?: boolean
+    supportOrgId?: string
+    supportPermissions?: string
+    supportTokenId?: string
+    supportExpiresAt?: string
+    supportActorId?: string
   }
 }
 
@@ -37,5 +49,11 @@ declare module "next-auth/jwt" {
     microsoftRefreshToken?: string
     microsoftTokenExpiry?: number
     microsoftConnected?: boolean
+    isSupportMode?: boolean
+    supportOrgId?: string
+    supportPermissions?: string
+    supportTokenId?: string
+    supportExpiresAt?: string
+    supportActorId?: string
   }
 }

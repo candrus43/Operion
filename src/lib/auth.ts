@@ -155,8 +155,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true // Allow all sign-ins
     },
-    async jwt({ token, user, account, trigger }) {
+    async jwt({ token, user, account, trigger, session }) {
       // console.log("[AUTH jwt] ENTER — trigger:", trigger, "hasUser:", !!user, "hasAccount:", !!account, "provider:", account?.provider)
+
+      // Handle support mode activation via client-side update()
+      if (trigger === "update" && session) {
+        if (session.isSupportMode) {
+          token.isSupportMode = true
+          token.supportOrgId = session.supportOrgId
+          token.supportPermissions = session.supportPermissions
+          token.supportTokenId = session.supportTokenId
+          token.supportExpiresAt = session.supportExpiresAt
+          token.supportActorId = session.supportActorId
+        } else if (session.isSupportMode === false) {
+          // Exiting support mode — clear claims
+          delete token.isSupportMode
+          delete token.supportOrgId
+          delete token.supportPermissions
+          delete token.supportTokenId
+          delete token.supportExpiresAt
+          delete token.supportActorId
+        }
+        return token
+      }
 
       if (user) {
         // Use db-linked id if available (set in signIn callback), otherwise use the OAuth sub
@@ -288,9 +309,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       // console.log("[AUTH session] ENTER — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       if (session.user) {
-        session.user.id = token.id
-        session.user.role = token.role
-        session.user.organizationId = token.organizationId
+        // Support mode: use target org context
+        if (token.isSupportMode) {
+          session.user.isSupportMode = true
+          session.user.supportOrgId = token.supportOrgId
+          session.user.supportPermissions = token.supportPermissions
+          session.user.supportTokenId = token.supportTokenId
+          session.user.supportExpiresAt = token.supportExpiresAt
+          session.user.supportActorId = token.supportActorId
+          // Override organizationId with the target org so all routes use the customer's org
+          session.user.organizationId = token.supportOrgId || token.organizationId
+          // Keep the user's real id for audit purposes
+          session.user.id = token.supportActorId || token.id
+          session.user.role = "STAFF" // Support gets STAFF-level access, read-only enforced by permissions
+        } else {
+          session.user.id = token.id
+          session.user.role = token.role
+          session.user.organizationId = token.organizationId
+        }
         session.user.stripeCustomerId = token.stripeCustomerId
         session.user.subscriptionStatus = token.subscriptionStatus
         session.user.subscriptionTier = token.subscriptionTier

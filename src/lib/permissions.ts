@@ -20,10 +20,15 @@ function hasMinRole(userRole: string | undefined | null, minRole: Role): boolean
   return getRoleLevel(userRole) >= getRoleLevel(minRole)
 }
 
+/** Check if the current request is in support mode and should be read-only */
+function isSupportReadOnly(session: any): boolean {
+  return session?.user?.isSupportMode === true && session?.user?.supportPermissions === "READ"
+}
+
 /** Require the user to have one of the allowed roles. Returns a 403 Response or null. */
 export async function requireRole(
   ...roles: Role[]
-): Promise<{ userId: string; orgId: string; role: string } | NextResponse> {
+): Promise<{ userId: string; orgId: string; role: string; isSupportMode: boolean; supportActorId?: string } | NextResponse> {
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -32,6 +37,8 @@ export async function requireRole(
   const userRole = (session.user as any).role || "STAFF"
   const userId = (session.user as any).id || ""
   const orgId = (session.user as any).organizationId || ""
+  const isSupportMode = session.user.isSupportMode === true
+  const supportActorId = session.user.supportActorId as string | undefined
 
   if (!roles.some((r) => userRole === r)) {
     // Check hierarchy: higher roles can always do what lower roles can
@@ -41,7 +48,21 @@ export async function requireRole(
     }
   }
 
-  return { userId, orgId, role: userRole }
+  return { userId, orgId, role: userRole, isSupportMode, supportActorId }
+}
+
+/** Require a write operation — blocks if in support mode with READ-only permissions */
+export async function requireWrite(
+  ...roles: Role[]
+): Promise<{ userId: string; orgId: string; role: string; isSupportMode: boolean; supportActorId?: string } | NextResponse> {
+  const result = await requireRole(...roles)
+  if (result instanceof NextResponse) return result
+
+  if (isSupportReadOnly({ user: result })) {
+    return NextResponse.json({ error: "Support mode is read-only — write operations are not permitted" }, { status: 403 })
+  }
+
+  return result
 }
 
 /** Quick check for UI — returns boolean for permissions */
