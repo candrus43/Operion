@@ -56,6 +56,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [tier, setTier] = useState<string | null>(null)
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -74,7 +75,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   useEffect(() => {
     fetch("/api/organization")
       .then((res) => res.ok ? res.json() : null)
-      .then((data) => { if (data?.tier) setTier(data.tier) })
+      .then((data) => {
+        if (data?.tier) setTier(data.tier)
+        if (data?.subscriptionStatus) setSubscriptionStatus(data.subscriptionStatus)
+      })
       .catch(() => {})
   }, [])
 
@@ -172,7 +176,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Bottom Navigation */}
       <div className="p-2 space-y-1">
-        {bottomNavItems.map((item) => {
+        {bottomNavItems
+          .filter((item) => {
+            // Hide Pricing for ACTIVE subscribers
+            if (item.href === "/pricing" && subscriptionStatus === "ACTIVE") return false
+            return true
+          })
+          .map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
           return (
