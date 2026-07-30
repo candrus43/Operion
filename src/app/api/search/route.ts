@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
           { name: { contains: query } },
           { url: { contains: query } },
           { filePath: { contains: query } },
+          { notes: { contains: query } },
         ],
       },
       select: { id: true, name: true, type: true },

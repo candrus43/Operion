@@ -165,6 +165,7 @@ model Document {
   type           String       // CONTRACT, PURCHASE_AGREEMENT, LEASE, INSURANCE, LICENSE, TAX, FINANCIAL_STATEMENT, PHOTO, PDF, OTHER
   url            String?
   filePath       String?
+  notes          String?
   organizationId String
   projectId      String?
   entityId       String?
