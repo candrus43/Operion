@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/db"
 import { sendWelcomeEmail } from "@/lib/email"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 function slugify(name: string): string {
   return name
@@ -13,6 +14,10 @@ function slugify(name: string): string {
 }
 
 export async function POST(req: Request) {
+  // Rate limit: 5 requests per hour per IP
+  const limit = await applyRateLimit(req, { maxRequests: 5, windowMs: 3600000 })
+  if (limit) return limit
+
   try {
     const { name, organizationName, email, password } = await req.json()
 
