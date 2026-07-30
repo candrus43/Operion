@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function GET(request: Request) {
+  const limit = await applyRateLimit(request, { maxRequests: 60, windowMs: 60_000 })
+  if (limit) return limit
+
   try {
     const { searchParams } = new URL(request.url)
     const plan = searchParams.get("plan") as "SOLO" | "TEAM"

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 // ── Audit log helper ────────────────────────────────────────────────
 

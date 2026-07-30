@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -20,6 +21,9 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limit = await applyRateLimit(req, { maxRequests: 60, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -63,6 +67,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const perm = await requireRole("OWNER", "EXECUTIVE_ASSISTANT")
   if (perm instanceof NextResponse) return perm
 
@@ -104,6 +111,9 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const perm = await requireRole("OWNER", "EXECUTIVE_ASSISTANT")
   if (perm instanceof NextResponse) return perm
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -16,6 +17,9 @@ async function createAuditLog(params: {
 }
 
 export async function GET(req: NextRequest) {
+  const limit = await applyRateLimit(req, { maxRequests: 60, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -53,6 +57,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

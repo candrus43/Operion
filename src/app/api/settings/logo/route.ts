@@ -4,6 +4,7 @@ import { getBranding } from "@/lib/branding"
 import { writeFile, mkdir, readdir, unlink } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml"]
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
@@ -23,6 +24,9 @@ export async function GET() {
 
 // POST: Upload logo
 export async function POST(req: NextRequest) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

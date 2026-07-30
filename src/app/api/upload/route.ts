@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
 import crypto from "crypto"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -31,6 +32,9 @@ const EXTENSION_MAP: Record<string, string> = {
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 
 export async function POST(req: NextRequest) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

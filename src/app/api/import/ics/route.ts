@@ -75,8 +75,8 @@ function parseICS(icsText: string) {
 }
 
 export async function POST(req: NextRequest) {
-  // Rate limit: 10 requests per minute per IP
-  const limit = await applyRateLimit(req, { maxRequests: 10, windowMs: 60000 })
+  // Rate limit: 30 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
   if (limit) return limit
 
   const session = await auth()

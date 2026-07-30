@@ -6,8 +6,8 @@ import { applyRateLimit } from "@/lib/rate-limit"
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
 export async function POST(req: NextRequest) {
-  // Rate limit: 20 requests per minute per IP
-  const limit = await applyRateLimit(req, { maxRequests: 20, windowMs: 60000 })
+  // Rate limit: 10 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 10, windowMs: 60_000 })
   if (limit) return limit
 
   const session = await auth()

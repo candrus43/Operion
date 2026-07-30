@@ -2,8 +2,12 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
+  const limit = await applyRateLimit(request, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   try {
     const session = await auth()
     if (!session?.user) {

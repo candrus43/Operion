@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { sendTeamInviteEmail } from "@/lib/email"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 const TIER_LIMITS: Record<string, { maxUsers: number | null; maxEntities: number | null }> = {
   SOLO: { maxUsers: 1, maxEntities: 3 },
@@ -29,6 +30,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

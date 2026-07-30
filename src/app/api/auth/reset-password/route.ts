@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 5, windowMs: 60_000 })
+  if (limit) return limit
+
   try {
     const { token, password } = await req.json()
 

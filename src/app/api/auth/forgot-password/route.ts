@@ -5,8 +5,8 @@ import { sendPasswordResetEmail } from "@/lib/email"
 import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: Request) {
-  // Rate limit: 3 requests per hour per IP
-  const limit = await applyRateLimit(req, { maxRequests: 3, windowMs: 3600000 })
+  // Rate limit: 5 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 5, windowMs: 60_000 })
   if (limit) return limit
 
   try {
