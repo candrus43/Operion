@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { getBranding } from "@/lib/branding"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 import { TIER_LIMITS } from "@/lib/tier-limits"
 
@@ -53,6 +54,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const limit = await applyRateLimit(request, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

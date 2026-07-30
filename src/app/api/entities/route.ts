@@ -18,7 +18,10 @@ async function createAuditLog(params: {
   await prisma.auditLog.create({ data: params })
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 60, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -35,6 +38,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
+  if (limit) return limit
+
   const perm = await requireRole("OWNER", "EXECUTIVE_ASSISTANT")
   if (perm instanceof NextResponse) return perm
 

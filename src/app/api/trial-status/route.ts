@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
-export async function GET() {
+export async function GET(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 60, windowMs: 60_000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -36,6 +40,11 @@ export async function GET() {
   let status = org.subscriptionStatus
   if (status === "TRIAL" && trialEndDate && trialEndDate < now) {
     status = "EXPIRED"
+    // Persist the expired status so middleware checks pick it up
+    await prisma.organization.update({
+      where: { id: orgId },
+      data: { subscriptionStatus: "EXPIRED" },
+    })
   }
 
   return NextResponse.json({
