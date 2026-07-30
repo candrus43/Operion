@@ -113,7 +113,10 @@ export async function sendTeamInviteEmail({
     <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center;">
       Sign in using Google or Microsoft with this email address (${escapeHtml(email)}).
     </p>
-  </div>
+    <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center; margin-top: 12px;">
+      After signing in, you can set a password in Settings → Profile.
+    </p>
+    </div>
 </body>
 </html>`.trim()
 

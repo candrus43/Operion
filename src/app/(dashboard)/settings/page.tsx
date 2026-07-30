@@ -416,8 +416,8 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Billing Section */}
-      {hasSubscription && (
+      {/* Billing Section — Fix 4: OWNER only */}
+      {hasSubscription && isOwner && (
         <Card className="border-[#262626] bg-[#111111]">
           <CardHeader>
             <CardTitle className="text-lg">Billing</CardTitle>
