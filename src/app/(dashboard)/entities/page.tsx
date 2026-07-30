@@ -17,19 +17,27 @@ export default async function EntitiesPage() {
     return <div className="flex items-center justify-center h-full">No organization found.</div>
   }
 
-  const [entities, org] = await Promise.all([
-    prisma.entity.findMany({
-      where: { organizationId: orgId },
-      include: {
-        _count: { select: { projects: true, tasks: true, contacts: true, documents: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.organization.findUnique({
-      where: { id: orgId },
-      select: { subscriptionTier: true },
-    }),
-  ])
+  let entities: any[] = []
+  let org: { subscriptionTier: string } | null = null
+
+  try {
+    const result = await Promise.all([
+      prisma.entity.findMany({
+        where: { organizationId: orgId },
+        include: {
+          _count: { select: { projects: true, tasks: true, contacts: true, documents: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.organization.findUnique({
+        where: { id: orgId },
+        select: { subscriptionTier: true },
+      }),
+    ]);
+    [entities, org] = result
+  } catch (err) {
+    console.error("Entities page fetch failed:", err)
+  }
 
   const tier = org?.subscriptionTier || "SOLO"
   const maxEntities = TIER_LIMITS[tier]?.maxEntities
