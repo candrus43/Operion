@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
+import { generateNotifications } from "@/lib/notifications"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -215,6 +216,15 @@ export async function PATCH(
     entityId: task.id,
     details: JSON.stringify({ title: task.title, status: task.status }),
   })
+
+  // Fire-and-forget: trigger system notification generation on key changes
+  const statusChangedToDone = status === "DONE" && oldSnapshot.status !== "DONE"
+  const dueDateChanged = dueDate !== undefined
+  if (statusChangedToDone || dueDateChanged) {
+    void generateNotifications(orgId).catch((err) => {
+      console.error("Failed to generate notifications on task mutation:", err)
+    })
+  }
 
   return NextResponse.json(task)
 }
