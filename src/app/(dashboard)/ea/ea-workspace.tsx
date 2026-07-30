@@ -51,6 +51,7 @@ interface Task {
   project?: { id: string; name: string } | null
   entity?: { id: string; name: string } | null
   assignee?: { id: string; name: string } | null
+  waitingOnUser?: { id: string; name: string } | null
 }
 
 interface Meeting {
@@ -77,7 +78,8 @@ export function EAWorkspace({
   userId,
   orgId,
   dailyTasks,
-  pendingApprovals,
+  blockedWaitingTasks,
+  submittedForReview,
   upcomingMeetings,
   completedTasks,
   users,
@@ -87,7 +89,8 @@ export function EAWorkspace({
   userId: string
   orgId: string
   dailyTasks: Task[]
-  pendingApprovals: Task[]
+  blockedWaitingTasks: Task[]
+  submittedForReview: Task[]
   upcomingMeetings: Meeting[]
   completedTasks: Task[]
   users: User[]
@@ -290,24 +293,24 @@ export function EAWorkspace({
         </CardContent>
       </Card>
 
-      {/* Section 2: Pending Approvals */}
+      {/* Section 2: Blocked & Waiting */}
       <Card className="bg-[#111111] border-white/[0.04]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <AlertCircle className="h-4 w-4 text-amber-400" />
-            Pending Approvals
-            <Badge variant="secondary" className="ml-2 text-[10px]">{pendingApprovals.length}</Badge>
+            <Clock className="h-4 w-4 text-amber-400" />
+            Blocked &amp; Waiting
+            <Badge variant="secondary" className="ml-2 text-[10px]">{blockedWaitingTasks.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          {pendingApprovals.length === 0 ? (
+          {blockedWaitingTasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <ClipboardList className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Nothing waiting for approval</p>
+              <CheckCircle2 className="h-10 w-10 text-emerald-400/40 mb-3" />
+              <p className="text-sm text-muted-foreground">No blocked or waiting tasks</p>
             </div>
           ) : (
             <div className="space-y-1">
-              {pendingApprovals.map((task) => (
+              {blockedWaitingTasks.map((task) => (
                 <div
                   key={task.id}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors"
@@ -323,7 +326,12 @@ export function EAWorkspace({
                       {task.title}
                     </a>
                     <div className="flex items-center gap-2 mt-0.5">
-                      {task.assignee && (
+                      {task.waitingOnUser && (
+                        <span className="text-[11px] text-amber-400/70">
+                          Waiting on {task.waitingOnUser.name}
+                        </span>
+                      )}
+                      {task.assignee && !task.waitingOnUser && (
                         <span className="text-[11px] text-muted-foreground">
                           <User className="h-3 w-3 inline mr-0.5" />
                           {task.assignee.name}
@@ -340,6 +348,67 @@ export function EAWorkspace({
                     variant="outline"
                     size="sm"
                     className="h-7 text-xs"
+                    onClick={() => router.push(`/tasks/${task.id}`)}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Section 3: Submitted for Review */}
+      <Card className="bg-[#111111] border-purple-500/10">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ClipboardList className="h-4 w-4 text-purple-400" />
+            Submitted for Review
+            <Badge variant="secondary" className="ml-2 text-[10px]">{submittedForReview.length}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {submittedForReview.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <ClipboardList className="h-10 w-10 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">No tasks submitted for review</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {submittedForReview.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors"
+                >
+                  <div className="shrink-0 h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="h-4 w-4 text-purple-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <a
+                      href={`/tasks/${task.id}`}
+                      className="text-sm font-medium truncate hover:underline hover:text-white transition-colors block"
+                    >
+                      {task.title}
+                    </a>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {task.assignee && (
+                        <span className="text-[11px] text-muted-foreground">
+                          <User className="h-3 w-3 inline mr-0.5" />
+                          {task.assignee.name}
+                        </span>
+                      )}
+                      {task.project && (
+                        <span className="text-[11px] text-muted-foreground/60">
+                          — {task.project.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs border-purple-500/30 hover:bg-purple-500/10"
                     onClick={() => router.push(`/tasks/${task.id}`)}
                   >
                     Review
