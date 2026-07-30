@@ -2,30 +2,13 @@ import { NextResponse } from "next/server"
 import { randomBytes } from "crypto"
 import { prisma } from "@/lib/db"
 import { sendPasswordResetEmail } from "@/lib/email"
-
-// In-memory rate limiting: email -> timestamps of requests
-const rateLimitMap = new Map<string, number[]>()
-
-function isRateLimited(email: string): boolean {
-  const now = Date.now()
-  const oneHourAgo = now - 60 * 60 * 1000
-
-  // Clean up old entries
-  const timestamps = (rateLimitMap.get(email) || []).filter((t) => t > oneHourAgo)
-
-  if (timestamps.length >= 3) {
-    // Still rate-limited — update the map with the cleaned list
-    rateLimitMap.set(email, timestamps)
-    return true
-  }
-
-  // Not rate-limited — add current timestamp
-  timestamps.push(now)
-  rateLimitMap.set(email, timestamps)
-  return false
-}
+import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: Request) {
+  // Rate limit: 3 requests per hour per IP
+  const limit = await applyRateLimit(req, { maxRequests: 3, windowMs: 3600000 })
+  if (limit) return limit
+
   try {
     const { email } = await req.json()
 
@@ -37,15 +20,6 @@ export async function POST(req: Request) {
     }
 
     const normalizedEmail = email.toLowerCase().trim()
-
-    // Rate limit: check before doing any DB work
-    if (isRateLimited(normalizedEmail)) {
-      // Return same response to not reveal rate-limiting
-      return NextResponse.json(
-        { message: "If an account exists, a reset link has been sent" },
-        { status: 200 }
-      )
-    }
 
     // Look up user
     const user = await prisma.user.findUnique({

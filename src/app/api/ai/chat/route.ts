@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
@@ -119,6 +120,10 @@ Help the executive prioritize, identify risks, and make decisions. Be concise bu
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 20 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 20, windowMs: 60000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {

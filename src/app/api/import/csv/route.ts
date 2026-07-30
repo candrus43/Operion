@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 10, windowMs: 60000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

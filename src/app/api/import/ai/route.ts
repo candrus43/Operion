@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import * as XLSX from "xlsx"
+import { applyRateLimit } from "@/lib/rate-limit"
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 const MAX_PREVIEW_ROWS = 50
@@ -122,6 +123,10 @@ Only include fields that have values. Omit empty/optional fields entirely. If no
 // ── POST handler ─────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 requests per minute per IP
+  const limit = await applyRateLimit(req, { maxRequests: 10, windowMs: 60000 })
+  if (limit) return limit
+
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
