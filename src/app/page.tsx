@@ -281,7 +281,7 @@ export default function LandingPage() {
                   Try the Demo
                 </Link>
                 <Link
-                  href="/register"
+                  href="/pricing"
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#111111] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#1a1a1a] hover:border-white/[0.08]"
                 >
                   Start Free Trial
@@ -488,7 +488,7 @@ export default function LandingPage() {
                   </div>
                   <div className="px-6 pb-6 mt-auto">
                     <Link
-                      href="/register"
+                      href="/pricing"
                       className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-all ${
                         plan.highlighted
                           ? "bg-foreground text-background hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
@@ -650,7 +650,7 @@ export default function LandingPage() {
                     Try the Demo
                   </Link>
                   <Link
-                    href="/register"
+                    href="/pricing"
                     className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-12 px-8 w-full sm:w-auto transition-all hover:bg-[#222]"
                   >
                     Start Free Trial
@@ -690,6 +690,18 @@ export default function LandingPage() {
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Help
+                </Link>
+                <Link
+                  href="/terms"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Terms
+                </Link>
+                <Link
+                  href="/privacy"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Privacy
                 </Link>
               </div>
             </div>

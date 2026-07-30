@@ -2,13 +2,19 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, Mail } from "lucide-react"
 import { toast } from "sonner"
 
 export default function PricingPage() {
+  const { data: session } = useSession()
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
 
   async function redirectToCheckout(plan: "SOLO" | "TEAM") {
+    if (!session) {
+      window.location.href = "/login?redirect=/pricing"
+      return
+    }
     setCheckingOut(plan)
     try {
       const res = await fetch("/api/stripe/checkout", {
@@ -18,6 +24,10 @@ export default function PricingPage() {
       })
       const data = await res.json()
       if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = "/login?redirect=/pricing"
+          return
+        }
         toast.error(data.error || "Checkout failed")
         setCheckingOut(null)
         return
@@ -147,13 +157,14 @@ const features = [
             Start with a 14-day free trial. No credit card required. Upgrade when you&apos;re ready.
           </p>
           <div className="pt-4">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90"
+            <button
+              onClick={() => redirectToCheckout("SOLO")}
+              disabled={checkingOut === "SOLO"}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              Start Free Trial
+              {checkingOut === "SOLO" ? "Redirecting..." : "Start Free Trial"}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -226,7 +237,7 @@ const features = [
                           : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
                       }`}
                     >
-                      {checkingOut === plan.plan ? "Redirecting..." : "Subscribe"}
+                      {checkingOut === plan.plan ? "Redirecting..." : "Start Free Trial"}
                       <ArrowRight className="h-4 w-4" />
                     </button>
                     <p className="text-xs text-muted-foreground text-center">
@@ -276,13 +287,14 @@ const features = [
               Join entrepreneurs who trust Operion as their AI Chief of Staff.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90"
+              <button
+                onClick={() => redirectToCheckout("SOLO")}
+                disabled={checkingOut === "SOLO"}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90 disabled:opacity-50"
               >
-                Start Free Trial
+                {checkingOut === "SOLO" ? "Redirecting..." : "Start Free Trial"}
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </button>
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]"
@@ -294,12 +306,24 @@ const features = [
         </div>
 
         {/* Back link */}
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center space-x-6">
           <Link
             href="/login"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Back to login
+          </Link>
+          <Link
+            href="/terms"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Privacy
           </Link>
         </div>
       </div>
