@@ -17,6 +17,7 @@ import {
   ClipboardList,
   Clock,
   HelpCircle,
+  Check,
 } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
 
@@ -131,6 +132,51 @@ const personas = [
     title: "Operations Managers",
     description:
       "Track projects, deadlines, and dependencies across every entity.",
+  },
+]
+
+const pricingPlans = [
+  {
+    name: "Solo",
+    price: "$249",
+    period: "/month",
+    description: "For solo operators managing a small portfolio.",
+    features: [
+      "1 user seat",
+      "Unlimited entities",
+      "AI daily briefing",
+      "Task & project management",
+      "Document & contact center",
+      "Document search",
+      "EA workspace",
+    ],
+    excluded: [
+      "Multi-user access",
+      "Advanced permissions",
+      "Dedicated tenant",
+    ],
+    highlighted: false,
+  },
+  {
+    name: "Team",
+    price: "$499",
+    period: "/month",
+    description: "For owners and teams running multiple entities.",
+    features: [
+      "Up to 5 user seats",
+      "Unlimited entities",
+      "AI daily briefing",
+      "Task & project management",
+      "Document & contact center",
+      "Document search",
+      "EA workspace",
+      "Multi-user access",
+      "Role-based permissions",
+      "Dedicated tenant",
+      "Priority support",
+    ],
+    excluded: [],
+    highlighted: true,
   },
 ]
 
@@ -388,6 +434,86 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Pricing */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Simple, transparent pricing
+              </h2>
+              <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm">
+                Start with a 14-day free trial. No credit card required.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid gap-8 lg:grid-cols-2 max-w-3xl mx-auto">
+            {pricingPlans.map((plan, i) => (
+              <ScrollReveal key={plan.name} delay={i * 100}>
+                <div
+                  className={`relative rounded-xl border-0 bg-[#111111] flex flex-col h-full card-glow${
+                    plan.highlighted ? " ring-2 ring-violet-400/30" : " border border-white/[0.04]"
+                  }`}
+                >
+                  {plan.highlighted && (
+                    <div className="absolute -top-3 left-0 right-0 flex justify-center">
+                      <span className="inline-flex items-center rounded-full bg-violet-400/20 text-violet-300 text-xs px-3 py-0.5 font-medium backdrop-blur-sm">
+                        Most popular
+                      </span>
+                    </div>
+                  )}
+                  <div className="p-6 pb-4">
+                    <h3 className="text-xl font-semibold">{plan.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
+                    <div className="mt-4">
+                      <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
+                      <span className="text-sm text-muted-foreground ml-1.5">{plan.period}</span>
+                    </div>
+                  </div>
+                  <div className="px-6 pb-4 flex-1">
+                    <ul className="space-y-2.5">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-center gap-2.5 text-sm">
+                          <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                      {plan.excluded.map((feature) => (
+                        <li key={feature} className="flex items-center gap-2.5 text-sm text-muted-foreground/40">
+                          <Check className="h-4 w-4 text-muted-foreground/30 shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="px-6 pb-6 mt-auto">
+                    <Link
+                      href="/register"
+                      className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-all ${
+                        plan.highlighted
+                          ? "bg-foreground text-background hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
+                          : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] hover:border-white/[0.08]"
+                      }`}
+                    >
+                      Start Free Trial
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/pricing"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View full pricing details →
+            </Link>
+          </div>
+        </section>
+
         {/* Trust */}
         <ScrollReveal>
           <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
@@ -539,12 +665,20 @@ export default function LandingPage() {
         {/* Footer */}
         <footer className="border-t border-white/[0.04]">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-50" />
-                <span className="text-xs text-muted-foreground">Operion</span>
+                <span className="text-xs text-muted-foreground">
+                  &copy; {new Date().getFullYear()} Operion
+                </span>
               </div>
               <div className="flex items-center gap-6">
+                <Link
+                  href="/login"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign In
+                </Link>
                 <Link
                   href="/pricing"
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -552,10 +686,10 @@ export default function LandingPage() {
                   Pricing
                 </Link>
                 <Link
-                  href="/login"
+                  href="/help"
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Sign In
+                  Help
                 </Link>
               </div>
             </div>
