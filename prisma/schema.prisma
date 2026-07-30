@@ -45,6 +45,7 @@ model Organization {
   notifications Notification[]
   comments      Comment[]
   auditLogs     AuditLog[]
+  executiveNotes ExecutiveNote[]
 }
 
 model User {
@@ -68,6 +69,7 @@ model User {
   notifications  Notification[]
   comments       Comment[]
   auditLogs      AuditLog[]
+  executiveNotes ExecutiveNote[]
 }
 
 model Account {
@@ -264,4 +266,16 @@ model StripeEvent {
   type      String
   createdAt DateTime @default(now())
   processedAt DateTime @default(now())
+}
+
+model ExecutiveNote {
+  id             String   @id @default(cuid())
+  content        String   @default("")
+  userId         String   @unique
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
