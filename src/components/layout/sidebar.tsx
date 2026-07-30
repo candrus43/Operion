@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
@@ -53,17 +54,11 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const userRole = (session?.user as any)?.role ?? null
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
-  const [userRole, setUserRole] = useState<string | null>(null)
   const [tier, setTier] = useState<string | null>(null)
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => setUserRole(data?.user?.role || null))
-      .catch(() => {})
-  }, [])
 
   useEffect(() => {
     fetch("/api/settings/logo")
