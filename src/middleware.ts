@@ -11,6 +11,8 @@ export default auth((req) => {
   const isPublicPage = req.nextUrl.pathname === "/" ||
                        req.nextUrl.pathname === "/pricing" ||
                        req.nextUrl.pathname === "/trial-expired" ||
+                       req.nextUrl.pathname === "/terms" ||
+                       req.nextUrl.pathname === "/privacy" ||
                        req.nextUrl.pathname.startsWith("/forgot-password") ||
                        req.nextUrl.pathname.startsWith("/reset-password") ||
                        req.nextUrl.pathname.startsWith("/accept-invite") ||
