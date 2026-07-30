@@ -60,7 +60,7 @@ export async function GET(request: Request) {
       line_items: [{ price: monthlyPriceId, quantity: 1 }],
       mode: "subscription",
       ...(Object.keys(subscriptionData).length > 0 && { subscription_data: subscriptionData }),
-      success_url: `${origin}/dashboard?checkout=success`,
+      success_url: `${origin}/home?checkout=success`,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
     })
 
