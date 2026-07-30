@@ -79,7 +79,13 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
     fetchNotifications()
     // Poll every 30s
     const interval = setInterval(fetchNotifications, 30000)
-    return () => clearInterval(interval)
+    // Refresh on window focus
+    const onFocus = () => fetchNotifications()
+    window.addEventListener("focus", onFocus)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener("focus", onFocus)
+    }
   }, [fetchNotifications])
 
   const markAsRead = async (id: string) => {
@@ -263,6 +269,17 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
                         </span>
                       </div>
                     ))
+                  )}
+                  {notifications.length > 0 && (
+                    <button
+                      className="w-full px-4 py-2.5 text-xs text-muted-foreground hover:text-white hover:bg-[#1a1a1a] transition-colors text-center border-t border-white/[0.04]"
+                      onClick={() => {
+                        setNotifOpen(false)
+                        router.push("/home")
+                      }}
+                    >
+                      View all notifications
+                    </button>
                   )}
                 </div>
               </div>

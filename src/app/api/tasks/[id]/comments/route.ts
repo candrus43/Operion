@@ -73,7 +73,7 @@ export async function POST(
   // Verify task exists and belongs to org
   const task = await prisma.task.findFirst({
     where: { id: taskId, organizationId: orgId },
-    select: { id: true, title: true },
+    select: { id: true, title: true, assigneeId: true, createdById: true },
   })
   if (!task) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 })
@@ -138,6 +138,45 @@ export async function POST(
           type: "MENTION",
           title: `${userName || "Someone"} mentioned you`,
           message: `in "${task.title}": ${commentPreview}`,
+          link: `/tasks/${taskId}`,
+          read: false,
+        })),
+      })
+    }
+  }
+
+  // Notify task assignee and creator of any new comment (deduplicated)
+  // Collect unique users to notify (assignee + creator, excluding commenter)
+  const usersToNotify = new Set<string>()
+  if (task.assigneeId && task.assigneeId !== userId) {
+    usersToNotify.add(task.assigneeId)
+  }
+  if (task.createdById && task.createdById !== userId) {
+    usersToNotify.add(task.createdById)
+  }
+
+  if (usersToNotify.size > 0) {
+    // Exclude any users already notified via @mention
+    const mentionedUsers = await prisma.user.findMany({
+      where: {
+        organizationId: orgId,
+        name: { in: mentionedNames },
+      },
+      select: { id: true },
+    })
+    for (const u of mentionedUsers) {
+      usersToNotify.delete(u.id)
+    }
+
+    if (usersToNotify.size > 0) {
+      const commentPreview = content.length > 80 ? content.substring(0, 77) + "..." : content
+      await prisma.notification.createMany({
+        data: Array.from(usersToNotify).map((uid) => ({
+          organizationId: orgId,
+          userId: uid,
+          type: "COMMENT",
+          title: `New comment on "${task.title}"`,
+          message: `${userName || "Someone"} commented: ${commentPreview}`,
           link: `/tasks/${taskId}`,
           read: false,
         })),

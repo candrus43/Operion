@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { randomBytes } from "crypto"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { sendTeamInviteEmail } from "@/lib/email"
@@ -95,14 +96,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A user with this email already exists in your organization" }, { status: 409 })
   }
 
+  // Generate invite token
+  const inviteToken = randomBytes(32).toString("hex")
+
   const user = await prisma.user.create({
     data: {
       name,
       email,
       role: role || "STAFF",
+      status: "PENDING",
+      inviteToken,
       organizationId: orgId,
     },
-    select: { id: true, name: true, email: true, image: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, image: true, role: true, status: true, createdAt: true },
   })
 
   // Try to send invite email
@@ -111,6 +117,7 @@ export async function POST(req: NextRequest) {
     name: user.name,
     orgName,
     invitedByName: session.user.name || "A team member",
+    inviteToken,
   })
 
   // Create audit log for the invitation
