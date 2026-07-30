@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Download, Loader2, CreditCard, ExternalLink, Link, Unlink, Check, User, Lock } from "lucide-react"
+import { Download, Loader2, CreditCard, ExternalLink, Link, Unlink, Check, User, Lock, Building2 } from "lucide-react"
 import { toast } from "sonner"
 
 export default function SettingsPage() {
@@ -38,6 +38,23 @@ export default function SettingsPage() {
       setProfileInitialized(true)
     }
   }, [session, profileInitialized])
+
+  // Organization editing state
+  const [orgName, setOrgName] = useState("")
+  const [savingOrg, setSavingOrg] = useState(false)
+  const [orgFetched, setOrgFetched] = useState(false)
+
+  useEffect(() => {
+    if (session?.user && !orgFetched) {
+      fetch("/api/organization")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.name) setOrgName(data.name)
+          setOrgFetched(true)
+        })
+        .catch(() => setOrgFetched(true))
+    }
+  }, [session, orgFetched])
 
   if (status === "loading") return null
   if (!session?.user) redirect("/login")
@@ -179,6 +196,40 @@ export default function SettingsPage() {
   const googleConnected = session.user.googleConnected ?? false
   const microsoftConnected = session.user.microsoftConnected ?? false
 
+  const userRole = (session.user as any).role ?? "STAFF"
+  const isOwner = userRole === "OWNER"
+
+  const handleSaveOrg = async () => {
+    if (!orgName.trim()) {
+      toast.error("Organization name is required")
+      return
+    }
+
+    setSavingOrg(true)
+    try {
+      const res = await fetch("/api/organization", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: orgName.trim() }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to update organization name")
+        return
+      }
+
+      toast.success("Organization name updated")
+      setOrgName(data.name)
+    } catch (err) {
+      console.error("Organization update failed:", err)
+      toast.error("Failed to update organization name")
+    } finally {
+      setSavingOrg(false)
+    }
+  }
+
   return (
     <div className="max-w-2xl space-y-8">
       <SettingsNav />
@@ -190,6 +241,46 @@ export default function SettingsPage() {
       </div>
 
       <Separator className="bg-[#262626]" />
+
+      {/* Organization Section — OWNER only */}
+      {isOwner && (
+        <Card className="border-[#262626] bg-[#111111]">
+          <CardHeader>
+            <CardTitle className="text-lg">Organization</CardTitle>
+            <CardDescription>
+              Update your organization&apos;s name. This is visible to all team members.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="org-name" className="text-sm text-muted-foreground">
+                Organization Name
+              </Label>
+              <Input
+                id="org-name"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                placeholder="Your organization name"
+                className="border-[#262626] bg-[#0d0d0d] text-white placeholder:text-muted-foreground focus-visible:ring-blue-500/30"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handleSaveOrg}
+                disabled={savingOrg}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {savingOrg ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Building2 className="h-4 w-4 mr-2" />
+                )}
+                {savingOrg ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Profile Section */}
       <Card className="border-[#262626] bg-[#111111]">

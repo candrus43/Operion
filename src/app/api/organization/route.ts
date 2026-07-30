@@ -43,3 +43,46 @@ export async function GET() {
     trialEndDate: org?.trialEndDate || null,
   })
 }
+
+export async function PATCH(request: Request) {
+  const session = await auth()
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const role = (session.user as any).role
+  if (role !== "OWNER") {
+    return NextResponse.json({ error: "Only owners can update organization settings" }, { status: 403 })
+  }
+
+  const orgId = (session.user as any).organizationId
+  if (!orgId) {
+    return NextResponse.json({ error: "No organization found" }, { status: 400 })
+  }
+
+  let body: { name?: string }
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+  }
+
+  const { name } = body
+
+  if (!name || typeof name !== "string" || !name.trim()) {
+    return NextResponse.json({ error: "Organization name is required" }, { status: 400 })
+  }
+
+  const org = await prisma.organization.update({
+    where: { id: orgId },
+    data: { name: name.trim() },
+    select: {
+      name: true,
+      subscriptionTier: true,
+      subscriptionStatus: true,
+      trialEndDate: true,
+    },
+  })
+
+  return NextResponse.json(org)
+}
