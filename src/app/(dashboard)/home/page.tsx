@@ -8,6 +8,7 @@ import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFee
 import { HealthScore } from "@/components/dashboard/health-score"
 import { WelcomeScreen } from "@/components/onboarding/welcome-screen"
 import { cn } from "@/lib/utils"
+import { generateNotifications } from "@/lib/notifications"
 import {
   Building2,
   FolderKanban,
@@ -51,13 +52,25 @@ export default async function DashboardPage() {
     prisma.contact.count({ where: { organizationId: orgId } }),
     prisma.organization.findUnique({
       where: { id: orgId },
-      select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true },
+      select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true, lastNotificationGeneration: true },
     }),
   ])
 
   // Show guided onboarding if org has no entities yet
   if (entityCount === 0) {
     return <WelcomeScreen userName={userName} />
+  }
+
+  // ── Trigger notification generation if it's been > 1 hour ──────
+  const shouldGenerateNotifications =
+    !org?.lastNotificationGeneration ||
+    (Date.now() - org.lastNotificationGeneration.getTime()) > 3600000
+
+  if (shouldGenerateNotifications) {
+    // Fire-and-forget: don't block the dashboard render
+    void generateNotifications(orgId).catch((err) => {
+      console.error("Failed to generate notifications on dashboard load:", err)
+    })
   }
 
   // ── Health Score Calculation ──────────────────────────────────

@@ -25,6 +25,7 @@ model Organization {
   microsoftAccessToken   String?
   microsoftTokenExpiry   Int?
   microsoftConnected     Boolean  @default(false)
+  lastNotificationGeneration DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
