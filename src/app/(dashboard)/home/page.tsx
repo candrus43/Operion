@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 import { AIBriefing } from "@/components/dashboard/ai-briefing"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
 import { HealthScore } from "@/components/dashboard/health-score"
@@ -38,6 +39,8 @@ export default async function DashboardPage({
   }
 
   const userName = session.user.name || "there"
+  const userId = (session.user as any).id
+  const userRole = (session.user as any).role || ""
 
   // Quick counts for stat cards
   // Note: org is fetched inside Promise.all below — trial expiration check comes right after
@@ -49,6 +52,7 @@ export default async function DashboardPage({
     docCount,
     contactCount,
     org,
+    awaitingReviewTasks,
   ] = await Promise.all([
     prisma.entity.count({ where: { organizationId: orgId } }),
     prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
@@ -59,6 +63,21 @@ export default async function DashboardPage({
     prisma.organization.findUnique({
       where: { id: orgId },
       select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true, lastNotificationGeneration: true },
+    }),
+    prisma.task.findMany({
+      where: {
+        organizationId: orgId,
+        status: "READY_FOR_REVIEW",
+        // Show tasks the user created OR any if they're the owner
+        ...(userRole !== "OWNER" ? { createdById: userId } : {}),
+      },
+      include: {
+        assignee: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+        project: { select: { id: true, name: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 10,
     }),
   ])
 
@@ -323,6 +342,68 @@ export default async function DashboardPage({
           <UpcomingDeadlines orgId={orgId} />
         </Suspense>
       </div>
+
+      {/* Awaiting My Review — shows READY_FOR_REVIEW tasks for owner */}
+      {awaitingReviewTasks.length > 0 && (
+        <div className="rounded-xl bg-[#111111] border border-purple-500/10 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
+              <CheckSquare className="h-3.5 w-3.5 text-purple-400" />
+            </div>
+            <h2 className="text-base font-semibold">Awaiting My Review</h2>
+            <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0 text-purple-400 bg-purple-500/10 border-purple-500/20">
+              {awaitingReviewTasks.length}
+            </Badge>
+          </div>
+          <div className="space-y-2">
+            {awaitingReviewTasks.map((task) => (
+              <Link
+                key={task.id}
+                href={`/tasks/${task.id}`}
+                className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] p-3 transition-colors group"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate group-hover:text-white transition-colors">
+                    {task.title}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {task.assignee && (
+                      <span className="text-[11px] text-muted-foreground">
+                        by {task.assignee.name}
+                      </span>
+                    )}
+                    {task.entity && (
+                      <span className="text-[11px] text-muted-foreground/60">
+                        · {task.entity.name}
+                      </span>
+                    )}
+                    {task.project && (
+                      <span className="text-[11px] text-muted-foreground/60">
+                        · {task.project.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <span className="text-xs text-purple-400 font-medium shrink-0 group-hover:underline">
+                  Review →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {awaitingReviewTasks.length === 0 && (
+        <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
+              <CheckSquare className="h-3.5 w-3.5 text-purple-400" />
+            </div>
+            <h2 className="text-base font-semibold">Awaiting My Review</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mt-3">Nothing awaiting your review</p>
+        </div>
+      )}
 
       {/* Row 4: Active Projects + Activity Feed */}
       <div className="grid gap-6 lg:grid-cols-2">
