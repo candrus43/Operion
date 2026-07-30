@@ -81,6 +81,7 @@ export async function CriticalTasks({ orgId }: CriticalTasksProps) {
       case "WAITING_ON": return "text-amber-400 bg-amber-500/10"
       case "BLOCKED": return "text-red-400 bg-red-500/10"
       case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10"
+      case "READY_FOR_REVIEW": return "text-purple-400 bg-purple-500/10"
       case "TODO": return "text-zinc-400 bg-zinc-500/10"
       default: return "text-zinc-400 bg-zinc-500/10"
     }

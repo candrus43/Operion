@@ -42,6 +42,7 @@ const statusColor = (s: string) => {
     case "BLOCKED": return "text-red-400 bg-red-500/10 border-red-500/20"
     case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10 border-blue-500/20"
     case "DONE": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+    case "READY_FOR_REVIEW": return "text-purple-400 bg-purple-500/10 border-purple-500/20"
     case "TODO": return "text-zinc-400 bg-zinc-500/10 border-zinc-500/20"
     default: return "text-zinc-400 bg-zinc-500/10"
   }
@@ -122,21 +123,25 @@ export default async function TaskDetailPage({
         </div>
       </div>
 
-      {/* WAITING_ON / BLOCKED callout */}
-      {(task.status === "WAITING_ON" || task.status === "BLOCKED") && (
+      {/* WAITING_ON / BLOCKED / READY_FOR_REVIEW callout */}
+      {(task.status === "WAITING_ON" || task.status === "BLOCKED" || task.status === "READY_FOR_REVIEW") && (
         <div className={cn(
           "rounded-xl p-4 border",
           task.status === "WAITING_ON"
             ? "bg-amber-500/5 border-amber-500/20"
+            : task.status === "READY_FOR_REVIEW"
+            ? "bg-purple-500/5 border-purple-500/20"
             : "bg-red-500/5 border-red-500/20"
         )}>
           <div className="flex items-start gap-3">
             <div className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg shrink-0 mt-0.5",
-              task.status === "WAITING_ON" ? "bg-amber-500/10" : "bg-red-500/10"
+              task.status === "WAITING_ON" ? "bg-amber-500/10" : task.status === "READY_FOR_REVIEW" ? "bg-purple-500/10" : "bg-red-500/10"
             )}>
               {task.status === "WAITING_ON" ? (
-                <Clock className={cn("h-4 w-4", task.status === "WAITING_ON" ? "text-amber-400" : "text-red-400")} />
+                <Clock className="h-4 w-4 text-amber-400" />
+              ) : task.status === "READY_FOR_REVIEW" ? (
+                <CheckCircle2 className="h-4 w-4 text-purple-400" />
               ) : (
                 <Ban className="h-4 w-4 text-red-400" />
               )}
@@ -144,9 +149,13 @@ export default async function TaskDetailPage({
             <div>
               <p className={cn(
                 "text-sm font-semibold",
-                task.status === "WAITING_ON" ? "text-amber-300" : "text-red-300"
+                task.status === "WAITING_ON" ? "text-amber-300" : task.status === "READY_FOR_REVIEW" ? "text-purple-300" : "text-red-300"
               )}>
-                {task.status === "WAITING_ON" ? "Waiting on External Party" : "Task is Blocked"}
+                {task.status === "WAITING_ON"
+                  ? "Waiting on External Party"
+                  : task.status === "READY_FOR_REVIEW"
+                  ? "Ready for Review"
+                  : "Task is Blocked"}
               </p>
               {task.notes && (
                 <p className="text-sm text-muted-foreground mt-1">{task.notes}</p>
@@ -155,6 +164,8 @@ export default async function TaskDetailPage({
                 <p className="text-sm text-muted-foreground mt-1">
                   {task.status === "WAITING_ON"
                     ? "This task is waiting on input, deliverables, or action from someone outside the team."
+                    : task.status === "READY_FOR_REVIEW"
+                    ? "The assignee has submitted this task for your review. Approve or request changes."
                     : "This task cannot proceed due to a blocker."
                   }
                 </p>
@@ -374,7 +385,51 @@ export default async function TaskDetailPage({
               <CardTitle className="text-sm font-medium">Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {task.status !== "IN_PROGRESS" && (
+              {/* READY_FOR_REVIEW: Approve / Request Changes (prominent for owner) */}
+              {task.status === "READY_FOR_REVIEW" && (
+                <>
+                  <form action={async () => {
+                    "use server"
+                    const { auth } = await import("@/lib/auth")
+                    const { prisma } = await import("@/lib/db")
+                    const { revalidatePath: rp } = await import("next/cache")
+                    const s = await auth()
+                    if (!s?.user) return
+                    await prisma.task.update({ where: { id: task.id }, data: { status: "DONE" } })
+                    rp("/tasks")
+                    rp(`/tasks/${task.id}`)
+                    rp("/home")
+                    rp("/ea")
+                  }}>
+                    <Button variant="default" size="sm" className="w-full justify-start gap-2 bg-emerald-600 hover:bg-emerald-700" type="submit">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-200" />
+                      Approve — Mark Done
+                    </Button>
+                  </form>
+                  <form action={async () => {
+                    "use server"
+                    const { auth } = await import("@/lib/auth")
+                    const { prisma } = await import("@/lib/db")
+                    const { revalidatePath: rp } = await import("next/cache")
+                    const s = await auth()
+                    if (!s?.user) return
+                    await prisma.task.update({
+                      where: { id: task.id },
+                      data: { status: "IN_PROGRESS", waitingOnUserId: task.assigneeId },
+                    })
+                    rp("/tasks")
+                    rp(`/tasks/${task.id}`)
+                    rp("/home")
+                    rp("/ea")
+                  }}>
+                    <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-amber-500/30 hover:bg-amber-500/10" type="submit">
+                      <ArrowLeft className="h-4 w-4 text-amber-400" />
+                      Request Changes
+                    </Button>
+                  </form>
+                </>
+              )}
+              {task.status !== "IN_PROGRESS" && task.status !== "READY_FOR_REVIEW" && (
                 <form action={async () => {
                   "use server"
                   const { auth } = await import("@/lib/auth")
@@ -392,7 +447,7 @@ export default async function TaskDetailPage({
                   </Button>
                 </form>
               )}
-              {task.status !== "DONE" && (
+              {task.status !== "DONE" && task.status !== "READY_FOR_REVIEW" && (
                 <form action={async () => {
                   "use server"
                   const { auth } = await import("@/lib/auth")
@@ -407,6 +462,26 @@ export default async function TaskDetailPage({
                   <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     Mark Done
+                  </Button>
+                </form>
+              )}
+              {task.status === "IN_PROGRESS" && (
+                <form action={async () => {
+                  "use server"
+                  const { auth } = await import("@/lib/auth")
+                  const { prisma } = await import("@/lib/db")
+                  const { revalidatePath: rp } = await import("next/cache")
+                  const s = await auth()
+                  if (!s?.user) return
+                  await prisma.task.update({ where: { id: task.id }, data: { status: "READY_FOR_REVIEW" } })
+                  rp("/tasks")
+                  rp(`/tasks/${task.id}`)
+                  rp("/home")
+                  rp("/ea")
+                }}>
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10" type="submit">
+                    <CheckCircle2 className="h-4 w-4 text-purple-400" />
+                    Submit for Review
                   </Button>
                 </form>
               )}
