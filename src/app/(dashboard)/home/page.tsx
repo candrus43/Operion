@@ -35,6 +35,7 @@ export default async function DashboardPage() {
   const userName = session.user.name || "there"
 
   // Quick counts for stat cards
+  // Note: org is fetched inside Promise.all below — trial expiration check comes right after
   const [
     entityCount,
     activeProjectCount,
@@ -55,6 +56,11 @@ export default async function DashboardPage() {
       select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true, lastNotificationGeneration: true },
     }),
   ])
+
+  // Enforce trial expiration at page level
+  if (org?.subscriptionStatus === "EXPIRED") {
+    redirect("/trial-expired")
+  }
 
   // Show guided onboarding if org has no entities yet
   if (entityCount === 0) {

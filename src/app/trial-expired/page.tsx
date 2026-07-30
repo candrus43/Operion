@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail } from "lucide-react"
 
 export default function TrialExpiredPage() {
@@ -229,7 +228,7 @@ export default function TrialExpiredPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center space-y-4">
+        <div className="text-center">
           <p className="text-sm text-muted-foreground">
             Questions?{" "}
             <a
@@ -239,12 +238,6 @@ export default function TrialExpiredPage() {
               Contact us
             </a>
           </p>
-          <Link
-            href="/home"
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Return to dashboard
-          </Link>
         </div>
       </div>
     </div>
