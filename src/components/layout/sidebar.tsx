@@ -20,6 +20,7 @@ import {
   Settings,
   CreditCard,
   ClipboardList,
+  HelpCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -39,6 +40,7 @@ const mainNavItems = [
 
 const bottomNavItems = [
   { href: "/pricing", label: "Pricing", icon: CreditCard },
+  { href: "/help", label: "Help", icon: HelpCircle },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 
