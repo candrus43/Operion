@@ -136,8 +136,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <nav className="flex-1 space-y-1 p-2 overflow-y-auto">
         {mainNavItems
           .filter((item) => {
-            // Hide EA Workspace for SOLO tier
-            if (item.href === "/ea" && tier === "SOLO") return false
+            // Fix 3: Gate EA Workspace link by role, not tier
+            if (item.href === "/ea" && userRole !== "EXECUTIVE_ASSISTANT" && userRole !== "OWNER") return false
             return true
           })
           .map((item) => {

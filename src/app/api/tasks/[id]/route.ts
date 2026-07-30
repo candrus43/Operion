@@ -159,6 +159,10 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  // Fix 1: Gate PATCH to EA+ roles
+  const roleCheck = await requireRole("EXECUTIVE_ASSISTANT")
+  if (roleCheck instanceof NextResponse) return roleCheck
+
   const { id } = await params
   const orgId = (session.user as any).organizationId
   const userId = (session.user as any).id

@@ -9,6 +9,12 @@ export default async function EAPage() {
     redirect("/login")
   }
 
+  // Fix 2: Gate EA Workspace to EA + OWNER roles only
+  const userRole = (session.user as any).role ?? ""
+  if (userRole !== "EXECUTIVE_ASSISTANT" && userRole !== "OWNER") {
+    redirect("/home")
+  }
+
   const userId = (session.user as any).id
   const orgId = (session.user as any).organizationId
   const now = new Date()
