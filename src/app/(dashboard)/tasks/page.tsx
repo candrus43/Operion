@@ -27,11 +27,14 @@ export default async function TasksPage(props: {
   const priorityFilter = searchParams.priority || ""
   const searchQuery = searchParams.search || ""
   const sortBy = searchParams.sort || "dueDate"
+  const mineFilter = searchParams.mine === "true"
+  const currentUserId = (session.user as any).id
 
   // Build where clause
   const where: any = { organizationId: orgId }
   if (statusFilter && statusFilter !== "all") where.status = statusFilter
   if (priorityFilter && priorityFilter !== "all") where.priority = priorityFilter
+  if (mineFilter) where.assigneeId = currentUserId
   if (searchQuery) {
     where.OR = [
       { title: { contains: searchQuery } },
@@ -94,6 +97,8 @@ export default async function TasksPage(props: {
           users={users}
           entities={entities}
           projects={projects}
+          currentUserId={currentUserId}
+          initialMineFilter={mineFilter}
         />
       </Suspense>
     </div>

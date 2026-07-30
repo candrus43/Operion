@@ -105,15 +105,34 @@ export function EAWorkspace({
   const [newAssigneeId, setNewAssigneeId] = useState("")
   const [creatingFollowUp, setCreatingFollowUp] = useState(false)
 
-  // Load notes from localStorage
+  // Load notes from API
   useEffect(() => {
-    const saved = localStorage.getItem("ea-notes")
-    if (saved) setNotes(saved)
+    let cancelled = false
+    const fetchNotes = async () => {
+      try {
+        const res = await fetch("/api/notes")
+        if (!res.ok) return
+        const data = await res.json()
+        if (!cancelled) setNotes(data.content || "")
+      } catch {
+        // Silently fail — notes aren't critical
+      }
+    }
+    fetchNotes()
+    return () => { cancelled = true }
   }, [])
 
-  const saveNotes = (value: string) => {
+  const saveNotes = async (value: string) => {
     setNotes(value)
-    localStorage.setItem("ea-notes", value)
+    try {
+      await fetch("/api/notes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: value }),
+      })
+    } catch {
+      // Silently fail — save will retry on next keystroke
+    }
   }
 
   // Complete toggle
@@ -493,7 +512,7 @@ export function EAWorkspace({
             className="min-h-[120px] bg-[#1a1a1a] border-white/[0.06] text-sm resize-y"
           />
           <p className="text-[11px] text-muted-foreground/50 mt-2">
-            Notes are stored locally in your browser. {notes.length > 0 && `${notes.length} characters`}
+            Notes are saved automatically. {notes.length > 0 && `${notes.length} characters`}
           </p>
         </CardContent>
       </Card>
