@@ -6,11 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Building2, Plus, AlertTriangle } from "lucide-react"
 import EntitySearch from "@/components/entities/entity-search"
 
-const TIER_ENTITY_LIMITS: Record<string, number | null> = {
-  SOLO: 3,
-  TEAM: 25,
-  ENTERPRISE: null,
-}
+import { TIER_LIMITS } from "@/lib/tier-limits"
 
 export default async function EntitiesPage() {
   const session = await auth()
@@ -36,7 +32,7 @@ export default async function EntitiesPage() {
   ])
 
   const tier = org?.subscriptionTier || "SOLO"
-  const maxEntities = TIER_ENTITY_LIMITS[tier]
+  const maxEntities = TIER_LIMITS[tier]?.maxEntities
   const atLimit = maxEntities !== null && maxEntities !== undefined && entities.length >= maxEntities
 
   return (

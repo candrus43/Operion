@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 import { applyRateLimit } from "@/lib/rate-limit"
+import { TIER_LIMITS } from "@/lib/tier-limits"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -33,12 +34,6 @@ export async function GET() {
   return NextResponse.json(entities)
 }
 
-const TIER_ENTITY_LIMITS: Record<string, number | null> = {
-  SOLO: 3,
-  TEAM: 25,
-  ENTERPRISE: null,
-}
-
 export async function POST(req: Request) {
   const perm = await requireRole("OWNER", "EXECUTIVE_ASSISTANT")
   if (perm instanceof NextResponse) return perm
@@ -55,7 +50,7 @@ export async function POST(req: Request) {
     select: { subscriptionTier: true },
   })
   const tier = org?.subscriptionTier || "SOLO"
-  const maxEntities = TIER_ENTITY_LIMITS[tier]
+  const maxEntities = TIER_LIMITS[tier]?.maxEntities
   if (maxEntities !== null && maxEntities !== undefined) {
     const currentCount = await prisma.entity.count({ where: { organizationId: perm.orgId } })
     if (currentCount >= maxEntities) {

@@ -3,11 +3,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { getBranding } from "@/lib/branding"
 
-const TIER_LIMITS: Record<string, { maxUsers: number | null; maxEntities: number | null }> = {
-  SOLO: { maxUsers: 1, maxEntities: 3 },
-  TEAM: { maxUsers: 5, maxEntities: 25 },
-  ENTERPRISE: { maxUsers: null, maxEntities: null },
-}
+import { TIER_LIMITS } from "@/lib/tier-limits"
 
 export async function GET() {
   const session = await auth()
