@@ -9,6 +9,7 @@ declare module "next-auth" {
       organizationId: string
       stripeCustomerId?: string
       subscriptionStatus?: string
+      subscriptionTier?: string
       googleConnected?: boolean
       microsoftConnected?: boolean
     } & DefaultSession["user"]
@@ -27,6 +28,7 @@ declare module "next-auth/jwt" {
     organizationId: string
     stripeCustomerId?: string
     subscriptionStatus?: string
+    subscriptionTier?: string
     googleAccessToken?: string
     googleRefreshToken?: string
     googleTokenExpiry?: number
