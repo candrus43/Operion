@@ -33,11 +33,27 @@ export default async function EAPage() {
     orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
   })
 
-  // Pending Approvals: tasks with WAITING_ON status
-  const pendingApprovals = await prisma.task.findMany({
+  // Blocked & Waiting: tasks with WAITING_ON status
+  const blockedWaitingTasks = await prisma.task.findMany({
     where: {
       organizationId: orgId,
       status: "WAITING_ON",
+    },
+    include: {
+      assignee: { select: { id: true, name: true } },
+      project: { select: { id: true, name: true } },
+      entity: { select: { id: true, name: true } },
+      waitingOnUser: { select: { id: true, name: true } },
+    },
+    orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
+    take: 20,
+  })
+
+  // Submitted for Review: tasks with READY_FOR_REVIEW status
+  const submittedForReview = await prisma.task.findMany({
+    where: {
+      organizationId: orgId,
+      status: "READY_FOR_REVIEW",
     },
     include: {
       assignee: { select: { id: true, name: true } },
@@ -96,7 +112,8 @@ export default async function EAPage() {
       userId={userId}
       orgId={orgId}
       dailyTasks={JSON.parse(JSON.stringify(dailyTasks))}
-      pendingApprovals={JSON.parse(JSON.stringify(pendingApprovals))}
+      blockedWaitingTasks={JSON.parse(JSON.stringify(blockedWaitingTasks))}
+      submittedForReview={JSON.parse(JSON.stringify(submittedForReview))}
       upcomingMeetings={JSON.parse(JSON.stringify(upcomingMeetings))}
       completedTasks={JSON.parse(JSON.stringify(completedTasks))}
       users={JSON.parse(JSON.stringify(users))}
