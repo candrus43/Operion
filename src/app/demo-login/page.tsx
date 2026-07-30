@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles, ArrowRight } from "lucide-react"
 
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "navid@movement.com";
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "password123";
+
 export default function DemoLoginPage() {
   const router = useRouter()
   const [error, setError] = useState("")
@@ -21,8 +24,8 @@ export default function DemoLoginPage() {
     setError("")
 
     const result = await signIn("credentials", {
-      email: "navid@movement.com",
-      password: "password123",
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
       redirect: false,
     })
 
@@ -68,7 +71,7 @@ export default function DemoLoginPage() {
               <div className="rounded-lg bg-violet-500/10 px-3 py-2.5 text-sm text-violet-300 border border-violet-500/20">
                 <p className="font-medium mb-0.5">Demo account</p>
                 <p className="text-violet-300/70 text-xs">
-                  navid@movement.com · password123
+                  {DEMO_EMAIL} · {DEMO_PASSWORD}
                 </p>
               </div>
               <div className="space-y-2">
@@ -76,7 +79,7 @@ export default function DemoLoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  value="navid@movement.com"
+                  value={DEMO_EMAIL}
                   readOnly
                   className="bg-[#1a1a1a] border-0 focus-visible:ring-1 text-muted-foreground cursor-default"
                 />
@@ -86,7 +89,7 @@ export default function DemoLoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  value="password123"
+                  value={DEMO_PASSWORD}
                   readOnly
                   className="bg-[#1a1a1a] border-0 focus-visible:ring-1 text-muted-foreground cursor-default"
                 />

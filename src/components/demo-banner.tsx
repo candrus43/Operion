@@ -4,11 +4,13 @@ import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Monitor, ArrowRight } from "lucide-react"
 
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "navid@movement.com";
+
 export function DemoBanner() {
   const { data: session, status } = useSession()
 
   if (status !== "authenticated") return null
-  if (session?.user?.email !== "navid@movement.com") return null
+  if (session?.user?.email !== DEMO_EMAIL) return null
 
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-violet-950/40 border-b border-violet-900/30">
