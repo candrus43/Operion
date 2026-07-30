@@ -3,6 +3,19 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -74,6 +87,16 @@ export async function PATCH(
     },
   })
 
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: perm.orgId,
+    userId: perm.userId,
+    action: "UPDATE",
+    entity: "Entity",
+    entityId: entity.id,
+    details: JSON.stringify({ name: entity.name, type: entity.type }),
+  })
+
   return NextResponse.json(entity)
 }
 
@@ -93,6 +116,16 @@ export async function DELETE(
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
+
+  // Store audit log before deleting
+  void createAuditLog({
+    organizationId: perm.orgId,
+    userId: perm.userId,
+    action: "DELETE",
+    entity: "Entity",
+    entityId: id,
+    details: JSON.stringify({ name: existing.name, type: existing.type }),
+  })
 
   await prisma.entity.delete({ where: { id } })
 

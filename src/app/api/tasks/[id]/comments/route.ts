@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -78,6 +91,16 @@ export async function POST(
         select: { id: true, name: true, image: true },
       },
     },
+  })
+
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "CREATE",
+    entity: "Comment",
+    entityId: comment.id,
+    details: JSON.stringify({ taskId, taskTitle: task.title }),
   })
 
   // Check for @mentions and create notifications

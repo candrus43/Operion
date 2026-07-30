@@ -3,6 +3,19 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET() {
   const session = await auth()
   if (!session?.user) {
@@ -60,5 +73,16 @@ export async function POST(req: Request) {
       organizationId: perm.orgId,
     },
   })
+
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: perm.orgId,
+    userId: perm.userId,
+    action: "CREATE",
+    entity: "Entity",
+    entityId: entity.id,
+    details: JSON.stringify({ name: entity.name, type: entity.type }),
+  })
+
   return NextResponse.json(entity, { status: 201 })
 }

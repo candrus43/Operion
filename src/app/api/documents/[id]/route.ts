@@ -3,6 +3,19 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 
+// ── Audit log helper ────────────────────────────────────────────────
+
+async function createAuditLog(params: {
+  organizationId: string
+  userId: string
+  action: string
+  entity: string
+  entityId: string
+  details?: string
+}) {
+  await prisma.auditLog.create({ data: params })
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -42,6 +55,7 @@ export async function PATCH(
 
   const { id } = await params
   const orgId = (session.user as any).organizationId
+  const userId = (session.user as any).id
   const body = await req.json()
   const { name, type, url, filePath, projectId, entityId } = body
 
@@ -67,6 +81,16 @@ export async function PATCH(
       entity: { select: { id: true, name: true } },
       uploadedBy: { select: { id: true, name: true } },
     },
+  })
+
+  // Fire-and-forget: create audit log (non-blocking)
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "UPDATE",
+    entity: "Document",
+    entityId: document.id,
+    details: JSON.stringify({ name: document.name, type: document.type }),
   })
 
   return NextResponse.json(document)
@@ -99,6 +123,16 @@ export async function DELETE(
   if (!allowedRoles.includes(userRole) && !isUploader) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
+
+  // Store audit log before deleting
+  void createAuditLog({
+    organizationId: orgId,
+    userId,
+    action: "DELETE",
+    entity: "Document",
+    entityId: id,
+    details: JSON.stringify({ name: existing.name, type: existing.type }),
+  })
 
   await prisma.document.delete({ where: { id } })
 
