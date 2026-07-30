@@ -96,5 +96,17 @@ export async function PATCH(request: Request) {
     },
   })
 
+  // Audit log the name change
+  await prisma.auditLog.create({
+    data: {
+      organizationId: orgId,
+      userId: (session.user as any).id,
+      action: "UPDATE",
+      entity: "Organization",
+      entityId: orgId,
+      details: JSON.stringify({ name: org.name }),
+    },
+  })
+
   return NextResponse.json(org)
 }

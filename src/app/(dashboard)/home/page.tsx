@@ -44,42 +44,50 @@ export default async function DashboardPage({
 
   // Quick counts for stat cards
   // Note: org is fetched inside Promise.all below — trial expiration check comes right after
-  const [
-    entityCount,
-    activeProjectCount,
-    openTaskCount,
-    waitingOnCount,
-    docCount,
-    contactCount,
-    org,
-    awaitingReviewTasks,
-  ] = await Promise.all([
-    prisma.entity.count({ where: { organizationId: orgId } }),
-    prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
-    prisma.task.count({ where: { organizationId: orgId, status: { not: "DONE" } } }),
-    prisma.task.count({ where: { organizationId: orgId, status: "WAITING_ON" } }),
-    prisma.document.count({ where: { organizationId: orgId } }),
-    prisma.contact.count({ where: { organizationId: orgId } }),
-    prisma.organization.findUnique({
-      where: { id: orgId },
-      select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true, lastNotificationGeneration: true },
-    }),
-    prisma.task.findMany({
-      where: {
-        organizationId: orgId,
-        status: "READY_FOR_REVIEW",
-        // Show tasks the user created OR any if they're the owner
-        ...(userRole !== "OWNER" ? { createdById: userId } : {}),
-      },
-      include: {
-        assignee: { select: { id: true, name: true } },
-        entity: { select: { id: true, name: true } },
-        project: { select: { id: true, name: true } },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 10,
-    }),
-  ])
+  let entityCount = 0, activeProjectCount = 0, openTaskCount = 0, waitingOnCount = 0, docCount = 0, contactCount = 0
+  let org: { subscriptionStatus: string; trialEndDate: Date | null; subscriptionTier: string; lastNotificationGeneration: Date | null } | null = null
+  let awaitingReviewTasks: any[] = []
+
+  try {
+    const result = await Promise.all([
+      prisma.entity.count({ where: { organizationId: orgId } }),
+      prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
+      prisma.task.count({ where: { organizationId: orgId, status: { not: "DONE" } } }),
+      prisma.task.count({ where: { organizationId: orgId, status: "WAITING_ON" } }),
+      prisma.document.count({ where: { organizationId: orgId } }),
+      prisma.contact.count({ where: { organizationId: orgId } }),
+      prisma.organization.findUnique({
+        where: { id: orgId },
+        select: { subscriptionStatus: true, trialEndDate: true, subscriptionTier: true, lastNotificationGeneration: true },
+      }),
+      prisma.task.findMany({
+        where: {
+          organizationId: orgId,
+          status: "READY_FOR_REVIEW",
+          ...(userRole !== "OWNER" ? { createdById: userId } : {}),
+        },
+        include: {
+          assignee: { select: { id: true, name: true } },
+          entity: { select: { id: true, name: true } },
+          project: { select: { id: true, name: true } },
+        },
+        orderBy: { updatedAt: "desc" },
+        take: 10,
+      }),
+    ]);
+    [
+      entityCount,
+      activeProjectCount,
+      openTaskCount,
+      waitingOnCount,
+      docCount,
+      contactCount,
+      org,
+      awaitingReviewTasks,
+    ] = result
+  } catch (err) {
+    console.error("Dashboard stats fetch failed:", err)
+  }
 
   // Enforce trial expiration at page level
   if (org?.subscriptionStatus === "EXPIRED") {
@@ -119,57 +127,56 @@ export default async function DashboardPage({
     unassignedOldTasks,
     recentlyCompleted,
     weeklyCompleted,
-  ] = await Promise.all([
-    // Overdue tasks: past due date, not DONE
-    prisma.task.count({
-      where: {
-        organizationId: orgId,
-        dueDate: { lt: now },
-        status: { not: "DONE" },
-      },
-    }),
-    // Stalled projects: ACTIVE or ON_HOLD, no task updated/completed in 14 days
-    // We check if the project has ANY task with updatedAt > 14 days ago
-    prisma.project.findMany({
-      where: {
-        organizationId: orgId,
-        status: { in: ["ACTIVE", "ON_HOLD"] },
-      },
-      include: {
-        tasks: {
+  ] = await (async () => {
+    try {
+      return await Promise.all([
+        prisma.task.count({
           where: {
-            updatedAt: { gte: fourteenDaysAgo },
+            organizationId: orgId,
+            dueDate: { lt: now },
+            status: { not: "DONE" },
           },
-          select: { id: true },
-        },
-      },
-    }),
-    // Unassigned tasks > 7 days old
-    prisma.task.count({
-      where: {
-        organizationId: orgId,
-        assigneeId: null,
-        status: { not: "DONE" },
-        createdAt: { lt: sevenDaysAgo },
-      },
-    }),
-    // Tasks completed in last 7 days
-    prisma.task.count({
-      where: {
-        organizationId: orgId,
-        status: "DONE",
-        updatedAt: { gte: sevenDaysAgo },
-      },
-    }),
-    // Tasks completed this week
-    prisma.task.count({
-      where: {
-        organizationId: orgId,
-        status: "DONE",
-        updatedAt: { gte: weekStart },
-      },
-    }),
-  ])
+        }),
+        prisma.project.findMany({
+          where: {
+            organizationId: orgId,
+            status: { in: ["ACTIVE", "ON_HOLD"] },
+          },
+          include: {
+            tasks: {
+              where: { updatedAt: { gte: fourteenDaysAgo } },
+              select: { id: true },
+            },
+          },
+        }),
+        prisma.task.count({
+          where: {
+            organizationId: orgId,
+            assigneeId: null,
+            status: { not: "DONE" },
+            createdAt: { lt: sevenDaysAgo },
+          },
+        }),
+        prisma.task.count({
+          where: {
+            organizationId: orgId,
+            status: "DONE",
+            updatedAt: { gte: sevenDaysAgo },
+          },
+        }),
+        prisma.task.count({
+          where: {
+            organizationId: orgId,
+            status: "DONE",
+            updatedAt: { gte: weekStart },
+          },
+        }),
+      ]) as [number, any[], number, number, number]
+    } catch (err) {
+      console.error("Dashboard health score fetch failed:", err)
+      return [0, [], 0, 0, 0] as [number, any[], number, number, number]
+    }
+  })()
 
   // Calculate stalled projects: those with no recently updated tasks
   const stalledProjectCount = stalledProjectsRaw.filter(p => p.tasks.length === 0).length

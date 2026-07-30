@@ -98,6 +98,10 @@ export async function POST(request: Request) {
         await handleSubscriptionDeleted(event.data.object)
         break
       }
+      case "invoice.payment_failed": {
+        await handlePaymentFailed(event.data.object)
+        break
+      }
       default:
         // Unhandled event type — acknowledged but not processed
         console.log(`Unhandled Stripe event type: ${event.type}`)
@@ -242,6 +246,55 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   })
 
   console.log(`❌ Org ${org.id} subscription cancelled`)
+}
+
+/**
+ * invoice.payment_failed
+ * Log payment failure and create a notification for the org owner.
+ */
+async function handlePaymentFailed(invoice: Stripe.Invoice) {
+  const customerId =
+    typeof invoice.customer === "string"
+      ? invoice.customer
+      : invoice.customer?.id
+
+  if (!customerId) {
+    console.warn("invoice.payment_failed: no customer ID")
+    return
+  }
+
+  const org = await prisma.organization.findFirst({
+    where: { stripeCustomerId: customerId },
+    include: {
+      users: {
+        where: { role: "OWNER" },
+        select: { id: true },
+        take: 1,
+      },
+    },
+  })
+
+  if (!org) {
+    console.warn(`invoice.payment_failed: org not found for customer ${customerId}`)
+    return
+  }
+
+  // Create a notification for the org owner about the failed payment
+  const ownerId = org.users[0]?.id
+  if (ownerId) {
+    await prisma.notification.create({
+      data: {
+        organizationId: org.id,
+        userId: ownerId,
+        type: "RENEWAL",
+        title: "Payment Failed",
+        message: `Your latest invoice payment failed. Please update your payment method to avoid service interruption.`,
+        link: "/pricing",
+      },
+    })
+  }
+
+  console.log(`💳 Payment failed for org ${org.id} (customer ${customerId})`)
 }
 
 /**

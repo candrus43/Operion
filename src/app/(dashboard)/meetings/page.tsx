@@ -20,13 +20,19 @@ export default async function MeetingsPage() {
     )
   }
 
-  const meetings = await prisma.meeting.findMany({
-    where: { organizationId: orgId },
-    include: {
-      project: { select: { id: true, name: true } },
-    },
-    orderBy: { date: "asc" },
-  })
+  let meetings: any[] = []
+
+  try {
+    meetings = await prisma.meeting.findMany({
+      where: { organizationId: orgId },
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+      orderBy: { date: "asc" },
+    })
+  } catch (err) {
+    console.error("Meetings page fetch failed:", err)
+  }
 
   const upcoming = meetings.filter((m) => new Date(m.date) >= new Date())
   const past = meetings.filter((m) => new Date(m.date) < new Date())

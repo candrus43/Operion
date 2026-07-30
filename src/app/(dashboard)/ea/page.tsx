@@ -19,93 +19,106 @@ export default async function EAPage() {
   const orgId = (session.user as any).organizationId
   const now = new Date()
 
-  // Daily Task Queue: tasks assigned to current user that are TODO or IN_PROGRESS
-  const dailyTasks = await prisma.task.findMany({
-    where: {
-      organizationId: orgId,
-      assigneeId: userId,
-      status: { in: ["TODO", "IN_PROGRESS"] },
-    },
-    include: {
-      project: { select: { id: true, name: true } },
-      entity: { select: { id: true, name: true } },
-    },
-    orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
-  })
+  let dailyTasks: any[] = []
+  let blockedWaitingTasks: any[] = []
+  let submittedForReview: any[] = []
+  let upcomingMeetings: any[] = []
+  let completedTasks: any[] = []
+  let users: any[] = []
+  let projects: any[] = []
 
-  // Blocked & Waiting: tasks with WAITING_ON status
-  const blockedWaitingTasks = await prisma.task.findMany({
-    where: {
-      organizationId: orgId,
-      status: "WAITING_ON",
-    },
-    include: {
-      assignee: { select: { id: true, name: true } },
-      project: { select: { id: true, name: true } },
-      entity: { select: { id: true, name: true } },
-      waitingOnUser: { select: { id: true, name: true } },
-    },
-    orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
-    take: 20,
-  })
+  try {
+    // Daily Task Queue: tasks assigned to current user that are TODO or IN_PROGRESS
+    dailyTasks = await prisma.task.findMany({
+      where: {
+        organizationId: orgId,
+        assigneeId: userId,
+        status: { in: ["TODO", "IN_PROGRESS"] },
+      },
+      include: {
+        project: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+      },
+      orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
+    })
 
-  // Submitted for Review: tasks with READY_FOR_REVIEW status
-  const submittedForReview = await prisma.task.findMany({
-    where: {
-      organizationId: orgId,
-      status: "READY_FOR_REVIEW",
-    },
-    include: {
-      assignee: { select: { id: true, name: true } },
-      project: { select: { id: true, name: true } },
-      entity: { select: { id: true, name: true } },
-    },
-    orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
-    take: 20,
-  })
+    // Blocked & Waiting: tasks with WAITING_ON status
+    blockedWaitingTasks = await prisma.task.findMany({
+      where: {
+        organizationId: orgId,
+        status: "WAITING_ON",
+      },
+      include: {
+        assignee: { select: { id: true, name: true } },
+        project: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+        waitingOnUser: { select: { id: true, name: true } },
+      },
+      orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
+      take: 20,
+    })
 
-  // Upcoming meetings for next 7 days
-  const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-  const upcomingMeetings = await prisma.meeting.findMany({
-    where: {
-      organizationId: orgId,
-      date: { gte: now, lte: sevenDaysFromNow },
-    },
-    include: {
-      project: { select: { id: true, name: true } },
-    },
-    orderBy: { date: "asc" },
-  })
+    // Submitted for Review: tasks with READY_FOR_REVIEW status
+    submittedForReview = await prisma.task.findMany({
+      where: {
+        organizationId: orgId,
+        status: "READY_FOR_REVIEW",
+      },
+      include: {
+        assignee: { select: { id: true, name: true } },
+        project: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+      },
+      orderBy: [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }],
+      take: 20,
+    })
 
-  // Follow-Up: tasks completed in last 7 days by current user
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const completedTasks = await prisma.task.findMany({
-    where: {
-      organizationId: orgId,
-      assigneeId: userId,
-      status: "DONE",
-      updatedAt: { gte: sevenDaysAgo },
-    },
-    include: {
-      project: { select: { id: true, name: true } },
-      entity: { select: { id: true, name: true } },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 20,
-  })
+    // Upcoming meetings for next 7 days
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+    upcomingMeetings = await prisma.meeting.findMany({
+      where: {
+        organizationId: orgId,
+        date: { gte: now, lte: sevenDaysFromNow },
+      },
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+      orderBy: { date: "asc" },
+    })
 
-  // Users for assignment dropdown
-  const users = await prisma.user.findMany({
-    where: { organizationId: orgId },
-    select: { id: true, name: true, role: true, email: true },
-  })
+    // Follow-Up: tasks completed in last 7 days by current user
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    completedTasks = await prisma.task.findMany({
+      where: {
+        organizationId: orgId,
+        assigneeId: userId,
+        status: "DONE",
+        updatedAt: { gte: sevenDaysAgo },
+      },
+      include: {
+        project: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 20,
+    })
 
-  // Projects for dropdown
-  const projects = await prisma.project.findMany({
-    where: { organizationId: orgId, status: { not: "COMPLETED" } },
-    select: { id: true, name: true },
-    orderBy: { name: "asc" },
-  })
+    // Users for assignment dropdown
+    users = await prisma.user.findMany({
+      where: { organizationId: orgId },
+      select: { id: true, name: true, role: true, email: true },
+    })
+
+    // Projects for dropdown
+    projects = await prisma.project.findMany({
+      where: { organizationId: orgId, status: { not: "COMPLETED" } },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    })
+  } catch (err) {
+    console.error("EA workspace fetch failed:", err)
+    // All arrays already initialized to [] — page renders with empty state
+  }
 
   return (
     <EAWorkspace
