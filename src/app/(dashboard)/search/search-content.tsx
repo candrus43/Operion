@@ -15,6 +15,7 @@ import {
   Users,
   ArrowRight,
   Loader2,
+  Calendar,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -22,7 +23,7 @@ interface SearchResult {
   id: string
   title: string
   subtitle: string
-  type: "task" | "project" | "entity" | "document" | "contact"
+  type: "task" | "project" | "entity" | "document" | "contact" | "meeting"
   link: string
 }
 
@@ -32,6 +33,7 @@ interface SearchResults {
   entities: SearchResult[]
   documents: SearchResult[]
   contacts: SearchResult[]
+  meetings: SearchResult[]
 }
 
 const sectionConfig: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; accent: string }> = {
@@ -40,6 +42,7 @@ const sectionConfig: Record<string, { label: string; icon: React.ComponentType<{
   entities: { label: "Entities", icon: Building2, accent: "text-blue-400" },
   documents: { label: "Documents", icon: FileText, accent: "text-sky-400" },
   contacts: { label: "Contacts", icon: Users, accent: "text-rose-400" },
+  meetings: { label: "Meetings", icon: Calendar, accent: "text-emerald-400" },
 }
 
 export function SearchContent() {
@@ -88,7 +91,7 @@ export function SearchContent() {
   }
 
   const totalResults = results
-    ? results.tasks.length + results.projects.length + results.entities.length + results.documents.length + results.contacts.length
+    ? results.tasks.length + results.projects.length + results.entities.length + results.documents.length + results.contacts.length + results.meetings.length
     : 0
 
   return (
