@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { getBranding } from "@/lib/branding"
 
 const TIER_LIMITS: Record<string, { maxUsers: number | null; maxEntities: number | null }> = {
   SOLO: { maxUsers: 1, maxEntities: 3 },
@@ -17,7 +18,16 @@ export async function GET() {
   const orgId = (session.user as any).organizationId
 
   if (!orgId) {
-    return NextResponse.json({ name: "Operion", tier: "SOLO", maxUsers: 1, maxEntities: 3, currentUserCount: 0, currentEntityCount: 0 })
+    const branding = getBranding()
+    return NextResponse.json({
+      name: "Operion",
+      tier: "SOLO",
+      maxUsers: 1,
+      maxEntities: 3,
+      currentUserCount: 0,
+      currentEntityCount: 0,
+      logoUrl: branding.logoUrl,
+    })
   }
 
   const [org, userCount, entityCount] = await Promise.all([
@@ -31,6 +41,7 @@ export async function GET() {
 
   const tier = org?.subscriptionTier || "SOLO"
   const limits = TIER_LIMITS[tier] || TIER_LIMITS.SOLO
+  const branding = getBranding()
 
   return NextResponse.json({
     name: org?.name || "Operion",
@@ -41,6 +52,7 @@ export async function GET() {
     currentEntityCount: entityCount,
     subscriptionStatus: org?.subscriptionStatus || "TRIAL",
     trialEndDate: org?.trialEndDate || null,
+    logoUrl: branding.logoUrl,
   })
 }
 

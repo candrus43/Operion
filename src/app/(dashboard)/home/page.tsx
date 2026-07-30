@@ -215,7 +215,27 @@ export default async function DashboardPage({
       {showCheckoutSuccess && <CheckoutSuccessToast planName={planName} />}
 
       {/* Row 1: AI Daily Briefing */}
-      <Suspense fallback={<div className="rounded-2xl bg-[#111111] h-64 animate-pulse" />}>
+      <Suspense fallback={
+        <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-6 space-y-4 animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-60" />
+            </div>
+            <div>
+              <div className="h-5 w-40 bg-[#1e1e1e] rounded" />
+              <div className="h-3.5 w-28 bg-[#1e1e1e] rounded mt-1.5" />
+            </div>
+          </div>
+          <div className="h-4 w-3/4 bg-[#1e1e1e] rounded" />
+          <div className="h-4 w-2/3 bg-[#1e1e1e] rounded" />
+          <div className="h-4 w-1/2 bg-[#1e1e1e] rounded" />
+          <div className="flex gap-2 pt-2">
+            <div className="h-8 w-24 bg-[#1e1e1e] rounded-full" />
+            <div className="h-8 w-20 bg-[#1e1e1e] rounded-full" />
+            <div className="h-8 w-28 bg-[#1e1e1e] rounded-full" />
+          </div>
+        </div>
+      }>
         <AIBriefing orgId={orgId} userName={userName} />
       </Suspense>
 

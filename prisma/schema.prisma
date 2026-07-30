@@ -2,6 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// The provider is "postgresql" for production deployments.
+// For local development with SQLite, override DATABASE_URL in .env to point
+// to a SQLite file (e.g. DATABASE_URL="file:./dev.db") and set the provider
+// to "sqlite" in a local-only schema branch, or use `prisma db push`
+// with an explicit DATABASE_URL. The Prisma schema stays PostgreSQL-native
+// so production deploys work without modification.
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

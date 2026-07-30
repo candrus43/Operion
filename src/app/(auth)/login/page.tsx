@@ -208,36 +208,33 @@ function LoginForm() {
 }
 
 function LoginSkeleton() {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetch("/api/settings/logo")
-      .then((res) => res.json())
-      .then((data) => setLogoUrl(data.logoUrl))
-      .catch(() => {})
-  }, [])
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
       <div className="w-full max-w-sm space-y-8">
+        {/* Branded loading — Operion logo with pulsing card skeleton */}
         <div className="text-center space-y-3">
-          {logoUrl ? (
-            <Link href="/" className="inline-flex items-center justify-center h-12">
-              <img
-                src={logoUrl}
-                alt="Logo"
-                className="h-10 max-w-[200px] object-contain"
-              />
-            </Link>
-          ) : (
-            <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
-              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
-            </Link>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome to Operion</h1>
-            <p className="text-sm text-muted-foreground mt-1">Loading...</p>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
           </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Operion</h1>
+            <p className="text-sm text-muted-foreground mt-1">Loading your workspace…</p>
+          </div>
+        </div>
+
+        {/* Card skeleton matching the real login card */}
+        <div className="rounded-xl bg-[#111111] shadow-2xl p-6 space-y-4 animate-pulse">
+          <div className="h-5 w-20 bg-[#1e1e1e] rounded" />
+          <div className="h-4 w-48 bg-[#1e1e1e] rounded" />
+          <div className="space-y-2 pt-2">
+            <div className="h-3.5 w-12 bg-[#1e1e1e] rounded" />
+            <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3.5 w-16 bg-[#1e1e1e] rounded" />
+            <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
+          </div>
+          <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
         </div>
       </div>
     </div>

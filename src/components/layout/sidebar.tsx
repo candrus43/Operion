@@ -60,17 +60,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const [tier, setTier] = useState<string | null>(null)
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch("/api/settings/logo")
-      .then((res) => res.json())
-      .then((data) => setLogoUrl(data.logoUrl))
-      .catch(() => {})
-  }, [])
-
+  // Single fetch to /api/organization provides logo, tier, and subscription status
   useEffect(() => {
     fetch("/api/organization")
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
+        if (data?.logoUrl) setLogoUrl(data.logoUrl)
         if (data?.tier) setTier(data.tier)
         if (data?.subscriptionStatus) setSubscriptionStatus(data.subscriptionStatus)
       })
