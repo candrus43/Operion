@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/db"
+import { sendWelcomeEmail } from "@/lib/email"
 
 function slugify(name: string): string {
   return name
@@ -62,8 +63,10 @@ export async function POST(req: Request) {
       },
     })
 
-    // TODO: Re-enable welcome email once Resend build issue is resolved
-    // Requires making Turbopack ignore the resend module during build
+    // Send welcome email — non-blocking, won't fail registration
+    sendWelcomeEmail({ email: user.email, name: user.name }).catch((err) => {
+      console.error("Failed to send welcome email:", err)
+    })
 
     return NextResponse.json({
       id: user.id,
