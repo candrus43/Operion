@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db"
 import { cn } from "@/lib/utils"
+import { Greeting } from "./greeting"
 import {
   Sparkles,
   AlertTriangle,
@@ -9,20 +10,6 @@ import {
   Calendar,
   Zap,
 } from "lucide-react"
-
-function getGreeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return "Good morning"
-  if (hour < 17) return "Good afternoon"
-  return "Good evening"
-}
-
-function getTimeEmoji(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return "☀️"
-  if (hour < 17) return "🌤️"
-  return "🌙"
-}
 
 interface BriefingProps {
   orgId: string
@@ -185,8 +172,7 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
           </div>
           <div>
             <h2 className="text-lg font-semibold tracking-tight">
-              <span className="text-amber-400">{getTimeEmoji()}</span>{" "}
-              {getGreeting()}, <span className="text-white">{firstName}</span>
+              <Greeting firstName={firstName} />
             </h2>
             <p className="text-xs text-muted-foreground/80 mt-0.5">
               Your AI briefing for {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
