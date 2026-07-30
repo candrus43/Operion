@@ -42,10 +42,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
   const [priority, setPriority] = useState(task?.priority || "MEDIUM")
   const [category, setCategory] = useState(task?.category || "")
   const [dueDate, setDueDate] = useState(task?.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : "")
-  const [projectId, setProjectId] = useState(task?.projectId || "")
-  const [entityId, setEntityId] = useState(task?.entityId || "")
-  const [assigneeId, setAssigneeId] = useState(task?.assigneeId || "")
-  const [dependsOnId, setDependsOnId] = useState(task?.dependsOnId || "")
+  const [projectId, setProjectId] = useState(task?.projectId || "none")
+  const [entityId, setEntityId] = useState(task?.entityId || "none")
+  const [assigneeId, setAssigneeId] = useState(task?.assigneeId || "none")
+  const [dependsOnId, setDependsOnId] = useState(task?.dependsOnId || "none")
   const [notes, setNotes] = useState(task?.notes || "")
 
   // Filter out the current task from the depends-on list (avoid circular deps + self)
@@ -66,10 +66,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
         priority,
         category: category.trim() || null,
         dueDate: dueDate || null,
-        projectId: projectId || null,
-        entityId: entityId || null,
-        assigneeId: assigneeId || null,
-        dependsOnId: dependsOnId || null,
+        projectId: projectId === "none" ? null : projectId || null,
+        entityId: entityId === "none" ? null : entityId || null,
+        assigneeId: assigneeId === "none" ? null : assigneeId || null,
+        dependsOnId: dependsOnId === "none" ? null : dependsOnId || null,
         notes: notes.trim() || null,
       }
 
