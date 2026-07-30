@@ -42,6 +42,7 @@ const bottomNavItems = [
 ]
 
 const adminNavItems = [
+  { href: "/settings/team", label: "Team", icon: Users },
   { href: "/audit-log", label: "Audit Log", icon: ClipboardList },
 ]
 

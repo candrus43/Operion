@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import { sendTeamInviteEmail } from "@/lib/email"
 
 const TIER_LIMITS: Record<string, { maxUsers: number | null; maxEntities: number | null }> = {
   SOLO: { maxUsers: 1, maxEntities: 3 },
   TEAM: { maxUsers: 5, maxEntities: 25 },
   ENTERPRISE: { maxUsers: null, maxEntities: null },
 }
+
+const VALID_ROLES = ["OWNER", "EXECUTIVE_ASSISTANT", "OPERATIONS_MANAGER", "STAFF", "READ_ONLY"]
 
 export async function GET() {
   const session = await auth()
@@ -18,7 +21,7 @@ export async function GET() {
 
   const users = await prisma.user.findMany({
     where: { organizationId: orgId },
-    select: { id: true, name: true, email: true, image: true },
+    select: { id: true, name: true, email: true, image: true, role: true, createdAt: true },
     orderBy: { name: "asc" },
   })
 
@@ -31,21 +34,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  const currentUserRole = (session.user as any).role
+  const currentUserId = (session.user as any).id
   const orgId = (session.user as any).organizationId
+
   if (!orgId) {
     return NextResponse.json({ error: "No organization" }, { status: 400 })
+  }
+
+  // Only OWNER can invite users
+  if (currentUserRole !== "OWNER") {
+    return NextResponse.json({ error: "Only owners can invite users" }, { status: 403 })
   }
 
   // Enforce tier user caps
   const [org, userCount] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: orgId },
-      select: { subscriptionTier: true },
+      select: { subscriptionTier: true, name: true },
     }),
     prisma.user.count({ where: { organizationId: orgId } }),
   ])
 
   const tier = org?.subscriptionTier || "SOLO"
+  const orgName = org?.name || "Operion"
   const limits = TIER_LIMITS[tier] || TIER_LIMITS.SOLO
   const maxUsers = limits.maxUsers
 
@@ -70,6 +82,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
   }
 
+  if (role && !VALID_ROLES.includes(role)) {
+    return NextResponse.json({ error: `Invalid role. Must be one of: ${VALID_ROLES.join(", ")}` }, { status: 400 })
+  }
+
+  // Check for duplicate email in this org
+  const existingUser = await prisma.user.findFirst({
+    where: { email, organizationId: orgId },
+  })
+
+  if (existingUser) {
+    return NextResponse.json({ error: "A user with this email already exists in your organization" }, { status: 409 })
+  }
+
   const user = await prisma.user.create({
     data: {
       name,
@@ -77,8 +102,37 @@ export async function POST(req: NextRequest) {
       role: role || "STAFF",
       organizationId: orgId,
     },
-    select: { id: true, name: true, email: true, image: true, role: true },
+    select: { id: true, name: true, email: true, image: true, role: true, createdAt: true },
   })
 
-  return NextResponse.json(user, { status: 201 })
+  // Try to send invite email
+  const emailSent = await sendTeamInviteEmail({
+    email: user.email,
+    name: user.name,
+    orgName,
+    invitedByName: session.user.name || "A team member",
+  })
+
+  // Create audit log for the invitation
+  await prisma.auditLog.create({
+    data: {
+      organizationId: orgId,
+      userId: currentUserId,
+      action: "CREATE",
+      entity: "User",
+      entityId: user.id,
+      details: JSON.stringify({ invitedEmail: email, invitedName: name, role: user.role, emailSent }),
+    },
+  })
+
+  return NextResponse.json(
+    {
+      ...user,
+      inviteEmailSent: emailSent,
+      inviteNote: emailSent
+        ? undefined
+        : "Email service not configured. The user can sign in at " + (process.env.NEXTAUTH_URL || "https://operion.ctonew.app") + "/login",
+    },
+    { status: 201 }
+  )
 }
