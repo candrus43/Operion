@@ -28,10 +28,11 @@ interface StatCardProps {
   icon: LucideIcon
   accent?: string
   subtitle?: string
+  href?: string
 }
 
-export function StatCard({ label, value, icon: Icon, accent, subtitle }: StatCardProps) {
-  return (
+export function StatCard({ label, value, icon: Icon, accent, subtitle, href }: StatCardProps) {
+  const card = (
     <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
@@ -47,6 +48,12 @@ export function StatCard({ label, value, icon: Icon, accent, subtitle }: StatCar
       </CardContent>
     </Card>
   )
+
+  if (href) {
+    return <Link href={href}>{card}</Link>
+  }
+
+  return card
 }
 
 // ── Critical Tasks Widget ───────────────────────────────────────
@@ -293,9 +300,10 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
           </div>
         ) : (
           projects.map((project) => (
-            <div
+            <Link
               key={project.id}
-              className="rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group cursor-pointer"
+              href={`/projects/${project.id}`}
+              className="block rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 min-w-0">
@@ -329,7 +337,7 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
                   Target: {project.targetDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                 </div>
               )}
-            </div>
+            </Link>
           ))
         )}
       </CardContent>

@@ -306,12 +306,12 @@ export default async function DashboardPage({
         </div>
         {/* Stat cards take remaining 5 columns */}
         <div className="lg:col-span-5 grid gap-4 grid-cols-2 sm:grid-cols-3">
-          <StatCard label="Entities" value={entityCount} icon={Building2} accent="text-blue-400" />
-          <StatCard label="Active Projects" value={activeProjectCount} icon={FolderKanban} accent="text-emerald-400" />
-          <StatCard label="Open Tasks" value={openTaskCount} icon={CheckSquare} accent="text-violet-400" />
-          <StatCard label="Waiting On" value={waitingOnCount} icon={Clock} accent="text-amber-400" />
-          <StatCard label="Documents" value={docCount} icon={FileText} accent="text-sky-400" />
-          <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" />
+          <StatCard label="Entities" value={entityCount} icon={Building2} accent="text-blue-400" href="/entities" />
+          <StatCard label="Active Projects" value={activeProjectCount} icon={FolderKanban} accent="text-emerald-400" href="/projects" />
+          <StatCard label="Open Tasks" value={openTaskCount} icon={CheckSquare} accent="text-violet-400" href="/tasks" />
+          <StatCard label="Waiting On" value={waitingOnCount} icon={Clock} accent="text-amber-400" href="/tasks?status=WAITING_ON" />
+          <StatCard label="Documents" value={docCount} icon={FileText} accent="text-sky-400" href="/documents" />
+          <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" href="/contacts" />
         </div>
         {isTrial && trialDaysRemaining !== null && (
           <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 flex flex-col justify-between">
