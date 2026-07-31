@@ -8,6 +8,7 @@ import { AIBriefing } from "@/components/dashboard/ai-briefing"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
 import { HealthScore } from "@/components/dashboard/health-score"
 import { WelcomeScreen } from "@/components/onboarding/welcome-screen"
+import { PostPaymentOnboarding } from "@/components/onboarding/PostPaymentOnboarding"
 import { CheckoutSuccessToast } from "@/components/dashboard/checkout-success-toast"
 import { cn } from "@/lib/utils"
 import { generateNotifications } from "@/lib/notifications"
@@ -94,7 +95,12 @@ export default async function DashboardPage({
     redirect("/trial-expired")
   }
 
-  // Show guided onboarding if org has no entities yet
+  // Show post-payment onboarding if org is ACTIVE but has no entities
+  if (entityCount === 0 && org?.subscriptionStatus === "ACTIVE") {
+    return <PostPaymentOnboarding userName={userName} />
+  }
+
+  // Show guided onboarding if org has no entities yet (trial state)
   if (entityCount === 0) {
     return <WelcomeScreen userName={userName} />
   }
