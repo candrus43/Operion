@@ -47,6 +47,15 @@ export default auth((req) => {
     return NextResponse.redirect(new URL(destination, req.url))
   }
 
+  // Restrict /admin routes to OWNER role only
+  if (isAuth && req.nextUrl.pathname.startsWith("/admin")) {
+    const role = (req.auth?.user as any)?.role
+    if (role !== "OWNER") {
+      const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
+      return NextResponse.redirect(new URL(destination, req.url))
+    }
+  }
+
   // Redirect expired users to trial-expired page (skip exempt routes)
   if (isAuth && !isExemptRoute) {
     const subscriptionStatus = req.auth?.user?.subscriptionStatus
