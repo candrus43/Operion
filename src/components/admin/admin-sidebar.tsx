@@ -2,12 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
   Users,
   PenLine,
   ArrowLeft,
+  LogOut,
 } from "lucide-react"
 
 const adminNavItems = [
@@ -16,7 +18,7 @@ const adminNavItems = [
   { href: "/admin/content", label: "Content", icon: PenLine },
 ]
 
-export function AdminSidebar() {
+export function AdminSidebar({ adminEmail }: { adminEmail?: string }) {
   const pathname = usePathname()
 
   const isActive = (href: string) => {
@@ -27,11 +29,14 @@ export function AdminSidebar() {
   return (
     <aside className="w-56 flex-shrink-0 border-r border-white/[0.06] bg-[#0a0a0a] flex flex-col h-screen">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 h-14 border-b border-white/[0.06]">
+      <div className="px-4 py-3 border-b border-white/[0.06]">
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo.svg" alt="Operion" className="h-6 w-6" />
           <span className="font-semibold text-sm">Admin</span>
         </Link>
+        {adminEmail && (
+          <p className="text-[10px] text-zinc-600 mt-1 truncate">{adminEmail}</p>
+        )}
       </div>
 
       {/* Navigation */}
@@ -57,8 +62,8 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      {/* Bottom: Back to app */}
-      <div className="p-3 border-t border-white/[0.06]">
+      {/* Bottom: Back to app + Logout */}
+      <div className="p-3 border-t border-white/[0.06] space-y-1">
         <Link
           href="/home"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04] transition-all"
@@ -66,6 +71,13 @@ export function AdminSidebar() {
           <ArrowLeft className="h-4 w-4 shrink-0" />
           <span>Back to app</span>
         </Link>
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full text-left"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          <span>Log out</span>
+        </button>
       </div>
     </aside>
   )

@@ -17,9 +17,11 @@ export default async function AdminLayout({
     redirect(dest)
   }
 
+  const adminEmail = session.user.email || ""
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0a]">
-      <AdminSidebar />
+      <AdminSidebar adminEmail={adminEmail} />
       <main className="flex-1 overflow-y-auto p-6">
         {children}
       </main>

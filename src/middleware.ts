@@ -43,14 +43,6 @@ export default auth((req) => {
     return NextResponse.redirect(new URL(destination, req.url))
   }
 
-  // Redirect authenticated users from landing page to dashboard
-  if (isAuth && req.nextUrl.pathname === "/") {
-    const role = (req.auth?.user as any)?.role
-    const isSuperAdmin = (req.auth?.user as any)?.isSuperAdmin
-    const destination = isSuperAdmin ? "/admin" : (role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home")
-    return NextResponse.redirect(new URL(destination, req.url))
-  }
-
   // Restrict /admin routes to super admins only
   if (isAuth && req.nextUrl.pathname.startsWith("/admin")) {
     // Allow /admin/login through without super admin check

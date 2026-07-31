@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Greeting } from "./greeting"
 import {
@@ -234,8 +235,9 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
                 </p>
               ) : (
                 focusItems.map((item, i) => (
-                  <div
+                  <Link
                     key={item.id}
+                    href={`/tasks/${item.id}`}
                     className="flex items-center gap-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.05] transition-colors px-3 py-2 group cursor-pointer"
                   >
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-foreground/5 text-[10px] font-semibold text-muted-foreground">
@@ -272,7 +274,7 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
                       </div>
                     </div>
                     <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-foreground/50 transition-colors shrink-0" />
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
