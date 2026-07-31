@@ -11,13 +11,15 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Download, Loader2, CreditCard, ExternalLink, Link, Unlink, Check, User, Lock, Building2 } from "lucide-react"
+import { Download, Loader2, CreditCard, ExternalLink, Link, Unlink, Check, User, Lock, Building2, Ban } from "lucide-react"
 import { toast } from "sonner"
+import { CancelFlow } from "@/components/billing/cancel-flow"
 
 export default function SettingsPage() {
   const { data: session, status, update } = useSession()
   const [exporting, setExporting] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
+  const [cancelFlowOpen, setCancelFlowOpen] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [disconnectingMicrosoft, setDisconnectingMicrosoft] = useState(false)
 
@@ -428,7 +430,7 @@ export default function SettingsPage() {
               </span>.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <Button
               onClick={handleManageBilling}
               disabled={portalLoading}
@@ -442,6 +444,18 @@ export default function SettingsPage() {
               )}
               {portalLoading ? "Opening portal..." : "Manage Billing"}
               {!portalLoading && <ExternalLink className="h-3 w-3 ml-1.5 opacity-50" />}
+            </Button>
+
+            <Separator className="bg-[#262626]" />
+
+            <Button
+              onClick={() => setCancelFlowOpen(true)}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
+            >
+              <Ban className="h-4 w-4 mr-2" />
+              Cancel Subscription
             </Button>
           </CardContent>
         </Card>
@@ -608,6 +622,13 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+      {/* Cancel Subscription Flow */}
+      <CancelFlow
+        open={cancelFlowOpen}
+        onOpenChange={setCancelFlowOpen}
+        subscriptionTier={session.user.subscriptionTier}
+        subscriptionStatus={session.user.subscriptionStatus}
+      />
     </div>
   )
 }
