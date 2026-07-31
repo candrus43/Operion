@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { AI_CONTENT_IDEAS, LINKEDIN_CONTENT_TEMPLATES } from "@/lib/content-templates"
 
 interface Post {
   id: string
@@ -55,6 +56,13 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
   const [calendarOffset, setCalendarOffset] = useState(0) // weeks offset from now
   const [scheduleModal, setScheduleModal] = useState<{ postId: string; currentDate: string | null } | null>(null)
   const [scheduleDate, setScheduleDate] = useState("")
+
+  const openInEditor = useCallback((title: string, body: string) => {
+    setGeneratedPost({ title, body })
+    setEditTitle(title)
+    setEditBody(body)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [])
 
   // ── Generate AI Post ──────────────────────────────────────────
   const generatePost = useCallback(async () => {
@@ -312,6 +320,58 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Ready-to-customize library */}
+      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Clipboard className="h-4 w-4 text-violet-400" />
+              <h2 className="text-sm font-semibold">Templates</h2>
+            </div>
+            <p className="text-xs text-zinc-500 mt-1">Start with a proven LinkedIn post, then make it yours.</p>
+          </div>
+          <span className="text-xs text-zinc-600">{LINKEDIN_CONTENT_TEMPLATES.length} starters</span>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {LINKEDIN_CONTENT_TEMPLATES.map((template) => (
+            <button
+              key={template.title}
+              type="button"
+              onClick={() => openInEditor(template.title, template.body)}
+              className="group rounded-lg border border-white/[0.05] bg-[#0a0a0a] p-3 text-left transition-colors hover:border-violet-400/30 hover:bg-violet-500/[0.04]"
+            >
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-violet-400">{template.category}</span>
+                <PenLine className="h-3.5 w-3.5 text-zinc-700 transition-colors group-hover:text-violet-400" />
+              </div>
+              <p className="text-xs font-medium leading-snug text-zinc-200">{template.title}</p>
+              <p className="mt-1.5 line-clamp-2 text-[11px] leading-relaxed text-zinc-600">{template.description}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* AI-suggested topics */}
+      <div className="rounded-xl border border-amber-500/10 bg-amber-500/[0.03] p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="h-4 w-4 text-amber-400" />
+          <h2 className="text-sm font-semibold">AI-suggested ideas</h2>
+          <span className="text-[10px] text-zinc-600">Click an idea to use it in the generator</span>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {AI_CONTENT_IDEAS.map((idea) => (
+            <button
+              key={idea}
+              type="button"
+              onClick={() => { setTopic(idea); window.scrollTo({ top: 0, behavior: "smooth" }) }}
+              className="rounded-lg border border-white/[0.05] bg-[#111111]/70 px-3 py-2.5 text-left text-xs text-zinc-400 transition-colors hover:border-amber-400/30 hover:text-zinc-200"
+            >
+              <span className="mr-2 text-amber-400">→</span>{idea}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Content Calendar */}
