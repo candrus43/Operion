@@ -114,6 +114,7 @@ model Entity {
   type           String       // BUSINESS, HOTEL, GAS_STATION, COMMERCIAL_PROPERTY, INVESTMENT, OTHER
   metadata       String       @default("{}") // JSON string for type-specific fields
   organizationId String
+  isSample       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -138,6 +139,7 @@ model Project {
   targetDate     DateTime?
   organizationId String
   entityId       String?
+  isSample       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -167,6 +169,7 @@ model Task {
   waitingOnUserId String?
   notes           String?
   aiSuggestion    String?
+  isSample        Boolean      @default(false)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -194,6 +197,7 @@ model Document {
   projectId      String?
   entityId       String?
   uploadedById   String?
+  isSample       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -215,6 +219,7 @@ model Contact {
   organizationId String
   entityId       String?
   notes          String?
+  isSample       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -232,6 +237,7 @@ model Meeting {
   organizationId String
   projectId      String?
   notes          String?
+  isSample       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 

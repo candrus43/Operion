@@ -176,6 +176,21 @@ async function handleCheckoutCompleted(
     },
   })
 
+  // ── Clean up sample data if transitioning from TRIAL ──────────
+  if (org.subscriptionStatus === "TRIAL") {
+    try {
+      await prisma.task.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      await prisma.meeting.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      await prisma.document.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      await prisma.contact.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      await prisma.project.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      await prisma.entity.deleteMany({ where: { organizationId: orgId, isSample: true } })
+      console.log(`🧹 Sample data cleaned for org ${orgId}`)
+    } catch (cleanupErr) {
+      console.error(`Failed to clean sample data for org ${orgId}:`, cleanupErr)
+    }
+  }
+
   console.log(
     `✅ Org ${orgId} activated: tier=${tier}, status=${status}, ` +
       `customer=${stripeCustomerId}, sub=${stripeSubscriptionId}`
