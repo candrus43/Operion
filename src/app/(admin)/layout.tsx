@@ -10,8 +10,9 @@ export default async function AdminLayout({
   const session = await auth()
   if (!session?.user) redirect("/login")
 
-  const role = (session.user as any).role
-  if (role !== "OWNER") {
+  const isSuperAdmin = (session.user as any).isSuperAdmin
+  if (!isSuperAdmin) {
+    const role = (session.user as any).role
     const dest = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
     redirect(dest)
   }

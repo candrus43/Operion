@@ -16,19 +16,21 @@ export default auth((req) => {
                        req.nextUrl.pathname.startsWith("/forgot-password") ||
                        req.nextUrl.pathname.startsWith("/reset-password") ||
                        req.nextUrl.pathname.startsWith("/accept-invite") ||
-                       req.nextUrl.pathname.startsWith("/support/access")
+                       req.nextUrl.pathname.startsWith("/support/access") ||
+                       req.nextUrl.pathname === "/admin/login"
 
   const isDemoRoute = req.nextUrl.pathname === "/api/demo"
   const isDebugRoute = req.nextUrl.pathname.startsWith("/api/debug")
   const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
   const isSupportAccessApi = req.nextUrl.pathname === "/api/support/access"
+  const isAdminSetupApi = req.nextUrl.pathname === "/api/admin/setup"
 
   // Skip enforcement for public routes, auth, etc.
-  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi ||
+  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi || isAdminSetupApi ||
                         isAuthPage || isPublicPage || isDemoRoute || isDebugRoute
 
-  if (isApiAuth || isRegisterApi || isStripeWebhook || isSupportAccessApi) return NextResponse.next()
+  if (isApiAuth || isRegisterApi || isStripeWebhook || isSupportAccessApi || isAdminSetupApi) return NextResponse.next()
 
   if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute && !isDebugRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
@@ -36,21 +38,26 @@ export default auth((req) => {
 
   if (isAuth && isAuthPage) {
     const role = (req.auth?.user as any)?.role
-    const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
+    const isSuperAdmin = (req.auth?.user as any)?.isSuperAdmin
+    const destination = isSuperAdmin ? "/admin" : (role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home")
     return NextResponse.redirect(new URL(destination, req.url))
   }
 
   // Redirect authenticated users from landing page to dashboard
   if (isAuth && req.nextUrl.pathname === "/") {
     const role = (req.auth?.user as any)?.role
-    const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
+    const isSuperAdmin = (req.auth?.user as any)?.isSuperAdmin
+    const destination = isSuperAdmin ? "/admin" : (role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home")
     return NextResponse.redirect(new URL(destination, req.url))
   }
 
-  // Restrict /admin routes to OWNER role only
+  // Restrict /admin routes to super admins only
   if (isAuth && req.nextUrl.pathname.startsWith("/admin")) {
-    const role = (req.auth?.user as any)?.role
-    if (role !== "OWNER") {
+    // Allow /admin/login through without super admin check
+    if (req.nextUrl.pathname === "/admin/login") return NextResponse.next()
+    const isSuperAdmin = (req.auth?.user as any)?.isSuperAdmin
+    if (!isSuperAdmin) {
+      const role = (req.auth?.user as any)?.role
       const destination = role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home"
       return NextResponse.redirect(new URL(destination, req.url))
     }

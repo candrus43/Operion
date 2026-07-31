@@ -256,6 +256,12 @@ export default function LandingPage() {
               </Link>
               <div className="flex items-center gap-3">
                 <Link
+                  href="/admin/login"
+                  className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+                >
+                  Admin
+                </Link>
+                <Link
                   href="/pricing"
                   className="inline-flex items-center justify-center rounded-md text-sm font-medium text-muted-foreground hover:text-foreground h-9 px-3 transition-colors"
                 >

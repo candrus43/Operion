@@ -96,6 +96,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           image: user.image,
           role: user.role,
           organizationId: user.organizationId,
+          isSuperAdmin: user.isSuperAdmin,
         }
       },
     }),
@@ -124,6 +125,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ;(user as any).dbId = existingUser.id
             ;(user as any).role = existingUser.role
             ;(user as any).organizationId = existingUser.organizationId
+            ;(user as any).isSuperAdmin = existingUser.isSuperAdmin
           } else {
             // console.log("[AUTH signIn] New Google user — no existing DB user for email:", user.email)
             // For now, allow sign-in even without DB user (JWT-only session)
@@ -145,6 +147,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ;(user as any).dbId = existingUser.id
             ;(user as any).role = existingUser.role
             ;(user as any).organizationId = existingUser.organizationId
+            ;(user as any).isSuperAdmin = existingUser.isSuperAdmin
           } else {
             // console.log("[AUTH signIn] New Microsoft user — no existing DB user for email:", user.email)
           }
@@ -185,6 +188,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = (user as any).role ?? "STAFF"
         token.organizationId = (user as any).organizationId ?? ""
         token.email = user.email ?? ""
+        token.isSuperAdmin = (user as any).isSuperAdmin ?? false
 
         // console.log("[AUTH jwt] user block — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
 
@@ -301,6 +305,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } catch (e) {
           console.error("[AUTH jwt] Org re-fetch failed:", e)
         }
+
+        // Re-fetch isSuperAdmin from DB
+        if (token.id) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { isSuperAdmin: true },
+            })
+            if (dbUser) {
+              token.isSuperAdmin = dbUser.isSuperAdmin
+            }
+          } catch (e) {
+            console.error("[AUTH jwt] isSuperAdmin re-fetch failed:", e)
+          }
+        }
       }
 
       // console.log("[AUTH jwt] EXIT — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
@@ -327,6 +346,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           session.user.role = token.role
           session.user.organizationId = token.organizationId
         }
+        session.user.isSuperAdmin = token.isSuperAdmin ?? false
         session.user.stripeCustomerId = token.stripeCustomerId
         session.user.subscriptionStatus = token.subscriptionStatus
         session.user.subscriptionTier = token.subscriptionTier
