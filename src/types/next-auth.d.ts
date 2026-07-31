@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: string
       role: string
       organizationId: string
+      isSuperAdmin?: boolean
       stripeCustomerId?: string
       subscriptionStatus?: string
       subscriptionTier?: string
@@ -24,6 +25,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     role?: string
     organizationId?: string
+    isSuperAdmin?: boolean
     isSupportMode?: boolean
     supportOrgId?: string
     supportPermissions?: string
@@ -38,6 +40,7 @@ declare module "next-auth/jwt" {
     id: string
     role: string
     organizationId: string
+    isSuperAdmin?: boolean
     stripeCustomerId?: string
     subscriptionStatus?: string
     subscriptionTier?: string

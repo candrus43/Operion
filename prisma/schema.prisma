@@ -58,6 +58,7 @@ model User {
   resetToken     String?      @unique
   resetTokenExpiry DateTime?
   role           String       @default("STAFF") // OWNER, EXECUTIVE_ASSISTANT, OPERATIONS_MANAGER, STAFF, READ_ONLY
+  isSuperAdmin   Boolean      @default(false)
   status         String       @default("ACTIVE") // ACTIVE, PENDING
   inviteToken    String?      @unique
   organizationId String

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -52,7 +52,14 @@ function LoginForm() {
       setError("Invalid email or password")
       setLoading(false)
     } else {
-      router.push("/home")
+      // Check if super admin — redirect to /admin if so
+      const session = await getSession()
+      const isSuperAdmin = (session?.user as any)?.isSuperAdmin
+      if (isSuperAdmin) {
+        router.push("/admin")
+      } else {
+        router.push("/home")
+      }
       router.refresh()
     }
   }
