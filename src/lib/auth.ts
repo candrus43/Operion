@@ -179,6 +179,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           delete token.supportExpiresAt
           delete token.supportActorId
         }
+
+        // Handle impersonation activation
+        if (session.isImpersonating) {
+          token.isImpersonating = true
+          token.impersonatingOriginalUserId = session.impersonatingOriginalUserId
+          token.impersonatingOriginalOrgId = session.impersonatingOriginalOrgId
+          token.impersonatingOriginalEmail = session.impersonatingOriginalEmail
+          token.impersonatingOriginalRole = session.impersonatingOriginalRole
+          token.impersonatingOriginalName = session.impersonatingOriginalName
+          token.impersonatingOriginalIsSuperAdmin = session.impersonatingOriginalIsSuperAdmin
+          // Override token with demo user data
+          token.id = session.impersonatingDemoUserId
+          token.email = session.impersonatingDemoEmail
+          token.name = session.impersonatingDemoName
+          token.role = session.impersonatingDemoRole
+          token.organizationId = session.impersonatingDemoOrgId
+          token.isSuperAdmin = false
+        } else if (session.isImpersonating === false) {
+          // Restore original admin session
+          if (token.impersonatingOriginalUserId) {
+            token.id = token.impersonatingOriginalUserId
+            token.email = token.impersonatingOriginalEmail
+            token.name = token.impersonatingOriginalName
+            token.role = token.impersonatingOriginalRole
+            token.organizationId = token.impersonatingOriginalOrgId
+            token.isSuperAdmin = token.impersonatingOriginalIsSuperAdmin
+          }
+          delete token.isImpersonating
+          delete token.impersonatingOriginalUserId
+          delete token.impersonatingOriginalOrgId
+          delete token.impersonatingOriginalEmail
+          delete token.impersonatingOriginalRole
+          delete token.impersonatingOriginalName
+          delete token.impersonatingOriginalIsSuperAdmin
+          delete token.impersonatingDemoUserId
+          delete token.impersonatingDemoEmail
+          delete token.impersonatingDemoName
+          delete token.impersonatingDemoRole
+          delete token.impersonatingDemoOrgId
+        }
+
         return token
       }
 
@@ -341,6 +382,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Keep the user's real id for audit purposes
           session.user.id = token.supportActorId || token.id
           session.user.role = "STAFF" // Support gets STAFF-level access, read-only enforced by permissions
+        } else if (token.isImpersonating) {
+          // Impersonation: use demo user context
+          session.user.isImpersonating = true
+          session.user.id = token.id
+          session.user.role = token.role
+          session.user.organizationId = token.organizationId
         } else {
           session.user.id = token.id
           session.user.role = token.role

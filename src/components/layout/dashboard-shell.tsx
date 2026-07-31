@@ -7,6 +7,7 @@ import { Topbar } from "@/components/layout/topbar"
 import { TrialBanner } from "@/components/trial-banner"
 import { DemoBanner } from "@/components/demo-banner"
 import { SupportModeBanner } from "@/components/support-mode-banner"
+import { ImpersonationBanner } from "@/components/impersonation-banner"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
@@ -41,6 +42,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           user={session?.user}
         />
         <SupportModeBanner />
+        <ImpersonationBanner />
         <TrialBanner />
         <DemoBanner />
         <main className="flex-1 overflow-y-auto p-6">

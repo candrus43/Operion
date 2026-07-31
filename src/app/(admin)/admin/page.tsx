@@ -13,6 +13,7 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ViewAsDemoButton } from "@/components/admin/view-as-demo-button"
 
 // ── Stripe MRR fetcher ─────────────────────────────────────────────
 async function fetchStripeMetrics(): Promise<{ totalMRR: number; payingCustomers: number; fromStripe: boolean }> {
@@ -440,8 +441,15 @@ export default async function AdminOverviewPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">Platform overview, customer insights, and content management.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
+            <p className="text-sm text-zinc-500 mt-1">Platform overview, customer insights, and content management.</p>
+          </div>
+          <Suspense fallback={null}>
+            <ViewAsDemoButton />
+          </Suspense>
+        </div>
       </div>
 
       {/* KPI Cards */}
