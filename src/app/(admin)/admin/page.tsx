@@ -14,6 +14,58 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+// ── Stripe MRR fetcher ─────────────────────────────────────────────
+async function fetchStripeMetrics(): Promise<{ totalMRR: number; payingCustomers: number; fromStripe: boolean }> {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) {
+    return { totalMRR: 0, payingCustomers: 0, fromStripe: false }
+  }
+
+  try {
+    const { getStripe } = await import("@/lib/stripe")
+    const stripe = getStripe()
+    let totalMRR = 0
+    let payingCustomers = 0
+    let hasMore = true
+    let startingAfter: string | undefined = undefined
+
+    while (hasMore) {
+      const subs = await stripe.subscriptions.list({
+        status: "active",
+        limit: 100,
+        starting_after: startingAfter,
+        expand: ["data.items.data.price"],
+      })
+
+      for (const sub of subs.data) {
+        const items = sub.items.data
+        let subMRR = 0
+        for (const item of items) {
+          const price = item.price
+          if (price && price.recurring?.interval === "month" && price.unit_amount) {
+            subMRR += price.unit_amount / 100
+          } else if (price && price.recurring?.interval === "year" && price.unit_amount) {
+            // Normalize yearly to monthly
+            subMRR += price.unit_amount / 100 / 12
+          }
+        }
+        if (subMRR > 0) {
+          totalMRR += subMRR
+          payingCustomers++
+        }
+      }
+
+      hasMore = subs.has_more
+      startingAfter = subs.data.length > 0 ? subs.data[subs.data.length - 1].id : undefined
+    }
+
+    return { totalMRR: Math.round(totalMRR), payingCustomers, fromStripe: true }
+  } catch (err) {
+    console.error("Stripe metrics fetch error:", err)
+    return { totalMRR: 0, payingCustomers: 0, fromStripe: false }
+  }
+}
+
 // ── KPI Card ──────────────────────────────────────────────────────
 function KPICard({
   label,
@@ -326,11 +378,14 @@ export default async function AdminOverviewPage() {
     }),
   ])
 
-  // Calculate MRR manually — sum up plan prices by org tier
-  const activeOrgs = allOrgs.filter(o => o.subscriptionStatus === "ACTIVE")
-  const totalMRR = activeOrgs.reduce((sum, o) => {
-    return sum + (o.subscriptionTier === "TEAM" ? 499 : 249)
-  }, 0)
+  // Fetch real MRR and paying customers from Stripe (falls back to $0/0)
+  const stripeMetrics = await fetchStripeMetrics()
+  const totalMRR = stripeMetrics.totalMRR
+  const payingCustomersFromStripe = stripeMetrics.payingCustomers
+  const mrrFromStripe = stripeMetrics.fromStripe
+
+  // Use Stripe paying customer count when available; fall back to DB count only for display context
+  const displayPayingCustomers = mrrFromStripe ? payingCustomersFromStripe : payingCustomers
 
   // Churn watchlist: orgs with no audit log in 7+ days
   const churnCandidates = await Promise.all(
@@ -374,7 +429,7 @@ export default async function AdminOverviewPage() {
   const metrics = {
     totalUsers,
     activeTrials,
-    payingCustomers,
+    payingCustomers: displayPayingCustomers,
     trialsExpiringSoon,
     totalMRR,
     conversionRate,
@@ -393,9 +448,9 @@ export default async function AdminOverviewPage() {
       <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         <KPICard label="Total Users" value={totalUsers} icon={Users} accent="text-blue-400" />
         <KPICard label="Active Trials" value={activeTrials} icon={FlaskConical} accent="text-amber-400" />
-        <KPICard label="Paying Customers" value={payingCustomers} icon={CreditCard} accent="text-emerald-400" />
+        <KPICard label="Paying Customers" value={displayPayingCustomers} icon={CreditCard} accent="text-emerald-400" sub={mrrFromStripe ? "from Stripe" : "Stripe unavailable"} />
         <KPICard label="Expiring Soon" value={trialsExpiringSoon} icon={Clock} accent="text-red-400" sub="within 3 days" />
-        <KPICard label="MRR" value={`$${totalMRR.toLocaleString()}`} icon={DollarSign} accent="text-violet-400" sub={`${activeOrgs.length} active`} />
+        <KPICard label="MRR" value={`${totalMRR.toLocaleString()}`} icon={DollarSign} accent="text-violet-400" sub={mrrFromStripe ? `${payingCustomersFromStripe} paying` : "Stripe unavailable"} />
       </div>
 
       {/* Row 2: Conversion Funnel + AI Insights */}

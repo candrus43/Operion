@@ -8,6 +8,7 @@ import {
   ArrowUpDown,
 } from "lucide-react"
 import Link from "next/link"
+import { DeleteCustomerButton } from "@/components/admin/delete-customer-button"
 
 // ── Status Badge ──────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
@@ -48,7 +49,7 @@ export default async function CustomersPage({
     include: {
       users: {
         where: { role: "OWNER" },
-        select: { email: true, name: true },
+        select: { id: true, email: true, name: true },
         take: 1,
       },
       _count: {
@@ -69,6 +70,7 @@ export default async function CustomersPage({
       return {
         id: org.id,
         name: org.name,
+        ownerId: org.users[0]?.id || "",
         ownerEmail: org.users[0]?.email || "N/A",
         ownerName: org.users[0]?.name || "N/A",
         plan: org.subscriptionTier,
@@ -202,6 +204,9 @@ export default async function CustomersPage({
                 <th className="text-right py-3 px-4 text-xs font-medium text-zinc-500">
                   <SortHeader field="lastActivity" label="Last Active" />
                 </th>
+                <th className="text-right py-3 px-4 text-xs font-medium text-zinc-500">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -255,11 +260,21 @@ export default async function CustomersPage({
                       day: "numeric",
                     })}
                   </td>
+                  <td className="py-3 px-4 text-right">
+                    {org.ownerId ? (
+                      <DeleteCustomerButton
+                        userId={org.ownerId}
+                        userName={org.ownerName !== "N/A" ? org.ownerName : org.ownerEmail}
+                      />
+                    ) : (
+                      <span className="text-[10px] text-zinc-700">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-zinc-500">
+                  <td colSpan={9} className="py-12 text-center text-zinc-500">
                     {search ? "No organizations match your search." : "No organizations yet."}
                   </td>
                 </tr>
