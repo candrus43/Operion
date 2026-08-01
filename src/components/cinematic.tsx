@@ -397,7 +397,7 @@ export function Atmosphere({
 export function HeadlineGlow() {
   return (
     <div
-      className="animate-breathe pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[24rem] w-[52rem] max-w-[130vw] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px]"
+      className="animate-breathe pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[24rem] w-[52rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px] sm:max-w-[130vw]"
       style={{
         background:
           "radial-gradient(ellipse at center, rgba(139,92,246,0.4) 0%, rgba(96,165,250,0.16) 45%, transparent 72%)",
@@ -434,7 +434,7 @@ export function DashboardShowcase() {
   const glow = eased
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative px-2 sm:px-0">
       {/* Floor glow */}
       <div
         className="pointer-events-none absolute inset-x-[8%] bottom-[-6%] h-40 rounded-[50%] blur-[80px]"
@@ -456,7 +456,7 @@ export function DashboardShowcase() {
           }}
         >
           {/* Browser chrome */}
-          <div className="flex items-center gap-3 border-b border-white/[0.05] bg-gradient-to-b from-[#17171b] to-[#101013] px-4 py-3">
+          <div className="flex items-center gap-2 border-b border-white/[0.05] bg-gradient-to-b from-[#17171b] to-[#101013] px-2 py-3 sm:gap-3 sm:px-4">
             <div className="flex shrink-0 gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/70" />
@@ -469,7 +469,7 @@ export function DashboardShowcase() {
                 </span>
               </div>
             </div>
-            <div className="w-12 shrink-0" />
+            <div className="w-6 shrink-0 sm:w-12" />
           </div>
 
           {/* Screenshot */}

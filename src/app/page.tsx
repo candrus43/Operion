@@ -272,7 +272,7 @@ export default function LandingPage() {
               </div>
 
               <h1
-                className="rise-in display relative mt-9 text-[2.75rem] sm:text-[4.25rem] lg:text-[5.75rem]"
+                className="rise-in display relative mt-9 text-[2.25rem] sm:text-[4.25rem] lg:text-[5.75rem]"
                 style={{ animationDelay: "200ms" }}
               >
                 <HeadlineGlow />
@@ -341,7 +341,7 @@ export default function LandingPage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               {entityTypes.map((item, i) => (
                 <Reveal key={item.label} delay={i * 90} direction="up" distance={26}>
-                  <div className="glass lift-sm group flex items-center gap-3 rounded-full px-6 py-3.5">
+                  <div className="glass lift-sm group flex items-center gap-3 rounded-full px-4 py-3 sm:px-6 sm:py-3.5">
                     <item.icon className="h-4 w-4 shrink-0 text-violet-300/60 transition-colors duration-500 group-hover:text-violet-300" />
                     <span className="whitespace-nowrap text-[13px] tracking-[-0.005em] text-white/55 transition-colors duration-500 group-hover:text-white/85">
                       {item.label}
