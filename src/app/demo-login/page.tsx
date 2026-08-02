@@ -1,15 +1,13 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { signIn, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { Sparkles, AlertTriangle } from "lucide-react"
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "morgan@blackstonepartners.demo"
 const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "demo123!"
 
 export default function DemoLoginPage() {
-  const router = useRouter()
   const attempted = useRef(false)
   const [error, setError] = useState(false)
 
@@ -18,26 +16,27 @@ export default function DemoLoginPage() {
     attempted.current = true
 
     async function enter() {
-      // Always sign out first — no matter who's logged in
-      await signOut({ redirect: false })
+      try {
+        const result = await signIn("credentials", {
+          email: DEMO_EMAIL,
+          password: DEMO_PASSWORD,
+          redirect: false,
+        })
 
-      // Always sign in as the demo user
-      const result = await signIn("credentials", {
-        email: DEMO_EMAIL,
-        password: DEMO_PASSWORD,
-        redirect: false,
-      })
-
-      if (!result?.error) {
-        router.push("/home")
-      } else {
+        if (result?.ok && !result?.error) {
+          // Full page reload to pick up the new session cookie
+          window.location.href = "/home"
+        } else {
+          setError(true)
+        }
+      } catch (_) {
         setError(true)
       }
     }
 
-    const t = setTimeout(enter, 600)
+    const t = setTimeout(enter, 800)
     return () => clearTimeout(t)
-  }, [router])
+  }, [])
 
   if (error) {
     return (
