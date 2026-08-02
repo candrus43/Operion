@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,10 @@ export default function DemoLoginPage() {
     e.preventDefault()
     setLoading(true)
     setError("")
+
+    // Clear any existing session (e.g. an admin already signed in) so the
+    // demo sign-in reliably replaces it instead of landing on the admin dashboard.
+    await signOut({ redirect: false })
 
     const result = await signIn("credentials", {
       email: DEMO_EMAIL,

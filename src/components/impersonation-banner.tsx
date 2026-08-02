@@ -15,6 +15,7 @@ export function ImpersonationBanner() {
 
   const handleReturnToAdmin = async () => {
     await update({ isImpersonating: false })
+    router.push("/admin")
     router.refresh()
   }
 
