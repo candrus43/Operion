@@ -29,26 +29,70 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
-/** Shared rAF-throttled scroll subscription so we never stack listeners. */
+/* -------------------------------------------------------------------------
+   Shared rAF-throttled scroll loop.
+
+   ONE module-level rAF dispatcher drives every subscriber, so a page with
+   many scroll-reactive components (Atmosphere, Parallax, progress bar,
+   nav, dashboard showcase) never stacks multiple rAF loops or duplicate
+   window listeners. A single scroll/resize listener is registered on the
+   first subscribe and torn down on the last unsubscribe.
+
+   On mobile (<768px) the loop is throttled to ~30fps by skipping every
+   other rAF tick, halving the per-frame measurement work.
+   ------------------------------------------------------------------------- */
+
+// Subscribers are refs so the latest handler is always called without
+// re-subscribing on every render (same pattern as the original hook).
+const rafSubscribers = new Set<{ current: () => void }>()
+
+let rafFrame = 0 // non-zero while a frame is scheduled
+let rafMobile = false
+let rafMobileTick = 0 // toggles on mobile to skip every other frame
+
+function rafRun() {
+  rafFrame = 0
+  if (rafMobile) {
+    rafMobileTick ^= 1
+    if (rafMobileTick === 1) return // skip every other frame → ~30fps
+  }
+  // Each subscriber does its own measurement (getBoundingClientRect etc.)
+  // inside its callback — the shared loop only dispatches.
+  rafSubscribers.forEach((cb) => cb.current())
+}
+
+function rafSchedule() {
+  rafMobile = window.innerWidth < 768
+  if (!rafFrame) rafFrame = requestAnimationFrame(rafRun)
+}
+
+function rafStop() {
+  if (rafFrame) {
+    cancelAnimationFrame(rafFrame)
+    rafFrame = 0
+  }
+}
+
+/** Shared rAF-throttled scroll subscription — one loop drives all listeners. */
 function useRafScroll(handler: () => void) {
   const cb = useRef(handler)
   cb.current = handler
   useEffect(() => {
-    let frame = 0
-    const run = () => {
-      frame = 0
-      cb.current()
+    const first = rafSubscribers.size === 0
+    rafSubscribers.add(cb)
+    if (first) {
+      window.addEventListener("scroll", rafSchedule, { passive: true })
+      window.addEventListener("resize", rafSchedule)
     }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(run)
-    }
-    run()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
+    cb.current() // immediate first measurement so initial paint is correct
     return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-      if (frame) cancelAnimationFrame(frame)
+      rafSubscribers.delete(cb)
+      if (rafSubscribers.size === 0) {
+        window.removeEventListener("scroll", rafSchedule)
+        window.removeEventListener("resize", rafSchedule)
+        rafStop()
+        rafMobileTick = 0
+      }
     }
   }, [])
 }
@@ -385,9 +429,9 @@ export function Atmosphere({
       className="pointer-events-none absolute inset-0 overflow-hidden"
       style={{ willChange: "transform, opacity" }}
     >
-      <div className="aurora-a absolute -left-[15%] top-[-18%] h-[46rem] w-[46rem] rounded-full bg-violet-600/[0.16] blur-[150px]" />
-      <div className="aurora-b absolute -right-[12%] top-[6%] h-[38rem] w-[38rem] rounded-full bg-indigo-500/[0.13] blur-[140px]" />
-      <div className="aurora-c absolute bottom-[-22%] left-[28%] h-[34rem] w-[34rem] rounded-full bg-sky-500/[0.09] blur-[130px]" />
+      <div className="aurora-a absolute -left-[15%] top-[-18%] h-[46rem] w-[46rem] rounded-full bg-violet-600/[0.16] blur-[80px] md:blur-[150px]" />
+      <div className="aurora-b absolute -right-[12%] top-[6%] h-[38rem] w-[38rem] rounded-full bg-indigo-500/[0.13] blur-[70px] md:blur-[140px]" />
+      <div className="aurora-c absolute bottom-[-22%] left-[28%] h-[34rem] w-[34rem] rounded-full bg-sky-500/[0.09] blur-[60px] md:blur-[130px]" />
       {particles && <Particles />}
     </div>
   )
