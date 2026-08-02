@@ -1,23 +1,33 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { signIn, signOut } from "next-auth/react"
+import { useEffect, useRef, useState } from "react"
+import { signIn, signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Sparkles } from "lucide-react"
+import { Sparkles, AlertTriangle } from "lucide-react"
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "morgan@blackstonepartners.demo"
 const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "demo123!"
 
 export default function DemoLoginPage() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const attempted = useRef(false)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
+    // Wait for session to load before deciding
+    if (status === "loading") return
     if (attempted.current) return
     attempted.current = true
 
+    // Already signed in as demo user — no need to sign out/in
+    if (session?.user?.email === DEMO_EMAIL) {
+      router.push("/home")
+      return
+    }
+
     async function enter() {
-      // Clear any existing session first so admin isn't carried over
+      // Not demo user — clear current session, then sign in as demo
       await signOut({ redirect: false })
 
       const result = await signIn("credentials", {
@@ -29,14 +39,33 @@ export default function DemoLoginPage() {
       if (!result?.error) {
         router.push("/home")
       } else {
-        router.push("/home")
+        setError(true)
       }
     }
 
-    // Slight delay so the user sees the transition
     const t = setTimeout(enter, 600)
     return () => clearTimeout(t)
-  }, [router])
+  }, [status, session, router])
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#08080a]">
+        <div className="flex flex-col items-center gap-4 text-center px-6">
+          <AlertTriangle className="h-10 w-10 text-amber-400" />
+          <h1 className="text-lg font-semibold text-white">Demo unavailable</h1>
+          <p className="text-sm text-white/40 max-w-xs">
+            We couldn&apos;t load the demo right now. Please try again in a moment.
+          </p>
+          <a
+            href="/"
+            className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
+          >
+            ← Back to Operion
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#08080a]">
