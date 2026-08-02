@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const passwordHash = await hash(password, 12);
   const user = await prisma.user.update({
     where: { email: "Hello@operion.online" },
-    data: { passwordHash },
+    data: { passwordHash, isSuperAdmin: true, role: "OWNER" },
   });
 
   return NextResponse.json({ ok: true, email: user.email });
