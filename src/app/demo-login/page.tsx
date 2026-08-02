@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Sparkles } from "lucide-react"
 
@@ -17,6 +17,9 @@ export default function DemoLoginPage() {
     attempted.current = true
 
     async function enter() {
+      // Clear any existing session first so admin isn't carried over
+      await signOut({ redirect: false })
+
       const result = await signIn("credentials", {
         email: DEMO_EMAIL,
         password: DEMO_PASSWORD,
@@ -26,8 +29,6 @@ export default function DemoLoginPage() {
       if (!result?.error) {
         router.push("/home")
       } else {
-        // If sign-in fails, redirect to home anyway — the demo page
-        // will prompt to retry or show the login form as fallback
         router.push("/home")
       }
     }
