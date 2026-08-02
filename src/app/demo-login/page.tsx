@@ -23,7 +23,7 @@ export default function DemoLoginPage() {
           redirect: false,
         })
 
-        if (result?.ok && !result?.error) {
+        if (result?.ok) {
           // Full page reload to pick up the new session cookie
           window.location.href = "/home"
         } else {
