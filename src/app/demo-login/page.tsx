@@ -27,8 +27,10 @@ export default function DemoLoginPage() {
     }
 
     async function enter() {
-      // Not demo user — clear current session, then sign in as demo
-      await signOut({ redirect: false })
+      // Only sign out if someone else is currently signed in
+      if (session?.user) {
+        await signOut({ redirect: false })
+      }
 
       const result = await signIn("credentials", {
         email: DEMO_EMAIL,
