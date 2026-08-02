@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 export const metadata: Metadata = {
   title: "Operion — AI Chief of Staff for Multi-Entity Portfolio Management",
   description:
-    "Operion is the AI-powered executive OS for owners managing multiple businesses, properties, and investments. One dashboard, daily AI briefings, cross-entity search. Start free.",
+    "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Operion — AI Chief of Staff for Multi-Entity Management",
     description:
-      "One dashboard for every business you run. AI-powered briefings, cross-entity search, and white-glove setup.",
+      "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
     url: "https://www.operion.online",
     siteName: "Operion",
     images: [
