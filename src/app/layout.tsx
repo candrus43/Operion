@@ -10,11 +10,15 @@ export const metadata: Metadata = {
   title: "Operion — AI Chief of Staff for Multi-Entity Portfolio Management",
   description:
     "Operion is the AI-powered executive OS for owners managing multiple businesses, properties, and investments. One dashboard, daily AI briefings, cross-entity search. Start free.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
   openGraph: {
     title: "Operion — AI Chief of Staff for Multi-Entity Management",
     description:
       "One dashboard for every business you run. AI-powered briefings, cross-entity search, and white-glove setup.",
-    url: "https://operion.ctonew.app",
+    url: "https://www.operion.online",
     siteName: "Operion",
     images: [
       {
