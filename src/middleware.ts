@@ -37,7 +37,9 @@ const isAdminFixPassword = req.nextUrl.pathname === "/api/admin/fix-password"
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
-  if (isAuth && isAuthPage) {
+  // Redirect authenticated users away from auth pages (login/register)
+  // EXCEPT demo-login — always allow it, regardless of auth state
+  if (isAuth && isAuthPage && !isDemoRoute) {
     const role = (req.auth?.user as any)?.role
     const isSuperAdmin = (req.auth?.user as any)?.isSuperAdmin
     const destination = isSuperAdmin ? "/admin" : (role === "EXECUTIVE_ASSISTANT" ? "/ea" : "/home")

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { signIn, signOut, useSession } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Sparkles, AlertTriangle } from "lucide-react"
 
@@ -10,28 +10,18 @@ const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "demo123!"
 
 export default function DemoLoginPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
   const attempted = useRef(false)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    // Wait for session to load before deciding
-    if (status === "loading") return
     if (attempted.current) return
     attempted.current = true
 
-    // Already signed in as demo user — no need to sign out/in
-    if (session?.user?.email === DEMO_EMAIL) {
-      router.push("/home")
-      return
-    }
-
     async function enter() {
-      // Only sign out if someone else is currently signed in
-      if (session?.user) {
-        await signOut({ redirect: false })
-      }
+      // Always sign out first — no matter who's logged in
+      await signOut({ redirect: false })
 
+      // Always sign in as the demo user
       const result = await signIn("credentials", {
         email: DEMO_EMAIL,
         password: DEMO_PASSWORD,
@@ -47,7 +37,7 @@ export default function DemoLoginPage() {
 
     const t = setTimeout(enter, 600)
     return () => clearTimeout(t)
-  }, [status, session, router])
+  }, [router])
 
   if (error) {
     return (
