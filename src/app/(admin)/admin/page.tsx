@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ViewAsDemoButton } from "@/components/admin/view-as-demo-button"
+import { SeedDemoButton } from "@/components/admin/seed-demo-button"
 
 // ── Stripe MRR fetcher ─────────────────────────────────────────────
 async function fetchStripeMetrics(): Promise<{ totalMRR: number; payingCustomers: number; fromStripe: boolean }> {
@@ -448,6 +449,7 @@ export default async function AdminOverviewPage() {
           </div>
           <Suspense fallback={null}>
             <ViewAsDemoButton />
+            <SeedDemoButton />
           </Suspense>
         </div>
       </div>
