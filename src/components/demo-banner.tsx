@@ -23,7 +23,13 @@ export function DemoBanner() {
           </span>
         </p>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
+        <Link
+          href="/"
+          className="text-xs text-violet-300/70 hover:text-violet-200 transition-colors"
+        >
+          ← Back to site
+        </Link>
         <Link
           href="/register"
           className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-7 px-3 bg-violet-600 hover:bg-violet-500 text-white transition-colors"
