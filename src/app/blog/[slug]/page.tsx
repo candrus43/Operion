@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: Props) {
                 Sign In
               </Link>
               <Link
-                href="/api/demo"
+                href="/demo-login"
                 className="inline-flex items-center justify-center gap-1.5 rounded-md bg-foreground text-background text-sm font-medium h-9 px-4 transition-all hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
               >
                 Explore the Product

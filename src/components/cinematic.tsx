@@ -254,7 +254,7 @@ export function CinematicNav() {
               </Link>
             ))}
             <Link
-              href="/api/demo"
+              href="/demo-login"
               className="ml-2 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-white px-5 text-[13px] font-medium text-black transition-all duration-500 hover:shadow-[0_0_32px_rgba(255,255,255,0.28)]"
             >
               Explore the Product
@@ -292,7 +292,7 @@ export function CinematicNav() {
               </Link>
             ))}
             <Link
-              href="/api/demo"
+              href="/demo-login"
               onClick={() => setOpen(false)}
               className="mt-1 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white text-sm font-medium text-black"
             >

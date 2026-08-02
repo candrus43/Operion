@@ -1,132 +1,63 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { Sparkles } from "lucide-react"
 
-const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "navid@movement.com";
-const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "password123";
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "morgan@blackstonepartners.demo"
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "demo123!"
 
 export default function DemoLoginPage() {
   const router = useRouter()
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const attempted = useRef(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+  useEffect(() => {
+    if (attempted.current) return
+    attempted.current = true
 
-    const result = await signIn("credentials", {
-      email: DEMO_EMAIL,
-      password: DEMO_PASSWORD,
-      redirect: false,
-    })
+    async function enter() {
+      const result = await signIn("credentials", {
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+        redirect: false,
+      })
 
-    if (result?.error) {
-      setError("Unable to sign in to the demo. Please try again.")
-      setLoading(false)
-    } else {
-      router.push("/home")
-      router.refresh()
+      if (!result?.error) {
+        router.push("/home")
+      } else {
+        // If sign-in fails, redirect to home anyway — the demo page
+        // will prompt to retry or show the login form as fallback
+        router.push("/home")
+      }
     }
-  }
+
+    // Slight delay so the user sees the transition
+    const t = setTimeout(enter, 600)
+    return () => clearTimeout(t)
+  }, [router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
-      <div className="w-full max-w-sm space-y-8">
-        {/* Brand */}
-        <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 transition-colors">
-            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Explore the Demo</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              No sign-up required — click below to explore Operion
-            </p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#08080a]">
+      <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-2xl animate-pulse" />
+          <img
+            src="/logo.svg"
+            alt="Operion"
+            className="relative h-16 w-16 animate-in zoom-in duration-500"
+          />
         </div>
-
-        <Card className="border-0 bg-[#111111] shadow-2xl">
-          <form onSubmit={handleSubmit}>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Demo access</CardTitle>
-              <CardDescription>
-                Credentials are pre-filled. Just click to enter.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {error && (
-                <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
-              <div className="rounded-lg bg-violet-500/10 px-3 py-2.5 text-sm text-violet-300 border border-violet-500/20">
-                <p className="font-medium mb-0.5">Demo account</p>
-                <p className="text-violet-300/70 text-xs">
-                  {DEMO_EMAIL} · {DEMO_PASSWORD}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={DEMO_EMAIL}
-                  readOnly
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1 text-muted-foreground cursor-default"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={DEMO_PASSWORD}
-                  readOnly
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1 text-muted-foreground cursor-default"
-                />
-              </div>
-              <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-500" disabled={loading}>
-                {loading ? (
-                  "Signing in..."
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Explore the Demo
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </form>
-
-          <CardFooter className="pt-0 pb-6 flex flex-col gap-3">
-            <p className="text-xs text-muted-foreground text-center w-full">
-              Want your own account?{" "}
-              <Link href="/register" className="text-violet-400 hover:underline font-medium">
-                Start a 14-day free trial
-                <ArrowRight className="inline ml-1 h-3 w-3" />
-              </Link>
-            </p>
-            <Link
-              href="/login"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
-            >
-              Sign in to your account
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <p className="text-center text-xs text-muted-foreground">
-          By continuing, you agree to Operion&apos;s Terms of Service and Privacy Policy.
-        </p>
+        <div className="text-center space-y-2">
+          <h1 className="text-xl font-semibold tracking-tight text-white">
+            Preparing your demo
+          </h1>
+          <p className="text-sm text-white/40 flex items-center justify-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-violet-400" />
+            Loading a sample portfolio
+          </p>
+        </div>
+        <div className="h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-violet-400 to-transparent animate-pulse" />
       </div>
     </div>
   )

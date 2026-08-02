@@ -101,7 +101,7 @@ export default function BlogIndexPage() {
                 Sign In
               </Link>
               <Link
-                href="/api/demo"
+                href="/demo-login"
                 className="inline-flex items-center justify-center gap-1.5 rounded-md bg-foreground text-background text-sm font-medium h-9 px-4 transition-all hover:bg-foreground/90 hover:shadow-[0_0_20px_rgba(250,250,250,0.1)]"
               >
                 Explore the Product
@@ -124,7 +124,7 @@ export default function BlogIndexPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
-              href="/api/demo"
+              href="/demo-login"
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground text-background text-sm font-medium h-10 px-6 transition-all hover:bg-foreground/90"
             >
               Explore the product

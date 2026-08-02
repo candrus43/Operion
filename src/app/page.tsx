@@ -296,7 +296,7 @@ export default function LandingPage() {
                 style={{ animationDelay: "500ms" }}
               >
                 <Link
-                  href="/api/demo"
+                  href="/demo-login"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full bg-white px-9 text-[15px] font-medium tracking-[-0.01em] text-black transition-all duration-500 hover:shadow-[0_0_50px_rgba(255,255,255,0.3)] sm:w-auto"
                 >
                   <Play className="h-4 w-4 transition-transform duration-500 group-hover:scale-110" />
@@ -824,7 +824,7 @@ export default function LandingPage() {
             <Reveal delay={340}>
               <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
-                  href="/api/demo"
+                  href="/demo-login"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full bg-white px-9 text-[15px] font-medium tracking-[-0.01em] text-black transition-all duration-500 hover:shadow-[0_0_50px_rgba(255,255,255,0.3)] sm:w-auto"
                 >
                   <Play className="h-4 w-4 transition-transform duration-500 group-hover:scale-110" />
