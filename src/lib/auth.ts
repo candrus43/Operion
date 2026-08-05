@@ -230,7 +230,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return token
       }
 
-      if (user) {
+      if (trigger === "signIn" && user) {
+        // Capture identity and authorization claims at sign-in. These claims stay
+        // in the signed JWT so middleware can validate sessions without Prisma.
         // Use db-linked id if available (set in signIn callback), otherwise use the OAuth sub
         token.id = (user as any).dbId || user.id || ""
         token.role = (user as any).role ?? "STAFF"
@@ -332,43 +334,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           }
         }
-      } else if (token.organizationId) {
-        // Re-fetch billing + connection status from DB so webhook updates propagate
-        try {
-          const org = await prisma.organization.findUnique({
-            where: { id: token.organizationId as string },
-            select: {
-              googleConnected: true,
-              microsoftConnected: true,
-              subscriptionStatus: true,
-              subscriptionTier: true,
-            },
-          })
-          if (org) {
-            token.googleConnected = org.googleConnected
-            token.microsoftConnected = org.microsoftConnected
-            token.subscriptionStatus = org.subscriptionStatus
-            token.subscriptionTier = org.subscriptionTier
-          }
-        } catch (e) {
-          console.error("[AUTH jwt] Org re-fetch failed:", e)
-        }
-
-        // Re-fetch isSuperAdmin from DB
-        if (token.id) {
-          try {
-            const dbUser = await prisma.user.findUnique({
-              where: { id: token.id as string },
-              select: { isSuperAdmin: true },
-            })
-            if (dbUser) {
-              token.isSuperAdmin = dbUser.isSuperAdmin
-            }
-          } catch (e) {
-            console.error("[AUTH jwt] isSuperAdmin re-fetch failed:", e)
-          }
-        }
       }
+
+      // JWT sessions are also validated by middleware in the Edge runtime. Keep
+      // all authorization claims in the signed token after the initial sign-in;
+      // Prisma cannot be queried here during token refresh/session validation.
 
       // console.log("[AUTH jwt] EXIT — token.id:", token.id, "token.role:", token.role, "token.organizationId:", token.organizationId)
       return token
