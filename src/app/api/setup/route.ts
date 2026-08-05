@@ -10,8 +10,16 @@ const DEMO_EMAIL = "morgan@blackstonepartners.demo"
 /** Populate the pitch account with a connected, believable operating history. */
 async function seedDemoAccount(user: { id: string; organizationId: string }) {
   const { organizationId, id: userId } = user
-  const existing = await prisma.entity.count({ where: { organizationId } })
-  if (existing > 0) return
+  // Wipe existing demo data so reseed always starts fresh
+  await prisma.auditLog.deleteMany({ where: { organizationId } })
+  await prisma.notification.deleteMany({ where: { organizationId } })
+  await prisma.comment.deleteMany({ where: { organizationId } })
+  await prisma.meeting.deleteMany({ where: { organizationId } })
+  await prisma.document.deleteMany({ where: { organizationId, isSample: true } })
+  await prisma.contact.deleteMany({ where: { organizationId, isSample: true } })
+  await prisma.task.deleteMany({ where: { organizationId, isSample: true } })
+  await prisma.project.deleteMany({ where: { organizationId, isSample: true } })
+  await prisma.entity.deleteMany({ where: { organizationId } })
 
   const now = new Date()
   const days = (offset: number) => new Date(now.getTime() + offset * 86400000)
