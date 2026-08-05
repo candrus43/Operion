@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -71,20 +72,19 @@ export default async function DocumentsPage({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {documents.length} document{documents.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <Link href="/documents/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Document
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Library"
+        title="Documents"
+        description={`${documents.length} document${documents.length !== 1 ? "s" : ""}`}
+        actions={
+          <Link href="/documents/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Document
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Type filter */}
       <div className="flex items-center gap-3">

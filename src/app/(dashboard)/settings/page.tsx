@@ -236,13 +236,13 @@ export default function SettingsPage() {
     <div className="max-w-2xl space-y-8">
       <SettingsNav />
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="display-tight text-2xl text-white sm:text-3xl">Settings</h1>
+        <p className="mt-2 text-sm text-white/40">
           Manage your organization&apos;s branding and preferences.
         </p>
       </div>
 
-      <Separator className="bg-[#262626]" />
+      <Separator className="bg-white/[0.06]" />
 
       {/* Organization Section — OWNER only */}
       {isOwner && (
@@ -322,7 +322,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <Separator className="bg-[#262626]" />
+          <Separator className="bg-white/[0.06]" />
 
           {/* Password Section */}
           <div className="space-y-4">
@@ -384,7 +384,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <Separator className="bg-[#262626]" />
+          <Separator className="bg-white/[0.06]" />
 
           {/* Save Button */}
           <div className="flex items-center gap-3">
@@ -446,7 +446,7 @@ export default function SettingsPage() {
               {!portalLoading && <ExternalLink className="h-3 w-3 ml-1.5 opacity-50" />}
             </Button>
 
-            <Separator className="bg-[#262626]" />
+            <Separator className="bg-white/[0.06]" />
 
             <Button
               onClick={() => setCancelFlowOpen(true)}

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -60,20 +61,19 @@ export default async function ContactsPage({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {contacts.length} contact{contacts.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <Link href="/contacts/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Contact
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Network"
+        title="Contacts"
+        description={`${contacts.length} contact${contacts.length !== 1 ? "s" : ""}`}
+        actions={
+          <Link href="/contacts/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Contact
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">

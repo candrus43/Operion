@@ -105,13 +105,13 @@ export default function ProfileSettingsPage() {
     <div className="max-w-2xl space-y-8">
       <SettingsNav />
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="display-tight text-2xl text-white sm:text-3xl">Profile</h1>
+        <p className="mt-2 text-sm text-white/40">
           Update your name, email address, and password.
         </p>
       </div>
 
-      <Separator className="bg-[#262626]" />
+      <Separator className="bg-white/[0.06]" />
 
       <Card className="border-[#262626] glass">
         <CardHeader>
@@ -150,7 +150,7 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
 
-          <Separator className="bg-[#262626]" />
+          <Separator className="bg-white/[0.06]" />
 
           {/* Password Section */}
           <div className="space-y-4">
@@ -212,7 +212,7 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
 
-          <Separator className="bg-[#262626]" />
+          <Separator className="bg-white/[0.06]" />
 
           {/* Save Button */}
           <div className="flex items-center gap-3">

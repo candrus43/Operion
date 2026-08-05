@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -109,20 +110,19 @@ export default async function ProjectsPage(props: {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground mt-1">
-            {projectCount} {projectCount === 1 ? "project" : "projects"} across your organization
-          </p>
-        </div>
-        <Link href="/projects/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Project
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Portfolio"
+        title="Projects"
+        description={`${projectCount} ${projectCount === 1 ? "project" : "projects"} across your organization`}
+        actions={
+          <Link href="/projects/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Project
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">

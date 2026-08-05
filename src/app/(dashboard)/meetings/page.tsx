@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
@@ -49,20 +50,19 @@ export default async function MeetingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Meetings</h1>
-          <p className="text-muted-foreground mt-1">
-            {meetings.length} {meetings.length === 1 ? "meeting" : "meetings"} scheduled
-          </p>
-        </div>
-        <Link href="/meetings/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Meeting
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Calendar"
+        title="Meetings"
+        description={`${meetings.length} ${meetings.length === 1 ? "meeting" : "meetings"} scheduled`}
+        actions={
+          <Link href="/meetings/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Meeting
+            </Button>
+          </Link>
+        }
+      />
 
       {meetings.length === 0 ? (
         <Card className="border-[#262626] glass">

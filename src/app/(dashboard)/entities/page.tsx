@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { prisma } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -75,27 +76,26 @@ export default async function EntitiesPage() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Entities</h1>
-          <p className="text-muted-foreground mt-1">
-            {entities.length} {entities.length === 1 ? "entity" : "entities"} across your portfolio
-          </p>
-        </div>
-        {atLimit ? (
-          <Button disabled className="gap-2 opacity-50 cursor-not-allowed" title="Entity limit reached">
-            <Plus className="h-4 w-4" />
-            Add Entity
-          </Button>
-        ) : (
-          <Link href="/entities/new">
-            <Button className="gap-2">
+      <PageHeader
+        eyebrow="Portfolio"
+        title="Entities"
+        description={`${entities.length} ${entities.length === 1 ? "entity" : "entities"} across your portfolio`}
+        actions={
+          atLimit ? (
+            <Button disabled className="gap-2 opacity-50 cursor-not-allowed" title="Entity limit reached">
               <Plus className="h-4 w-4" />
               Add Entity
             </Button>
-          </Link>
-        )}
-      </div>
+          ) : (
+            <Link href="/entities/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Entity
+              </Button>
+            </Link>
+          )
+        }
+      />
 
       <EntitySearch entities={entities} />
 

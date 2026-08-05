@@ -211,8 +211,8 @@ export function EAWorkspace({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">EA Workspace</h1>
-          <p className="text-sm text-muted-foreground mt-1">Your command center for daily operations</p>
+          <h1 className="display-tight text-2xl text-white sm:text-3xl">EA Workspace</h1>
+          <p className="mt-2 text-sm text-white/40">Your command center for daily operations</p>
         </div>
         <Button size="sm" variant="outline" onClick={() => router.refresh()}>
           <RefreshCw className="h-4 w-4 mr-2" />

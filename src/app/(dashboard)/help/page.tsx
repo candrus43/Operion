@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { HelpCircle, BookOpen, MessageCircle, Mail } from "lucide-react"
@@ -8,12 +9,11 @@ export default async function HelpPage() {
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Help & Documentation</h1>
-        <p className="text-muted-foreground mt-1">
-          Guides, FAQs, and support resources for Operion.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Support"
+        title="Help & Documentation"
+        description="Guides, FAQs, and support resources for Operion."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl glass border border-white/[0.06] p-6 space-y-3">

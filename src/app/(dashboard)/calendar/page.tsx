@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
@@ -85,20 +86,19 @@ export default async function CalendarPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {meetings.length} meeting{meetings.length !== 1 ? "s" : ""} scheduled
-          </p>
-        </div>
-        <Link href="/meetings/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Meeting
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Schedule"
+        title="Calendar"
+        description={`${meetings.length} meeting${meetings.length !== 1 ? "s" : ""} scheduled`}
+        actions={
+          <Link href="/meetings/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Meeting
+            </Button>
+          </Link>
+        }
+      />
 
       {meetings.length === 0 ? (
         <Card className="glass">
