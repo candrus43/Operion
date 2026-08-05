@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { hash } from "bcryptjs"
+import { auth } from "@/lib/auth"
+import { applyRateLimit } from "@/lib/rate-limit"
+import { randomBytes } from "node:crypto"
 
 const DEMO_EMAIL = "morgan@blackstonepartners.demo"
 
@@ -62,15 +65,21 @@ async function seedDemoAccount(user: { id: string; organizationId: string }) {
   await prisma.notification.createMany({ data: [{ organizationId, userId, type: "DEADLINE", title: "Lease renewal needs attention", message: "Riverfront Plaza lease renewal expires in 12 days.", link: "/tasks", read: false }, { organizationId, userId, type: "OVERDUE", title: "2 tasks are past due", message: "Review the overdue property workstream items.", link: "/tasks", read: false }] })
 }
 
-export async function POST(req: NextRequest) {
-  const { secret } = await req.json().catch(() => ({}))
-  if (secret !== "operion-setup-2026") return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+export async function POST(_req: NextRequest) {
+  const limit = await applyRateLimit(_req, { maxRequests: 3, windowMs: 5 * 60 * 1000 })
+  if (limit) return limit
+
+  const session = await auth()
+  if (!session?.user || !(session.user as { isSuperAdmin?: boolean }).isSuperAdmin) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const adminEmail = "Hello@operion.online"
     let adminUser = await prisma.user.findUnique({ where: { email: adminEmail } })
     if (!adminUser) {
       const adminOrg = await prisma.organization.create({ data: { name: "Operion", slug: "operion" } })
-      adminUser = await prisma.user.create({ data: { email: adminEmail, name: "Admin", passwordHash: await hash("Admin123!", 10), role: "OWNER", organizationId: adminOrg.id, isSuperAdmin: true } })
+      adminUser = await prisma.user.create({ data: { email: adminEmail, name: "Admin", passwordHash: await hash(process.env.SUPER_ADMIN_INITIAL_PASSWORD || randomBytes(32).toString("base64url"), 10), role: "OWNER", organizationId: adminOrg.id, isSuperAdmin: true } })
     }
     let demoUser = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } })
     if (!demoUser) {
