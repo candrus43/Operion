@@ -50,3 +50,6 @@ next-env.d.ts
 
 # uploads
 /public/uploads/
+
+# Generated demo media
+public/operion-demo.mp4

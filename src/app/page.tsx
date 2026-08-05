@@ -105,9 +105,9 @@ const features = [
 const trustPoints = [
   {
     icon: Lock,
-    title: "Enterprise-grade encryption",
+    title: "Enterprise-grade security",
     description:
-      "Your data is encrypted at rest and in transit with industry-standard protocols.",
+      "Your portfolio is protected with security practices designed for modern businesses.",
   },
   {
     icon: Shield,

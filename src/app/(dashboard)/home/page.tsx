@@ -26,8 +26,9 @@ import {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { checkout?: string }
+  searchParams: Promise<{ checkout?: string }>
 }) {
+  const searchParamsValue = await searchParams
   const session = await auth()
   if (!session?.user) redirect("/login")
 
@@ -229,7 +230,7 @@ export default async function DashboardPage({
   }
 
   // ── Checkout success handling ──────────────────────────────────
-  const showCheckoutSuccess = searchParams?.checkout === "success"
+  const showCheckoutSuccess = searchParamsValue.checkout === "success"
   const planName = tier === "TEAM" ? "Team" : "Solo"
 
   let trialDaysRemaining: number | null = null
