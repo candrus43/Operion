@@ -4,8 +4,6 @@ import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Topbar } from "@/components/layout/topbar"
-import { TrialBanner } from "@/components/trial-banner"
-import { DemoBanner } from "@/components/demo-banner"
 import { SupportModeBanner } from "@/components/support-mode-banner"
 import { ImpersonationBanner } from "@/components/impersonation-banner"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -15,6 +13,7 @@ import { Menu } from "lucide-react"
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const { data: session } = useSession()
+  const isPitchAccount = session?.user?.email === "morgan@blackstonepartners.demo"
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -41,10 +40,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           onMenuClick={() => {}}
           user={session?.user}
         />
-        <SupportModeBanner />
-        <ImpersonationBanner />
-        <TrialBanner />
-        <DemoBanner />
+        {!isPitchAccount && <SupportModeBanner />}
+        {!isPitchAccount && <ImpersonationBanner />}
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
