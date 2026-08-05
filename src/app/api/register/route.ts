@@ -29,7 +29,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 })
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const normalizedEmail = email.trim().toLowerCase()
+    const existing = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    })
     if (existing) {
       return NextResponse.json({ error: "Email already registered" }, { status: 409 })
     }
@@ -61,7 +64,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        email: normalizedEmail,
         passwordHash,
         role: "OWNER",
         organizationId: org.id,

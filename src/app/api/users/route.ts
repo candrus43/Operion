@@ -87,9 +87,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Invalid role. Must be one of: ${VALID_ROLES.join(", ")}` }, { status: 400 })
   }
 
-  // Check for duplicate email in this org
+  const normalizedEmail = email.trim().toLowerCase()
+
+  // Check for duplicate email in this org, regardless of casing.
   const existingUser = await prisma.user.findFirst({
-    where: { email, organizationId: orgId },
+    where: {
+      email: { equals: normalizedEmail, mode: "insensitive" },
+      organizationId: orgId,
+    },
   })
 
   if (existingUser) {
@@ -102,7 +107,7 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.create({
     data: {
       name,
-      email,
+      email: normalizedEmail,
       role: role || "STAFF",
       status: "PENDING",
       inviteToken,
