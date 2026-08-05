@@ -6,7 +6,7 @@ import { ChevronRight, Home } from "lucide-react"
 
 const sectionLabels: Record<string, string> = {
   ai: "AI Briefing",
-  audit-log: "Audit Log",
+  "audit-log": "Audit Log",
   calendar: "Calendar",
   contacts: "Contacts",
   documents: "Documents",
