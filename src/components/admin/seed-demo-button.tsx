@@ -17,10 +17,8 @@ export function SeedDemoButton() {
     setLoading(true)
     setResult("idle")
     try {
-      const res = await fetch("/api/admin/reset", {
+      const res = await fetch("/api/setup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ secret: "operion-reset-2026" }),
       })
       if (res.ok) {
         setResult("ok")

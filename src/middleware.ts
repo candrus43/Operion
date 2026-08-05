@@ -25,15 +25,12 @@ export default auth((req) => {
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
   const isSupportAccessApi = req.nextUrl.pathname === "/api/support/access"
   const isAdminSetupApi = req.nextUrl.pathname === "/api/admin/setup"
-const isAdminFixPassword = req.nextUrl.pathname === "/api/admin/fix-password"
-const isAdminResetApi = req.nextUrl.pathname === "/api/admin/reset"
-const isSetupApi = req.nextUrl.pathname === "/api/setup"
 
   // Skip enforcement for public routes, auth, etc.
-  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi || isAdminSetupApi || isAdminFixPassword || isAdminResetApi || isSetupApi ||
+  const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi || isAdminSetupApi ||
                         isAuthPage || isPublicPage || isDemoRoute || isDebugRoute
 
-  if (isApiAuth || isRegisterApi || isStripeWebhook || isSupportAccessApi || isAdminSetupApi || isAdminFixPassword || isAdminResetApi || isSetupApi) return NextResponse.next()
+  if (isApiAuth || isRegisterApi || isStripeWebhook || isSupportAccessApi || isAdminSetupApi) return NextResponse.next()
 
   if (!isAuth && !isAuthPage && !isPublicPage && !isDemoRoute && !isDebugRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
