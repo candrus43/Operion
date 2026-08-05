@@ -63,7 +63,10 @@ export async function PATCH(req: NextRequest) {
 
     // Check uniqueness (exclude current user)
     const existing = await prisma.user.findFirst({
-      where: { email: trimmedEmail, id: { not: userId } },
+      where: {
+        email: { equals: trimmedEmail, mode: "insensitive" },
+        id: { not: userId },
+      },
     })
     if (existing) {
       return NextResponse.json({ error: "Email is already in use" }, { status: 409 })

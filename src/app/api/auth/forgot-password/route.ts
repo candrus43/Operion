@@ -22,8 +22,8 @@ export async function POST(req: Request) {
     const normalizedEmail = email.toLowerCase().trim()
 
     // Look up user
-    const user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
       select: { id: true, email: true, name: true, resetTokenExpiry: true },
     })
 

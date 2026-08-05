@@ -127,12 +127,16 @@ export async function POST(_req: NextRequest) {
 
   try {
     const adminEmail = "Hello@operion.online"
-    let adminUser = await prisma.user.findUnique({ where: { email: adminEmail } })
+    let adminUser = await prisma.user.findFirst({
+      where: { email: { equals: adminEmail, mode: "insensitive" } },
+    })
     if (!adminUser) {
       const adminOrg = await prisma.organization.create({ data: { name: "Operion", slug: "operion" } })
       adminUser = await prisma.user.create({ data: { email: adminEmail, name: "Admin", passwordHash: await hash(process.env.SUPER_ADMIN_INITIAL_PASSWORD || randomBytes(32).toString("base64url"), 10), role: "OWNER", organizationId: adminOrg.id, isSuperAdmin: true } })
     }
-    let demoUser = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } })
+    let demoUser = await prisma.user.findFirst({
+      where: { email: { equals: DEMO_EMAIL, mode: "insensitive" } },
+    })
     if (!demoUser) {
       const demoOrg = await prisma.organization.create({ data: { name: "Blackstone Partners LLC", slug: "blackstone-partners-" + Date.now(), subscriptionTier: "SOLO", subscriptionStatus: "ACTIVE" } })
       demoUser = await prisma.user.create({ data: { email: DEMO_EMAIL, name: "Morgan Webb", passwordHash: await hash("demo123!", 10), role: "OWNER", organizationId: demoOrg.id } })

@@ -72,8 +72,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+        const user = await prisma.user.findFirst({
+          where: {
+            email: { equals: credentials.email as string, mode: "insensitive" },
+          },
         })
 
         if (!user || !user.passwordHash) {
@@ -114,8 +116,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Ensure organization exists (or link user to existing org by email)
         try {
           // Check if there's an existing user with this email
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+          const existingUser = await prisma.user.findFirst({
+            where: {
+              email: { equals: user.email!, mode: "insensitive" },
+            },
           })
 
           if (existingUser) {
@@ -138,8 +142,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (account?.provider === "microsoft-entra-id") {
         try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+          const existingUser = await prisma.user.findFirst({
+            where: {
+              email: { equals: user.email!, mode: "insensitive" },
+            },
           })
 
           if (existingUser) {

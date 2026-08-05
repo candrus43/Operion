@@ -18,7 +18,7 @@ export async function POST() {
 
     // Find the demo user
     const demoUser = await prisma.user.findUnique({
-      where: { email: DEMO_EMAIL },
+      where: { email: { equals: DEMO_EMAIL, mode: "insensitive" } },
       select: {
         id: true,
         email: true,
