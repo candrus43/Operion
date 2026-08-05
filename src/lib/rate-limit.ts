@@ -1,8 +1,7 @@
 /**
  * In-memory sliding-window rate limiter for API routes.
  *
- * Tracks requests by IP address using the x-forwarded-for header
- * (falling back to a random token for local dev). Old entries are
+ * Tracks requests by route and trusted client identifier. Old entries are
  * cleaned up periodically to avoid memory leaks.
  */
 
@@ -61,21 +60,20 @@ function startCleanup() {
 
 /**
  * Extract a client identifier from the request.
- * Uses x-forwarded-for header (first IP in the chain),
- * or falls back to a random identifier if unavailable (local dev).
+ * Prefer platform-provided connection identity; do not trust the first
+ * x-forwarded-for value because clients can forge it.
  */
 function getClientIp(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for")
-  if (forwarded) {
-    // Take the first IP (client IP, not proxies)
-    return forwarded.split(",")[0].trim()
-  }
+  // Vercel and most managed runtimes expose the connection IP here.
+  const connectionIp = (req as Request & { ip?: string }).ip
+  if (connectionIp) return connectionIp
 
-  // Fallbacks for local development
+  // x-real-ip is set by the trusted reverse proxy in supported deployments.
   const realIp = req.headers.get("x-real-ip")
   if (realIp) return realIp.trim()
 
-  // Use a combination of headers as a fallback identifier
+  // Never use the client-controlled x-forwarded-for value as an identity.
+  // Use a stable fallback for local development instead.
   const ua = req.headers.get("user-agent") || "unknown"
   return `local-${ua.slice(0, 50)}`
 }
@@ -96,7 +94,8 @@ export async function rateLimit(
   startCleanup()
 
   const ip = getClientIp(req)
-  const key = `rl:${ip}`
+  const route = new URL(req.url).pathname
+  const key = `rl:${route}:${ip}`
   const now = Date.now()
   const windowStart = now - windowMs
 

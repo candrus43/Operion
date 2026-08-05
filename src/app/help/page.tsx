@@ -1,12 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header"
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
 import { HelpCircle, BookOpen, MessageCircle, Mail } from "lucide-react"
 
 export default async function HelpPage() {
-  const session = await auth()
-  if (!session?.user) redirect("/login")
-
   return (
     <div className="space-y-8 max-w-3xl">
       <PageHeader

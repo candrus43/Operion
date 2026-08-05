@@ -43,10 +43,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
-        <Topbar
-          onMenuClick={() => {}}
-          user={session?.user}
-        />
+        <Topbar user={session?.user} />
         {!isPitchAccount && <SupportModeBanner />}
         {!isPitchAccount && <ImpersonationBanner />}
         <main className="flex-1 overflow-y-auto p-6">

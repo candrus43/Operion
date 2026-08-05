@@ -31,7 +31,7 @@ export function AdminSidebar({ adminEmail }: { adminEmail?: string }) {
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/[0.06]">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Operion" className="h-6 w-6" />
+          <img src="/logo.svg" alt="Operion" className="h-6 w-6" />
           <span className="font-semibold text-sm">Admin</span>
         </Link>
         {adminEmail && (

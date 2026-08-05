@@ -252,7 +252,7 @@ export default async function DashboardPage({
         <div className="rounded-2xl glass border border-white/[0.06] p-6 space-y-4 animate-pulse">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <img src="/logo.png" alt="Operion" className="h-5 w-5 opacity-60" />
+              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-60" />
             </div>
             <div>
               <div className="h-5 w-40 bg-white/[0.04] rounded" />
