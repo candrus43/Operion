@@ -9,6 +9,7 @@ import { ImpersonationBanner } from "@/components/impersonation-banner"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
+import { DashboardBreadcrumbs } from "@/components/layout/dashboard-breadcrumbs"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -47,7 +48,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {!isPitchAccount && <SupportModeBanner />}
         {!isPitchAccount && <ImpersonationBanner />}
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="mx-auto w-full max-w-7xl">{children}</div>
+          <div className="mx-auto w-full max-w-7xl">
+            <DashboardBreadcrumbs />
+            {children}
+          </div>
         </main>
       </div>
     </div>
