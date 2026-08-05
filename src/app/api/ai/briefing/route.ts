@@ -34,11 +34,12 @@ export async function POST(request: NextRequest) {
   const userId = (session.user as { id?: string }).id
   if (!orgId) return NextResponse.json({ error: "No organization found" }, { status: 400 })
 
-  const cached = briefingCache.get(orgId)
+  const cacheKey = `${orgId}:${userId ?? "unknown"}`
+  const cached = briefingCache.get(cacheKey)
   if (cached && cached.expiresAt > Date.now()) {
     return NextResponse.json({ briefing: cached.briefing, cached: true })
   }
-  briefingCache.delete(orgId)
+  briefingCache.delete(cacheKey)
 
   try {
     const now = new Date()
@@ -48,20 +49,20 @@ export async function POST(request: NextRequest) {
       prisma.entity.findMany({ where: { organizationId: orgId }, select: { name: true, type: true }, orderBy: { name: "asc" } }),
       prisma.task.findMany({
         where: { organizationId: orgId, status: { not: "DONE" } },
-        select: { title: true, status: true, priority: true, dueDate: true, entity: { select: { name: true } }, project: { select: { name: true } } },
+        select: { title: true, description: true, status: true, priority: true, dueDate: true, category: true, notes: true, assignee: { select: { name: true } }, entity: { select: { name: true } }, project: { select: { name: true } } },
         orderBy: [{ priority: "asc" }, { dueDate: "asc" }], take: 30,
       }),
       prisma.project.findMany({
         where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } },
-        select: { name: true, status: true, progress: true, targetDate: true, entity: { select: { name: true } } }, orderBy: { targetDate: "asc" }, take: 20,
+        select: { name: true, phase: true, description: true, status: true, progress: true, startDate: true, targetDate: true, entity: { select: { name: true } } }, orderBy: { targetDate: "asc" }, take: 20,
       }),
       prisma.meeting.findMany({
         where: { organizationId: orgId, date: { gte: now, lte: weekAhead } },
-        select: { title: true, date: true, location: true, project: { select: { name: true } } }, orderBy: { date: "asc" }, take: 10,
+        select: { title: true, date: true, location: true, notes: true, project: { select: { name: true } } }, orderBy: { date: "asc" }, take: 10,
       }),
       prisma.task.findMany({
         where: { organizationId: orgId, status: { not: "DONE" }, dueDate: { lt: now } },
-        select: { title: true, priority: true, dueDate: true, entity: { select: { name: true } } }, orderBy: { dueDate: "asc" }, take: 10,
+        select: { title: true, status: true, priority: true, dueDate: true, entity: { select: { name: true } } }, orderBy: { dueDate: "asc" }, take: 10,
       }),
       prisma.notification.findMany({
         where: { organizationId: orgId, ...(userId ? { userId } : {}) },
@@ -72,13 +73,27 @@ export async function POST(request: NextRequest) {
     const data = JSON.stringify({
       organization: organization?.name || "Your organization",
       entities,
-      tasks: tasks.map(t => ({ ...t, dueDate: formatDate(t.dueDate) })),
-      projects: projects.map(p => ({ ...p, targetDate: formatDate(p.targetDate) })),
-      upcomingMeetings: meetings.map(m => ({ ...m, date: formatDate(m.date) })),
-      overdueItems: overdueTasks.map(t => ({ ...t, dueDate: formatDate(t.dueDate) })),
-      recentNotifications: notifications.map(n => ({ ...n, createdAt: formatDate(n.createdAt) })),
+      tasks: tasks.slice(0, 20).map(t => ({
+        ...t,
+        description: t.description?.slice(0, 200) || null,
+        notes: t.notes?.slice(0, 200) || null,
+        dueDate: formatDate(t.dueDate),
+      })),
+      projects: projects.slice(0, 12).map(p => ({
+        ...p,
+        description: p.description?.slice(0, 200) || null,
+        startDate: formatDate(p.startDate),
+        targetDate: formatDate(p.targetDate),
+      })),
+      upcomingMeetings: meetings.slice(0, 8).map(m => ({
+        ...m,
+        notes: m.notes?.slice(0, 200) || null,
+        date: formatDate(m.date),
+      })),
+      overdueItems: overdueTasks.slice(0, 8).map(t => ({ ...t, dueDate: formatDate(t.dueDate) })),
+      recentNotifications: notifications.slice(0, 8).map(n => ({ ...n, createdAt: formatDate(n.createdAt) })),
     })
-    const systemPrompt = `You are an AI Chief of Staff for a business owner. Analyze their data and give a concise briefing with sections: 1. Critical Items (max 3), 2. Upcoming Deadlines, 3. Risks to Watch, 4. Recommended Actions. Be specific — mention entity names, task names, dates. Keep to ~500 words.
+    const systemPrompt = `You are an AI Chief of Staff for a business owner. Today is ${now.toISOString().slice(0, 10)}. Analyze their data and give a concise briefing with sections: 1. Critical Items (max 3), 2. Upcoming Deadlines, 3. Risks to Watch, 4. Recommended Actions. Be specific — mention entity names, task names, dates. Keep to ~500 words.
 
 Use only the supplied organization data. Do not invent facts. Return plain text with the four numbered headings.
 
@@ -95,7 +110,7 @@ ${data}`
       max_tokens: 900,
     })
     const briefing = completion.choices[0]?.message?.content?.trim() || FALLBACK_BRIEFING
-    briefingCache.set(orgId, { briefing, expiresAt: Date.now() + CACHE_TTL })
+    briefingCache.set(cacheKey, { briefing, expiresAt: Date.now() + CACHE_TTL })
     return NextResponse.json({ briefing, cached: false })
   } catch (error) {
     console.error("AI briefing failed; using fallback", error)
