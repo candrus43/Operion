@@ -17,7 +17,7 @@ export async function POST() {
     }
 
     // Find the demo user
-    const demoUser = await prisma.user.findUnique({
+    const demoUser = await prisma.user.findFirst({
       where: { email: { equals: DEMO_EMAIL, mode: "insensitive" } },
       select: {
         id: true,
