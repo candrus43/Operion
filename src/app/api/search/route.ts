@@ -66,6 +66,7 @@ export async function GET(req: NextRequest) {
           { url: { contains: query, mode: "insensitive" } },
           { filePath: { contains: query, mode: "insensitive" } },
           { notes: { contains: query, mode: "insensitive" } },
+          { content: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, type: true },
@@ -91,6 +92,7 @@ export async function GET(req: NextRequest) {
         OR: [
           { title: { contains: query, mode: "insensitive" } },
           { notes: { contains: query, mode: "insensitive" } },
+          { content: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, title: true, date: true, location: true },

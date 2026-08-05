@@ -154,14 +154,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
+                "group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
                   ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_20px_rgba(139,92,246,0.08)]"
                   : "text-white/50 hover:bg-white/[0.04] hover:text-white/90"
               )}
             >
               <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/40 group-hover:text-white/70")} />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span className="min-w-0 truncate">{item.label}</span>}
               {!collapsed && isActive && (
                 <span className="ml-auto h-1 w-1 rounded-full bg-violet-400" />
               )}
@@ -188,14 +188,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
+                "group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
                   ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
                   : "text-white/40 hover:bg-white/[0.04] hover:text-white/80"
               )}
             >
               <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/35 group-hover:text-white/60")} />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span className="min-w-0 truncate">{item.label}</span>}
             </Link>
           )
         })}
@@ -210,14 +210,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
+                  "group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                   isActive
                     ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
                     : "text-white/40 hover:bg-white/[0.04] hover:text-white/80"
                 )}
               >
                 <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/35 group-hover:text-white/60")} />
-                {!collapsed && <span>{item.label}</span>}
+                {!collapsed && <span className="min-w-0 truncate">{item.label}</span>}
               </Link>
             )
           })

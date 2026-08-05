@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Stripe reactivate error:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to reactivate subscription" },
+      { error: "Unable to reactivate subscription" },
       { status: 500 }
     )
   }

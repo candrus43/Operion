@@ -70,7 +70,6 @@ export async function GET(request: Request) {
 
     return NextResponse.redirect(session.url!)
   } catch (error: any) {
-    console.error("Subscription redirect error:", error)
     return NextResponse.redirect(
       new URL("/pricing?checkout=error", request.url).toString()
     )

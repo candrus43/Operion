@@ -1,14 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 import { Sparkles, Check, ArrowRight, Building2, Users, Briefcase, Search, Zap, Mail } from "lucide-react"
 import { toast } from "sonner"
 
 export default function PricingPage() {
   const { data: session } = useSession()
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
+  useEffect(() => {
+    const status = searchParams.get("checkout")
+    if (status === "error") toast.error("Checkout could not be started. Please try again.")
+    if (status === "cancelled") toast.info("Checkout cancelled — no payment was made.")
+  }, [searchParams])
 
   async function redirectToCheckout(plan: "SOLO" | "TEAM") {
     if (!session) {
