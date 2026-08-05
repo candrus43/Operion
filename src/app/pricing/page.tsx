@@ -51,7 +51,7 @@ export default function PricingPage() {
     description: "For solo operators managing a small portfolio.",
     features: [
       { text: "1 user seat", included: true },
-      { text: "Up to 3 entities", included: true },
+      { text: "Unlimited entities", included: true },
       { text: "AI daily briefing", included: true },
       { text: "Task & project management", included: true },
       { text: "Document & contact center", included: true },
@@ -84,28 +84,6 @@ export default function PricingPage() {
       { text: "Document & contact center", included: true },
     ],
     highlighted: true,
-  },
-  {
-    name: "Enterprise",
-    setupFee: "$10,000+",
-    setupPeriod: "one-time",
-    plan: null,
-    price: "$999",
-    period: "/month",
-    description: "For organizations with advanced needs and scale.",
-    features: [
-      { text: "Unlimited user seats", included: true },
-      { text: "Unlimited entities", included: true },
-      { text: "AI daily briefing", included: true },
-      { text: "AI chat & task suggestions", included: true },
-      { text: "Document search", included: true },
-      { text: "EA workspace", included: true },
-      { text: "Advanced permissions", included: true },
-      { text: "Priority support", included: true },
-      { text: "SSO & audit logs", included: true },
-      { text: "Dedicated tenant", included: true },
-    ],
-    highlighted: false,
   },
 ]
 
@@ -169,7 +147,7 @@ const features = [
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-8 lg:grid-cols-3 max-w-4xl mx-auto">
+        <div className="grid gap-8 lg:grid-cols-2 max-w-4xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}

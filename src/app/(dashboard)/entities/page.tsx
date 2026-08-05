@@ -46,8 +46,8 @@ export default async function EntitiesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Entity usage count banner — always visible */}
-      <div className={`rounded-lg border p-4 ${
+      {/* Finite plans get usage guidance; unlimited plans do not need a limit banner. */}
+      {Number.isFinite(maxEntities) && <div className={`rounded-lg border p-4 ${
         atLimit
           ? "border-amber-500/20 bg-amber-500/[0.06]"
           : "border-white/[0.06] glass"
@@ -73,7 +73,7 @@ export default async function EntitiesPage() {
             </Link>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Header */}
       <PageHeader

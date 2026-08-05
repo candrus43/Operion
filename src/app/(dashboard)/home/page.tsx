@@ -12,6 +12,7 @@ import { PostPaymentOnboarding } from "@/components/onboarding/PostPaymentOnboar
 import { CheckoutSuccessToast } from "@/components/dashboard/checkout-success-toast"
 import { cn } from "@/lib/utils"
 import { generateNotifications } from "@/lib/notifications"
+import { TIER_LIMITS } from "@/lib/tier-limits"
 import {
   Building2,
   FolderKanban,
@@ -280,7 +281,7 @@ export default async function DashboardPage({
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
           {tierLabel}
         </span>
-        {tier === "SOLO" && entityCount >= 3 && (
+        {Number.isFinite(TIER_LIMITS[tier]?.maxEntities) && entityCount >= (TIER_LIMITS[tier]?.maxEntities ?? Infinity) && (
           <div className="flex items-center gap-3 rounded-lg bg-amber-500/5 border border-amber-500/15 px-4 py-2.5 text-sm">
             <span className="text-amber-400">⚠</span>
             <span className="text-amber-300/80">You&apos;ve reached your entity limit.</span>

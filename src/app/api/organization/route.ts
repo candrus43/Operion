@@ -20,7 +20,7 @@ export async function GET() {
       name: "Operion",
       tier: "SOLO",
       maxUsers: 1,
-      maxEntities: 3,
+      maxEntities: TIER_LIMITS.SOLO.maxEntities,
       currentUserCount: 0,
       currentEntityCount: 0,
       logoUrl: branding.logoUrl,

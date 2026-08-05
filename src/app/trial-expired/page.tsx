@@ -67,14 +67,14 @@ export default function TrialExpiredPage() {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Single user, up to 3 entities, core AI briefing
+                Single user, unlimited entities, core AI briefing
               </p>
             </div>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {[
                 "1 user seat",
-                "Up to 3 entities",
+                "Unlimited entities",
                 "AI daily briefing",
                 "Task & project management",
                 "Document & contact center",
