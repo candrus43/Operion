@@ -194,6 +194,7 @@ model Document {
   url            String?
   filePath       String?
   notes          String?
+  content        String?
   organizationId String
   projectId      String?
   entityId       String?

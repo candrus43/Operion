@@ -60,7 +60,7 @@ export async function POST(req: Request) {
   const userId = (session.user as any).id
   const body = await req.json()
 
-  const { name, type, url, filePath, projectId, entityId } = body
+  const { name, type, url, filePath, content, projectId, entityId } = body
 
   if (!name || !type) {
     return NextResponse.json({ error: "Name and type are required" }, { status: 400 })

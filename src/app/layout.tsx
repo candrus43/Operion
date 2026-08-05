@@ -50,8 +50,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Keep zoom available for accessibility (WCAG 1.4.4).
+  maximumScale: 5,
+  userScalable: true,
 }
 
 export default async function RootLayout({
