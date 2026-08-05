@@ -68,9 +68,9 @@ export default async function ProjectsPage(props: {
     )
   }
 
-  const searchParams = await props.searchParams
-  const statusFilter = searchParams.status || ""
-  const phaseFilter = searchParams.phase || ""
+  const params = await props.searchParams
+  const statusFilter = params.status || ""
+  const phaseFilter = params.phase || ""
 
   const where: any = { organizationId: orgId }
   if (statusFilter && statusFilter !== "all") where.status = statusFilter

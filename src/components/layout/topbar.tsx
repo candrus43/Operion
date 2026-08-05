@@ -59,11 +59,10 @@ export function Topbar({ user }: TopbarProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [notifOpen, setNotifOpen] = useState(false)
-  const [generatingNotifs, setGeneratingNotifs] = useState(false)
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("/api/notifications?unread=true")
+      const res = await fetch("/api/notifications?unread=false")
       if (res.ok) {
         const data = await res.json()
         setNotifications(data)
@@ -99,20 +98,6 @@ export function Topbar({ user }: TopbarProps) {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
       setUnreadCount(0)
     } catch { /* ignore */ }
-  }
-
-  const generateNotifications = async () => {
-    setGeneratingNotifs(true)
-    try {
-      const res = await fetch("/api/notifications/generate", { method: "POST" })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.created > 0) {
-          fetchNotifications()
-        }
-      }
-    } catch { /* ignore */ }
-    finally { setGeneratingNotifs(false) }
   }
 
   function handleSearch(e: React.FormEvent) {
@@ -209,15 +194,6 @@ export function Topbar({ user }: TopbarProps) {
                         Mark all read
                       </Button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs text-muted-foreground"
-                      onClick={generateNotifications}
-                      disabled={generatingNotifs}
-                    >
-                      {generatingNotifs ? "..." : "Generate"}
-                    </Button>
                   </div>
                 </div>
                 <div className="max-h-[360px] overflow-y-auto">
@@ -225,7 +201,7 @@ export function Topbar({ user }: TopbarProps) {
                     <div className="flex flex-col items-center justify-center py-10 text-center">
                       <Bell className="h-8 w-8 text-muted-foreground/30 mb-2" />
                       <p className="text-sm text-muted-foreground">No notifications</p>
-                      <p className="text-xs text-muted-foreground/50 mt-1">Click "Generate" to scan for alerts</p>
+                      <p className="text-xs text-muted-foreground/50 mt-1">You're all caught up</p>
                     </div>
                   ) : (
                     notifications.map((notif) => (
@@ -275,12 +251,6 @@ export function Topbar({ user }: TopbarProps) {
             </>
           )}
         </div>
-
-        {/* Org Switcher Placeholder */}
-        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          {orgName}
-        </Button>
 
         {/* User Menu */}
         <DropdownMenu>

@@ -23,12 +23,12 @@ export default async function TasksPage(props: {
     )
   }
 
-  const searchParams = await props.searchParams
-  const statusFilter = searchParams.status || ""
-  const priorityFilter = searchParams.priority || ""
-  const searchQuery = searchParams.search || ""
-  const sortBy = searchParams.sort || "dueDate"
-  const mineFilter = searchParams.mine === "true"
+  const params = await props.searchParams
+  const statusFilter = params.status || ""
+  const priorityFilter = params.priority || ""
+  const searchQuery = params.search || ""
+  const sortBy = params.sort || "dueDate"
+  const mineFilter = params.mine === "true"
   const currentUserId = (session.user as any).id
 
   // Build where clause

@@ -57,7 +57,7 @@ export default function PricingPage() {
       { text: "Document & contact center", included: true },
       { text: "AI chat & task suggestions", included: false },
       { text: "Document search", included: false },
-      { text: "EA workspace", included: false },
+      { text: "EA workspace", included: true },
       { text: "Advanced permissions", included: false },
       { text: "Priority support", included: false },
     ],
@@ -273,7 +273,7 @@ const features = [
           <div className="rounded-2xl glass border border-white/[0.06] p-10 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold tracking-tight mb-2">Ready to get started?</h2>
             <p className="text-muted-foreground mb-6">
-              Join entrepreneurs who trust Operion as their AI Chief of Staff.
+              Built for entrepreneurs managing multiple entities with confidence.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link

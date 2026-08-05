@@ -34,14 +34,15 @@ function StatusBadge({ status }: { status: string }) {
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: { sort?: string; search?: string }
+  searchParams: Promise<{ sort?: string; search?: string }>
 }) {
+  const searchParamsValue = await searchParams
   const session = await auth()
   if (!session?.user) redirect("/login")
   if ((session.user as any).role !== "OWNER") redirect("/home")
 
-  const sort = searchParams.sort || "createdAt_desc"
-  const search = searchParams.search || ""
+  const sort = searchParamsValue.sort || "createdAt_desc"
+  const search = searchParamsValue.search || ""
   const [sortField, sortDir] = sort.split("_")
 
   // Fetch all orgs with their owner user
