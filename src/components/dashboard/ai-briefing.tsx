@@ -159,7 +159,7 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
   const priorityOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.04] bg-gradient-to-br from-[#111111] via-[#151518] to-[#111122] p-6 md:p-8">
+    <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#111111] via-[#151518] to-[#111122] p-6 md:p-8">
       {/* Subtle glow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.03] via-transparent to-blue-500/[0.03]" />
       <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/[0.04] blur-3xl" />
@@ -184,7 +184,7 @@ export async function AIBriefing({ orgId, userName }: BriefingProps) {
         {/* Main Briefing Content */}
         <div className="space-y-4">
           {/* Stats Summary */}
-          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4">
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
             <p className="text-sm leading-relaxed text-foreground/90">
               You have{" "}
               <span className="font-semibold text-white">{activeTasks} active priorities</span>

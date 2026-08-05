@@ -541,16 +541,16 @@ export function ImportClient() {
       </div>
 
       <Tabs defaultValue="csv" className="w-full">
-        <TabsList className="bg-[#111111] border border-white/[0.05]">
-          <TabsTrigger value="csv" className="data-[state=active]:bg-[#1a1a1a]">
+        <TabsList className="glass border border-white/[0.05]">
+          <TabsTrigger value="csv" className="data-[state=active]:bg-white/[0.04]">
             <FileSpreadsheet className="h-4 w-4 mr-2" />
             CSV / Excel
           </TabsTrigger>
-          <TabsTrigger value="ics" className="data-[state=active]:bg-[#1a1a1a]">
+          <TabsTrigger value="ics" className="data-[state=active]:bg-white/[0.04]">
             <Calendar className="h-4 w-4 mr-2" />
             Calendar (ICS)
           </TabsTrigger>
-          <TabsTrigger value="ai" className="data-[state=active]:bg-[#1a1a1a]">
+          <TabsTrigger value="ai" className="data-[state=active]:bg-white/[0.04]">
             <Sparkles className="h-4 w-4 mr-2" />
             AI Import
           </TabsTrigger>
@@ -561,7 +561,7 @@ export function ImportClient() {
           <div className="space-y-6 pt-4">
             {/* Step 1: Upload */}
             {step === "upload" && (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">Upload File</CardTitle>
                   <CardDescription>Upload a CSV, XLSX, or XLS file to import your data.</CardDescription>
@@ -602,7 +602,7 @@ export function ImportClient() {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between rounded-xl bg-[#1a1a1a] p-4">
+                    <div className="flex items-center justify-between rounded-xl bg-white/[0.04] p-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10">
                           <FileSpreadsheet className="h-4 w-4 text-sky-400" />
@@ -627,7 +627,7 @@ export function ImportClient() {
             {step === "map" && (
               <>
                 {/* Import type selector */}
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">What are you importing?</CardTitle>
                     <CardDescription>Select the type of data in your file.</CardDescription>
@@ -655,7 +655,7 @@ export function ImportClient() {
                 </Card>
 
                 {/* Preview table */}
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle className="text-sm font-medium">Preview ({previewRows.length} of {allRows.length} rows)</CardTitle>
@@ -666,10 +666,10 @@ export function ImportClient() {
                     </Badge>
                   </CardHeader>
                   <CardContent>
-                    <div className="overflow-x-auto rounded-lg border border-white/[0.04]">
+                    <div className="overflow-x-auto rounded-lg border border-white/[0.06]">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-[#1a1a1a]">
+                          <tr className="bg-white/[0.04]">
                             {headers.map((h) => (
                               <th key={h} className="px-3 py-2 text-left font-medium text-muted-foreground whitespace-nowrap">
                                 {h}
@@ -701,7 +701,7 @@ export function ImportClient() {
                 </Card>
 
                 {/* Column mapping */}
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">Column Mapping</CardTitle>
                     <CardDescription>
@@ -724,10 +724,10 @@ export function ImportClient() {
                             value={mappings[field] || "none"}
                             onValueChange={(v) => handleMappingChange(field, v)}
                           >
-                            <SelectTrigger className="flex-1 bg-[#1a1a1a] border-0 text-sm">
+                            <SelectTrigger className="flex-1 bg-white/[0.04] border-0 text-sm">
                               <SelectValue placeholder="Skip this field" />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                            <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                               <SelectItem value="none">— Skip —</SelectItem>
                               {headers.map((h) => (
                                 <SelectItem key={h} value={h}>{h}</SelectItem>
@@ -746,16 +746,16 @@ export function ImportClient() {
                 </Card>
 
                 {/* Mapped preview */}
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">Mapped Preview</CardTitle>
                     <CardDescription>First 3 rows after applying your mapping.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="overflow-x-auto rounded-lg border border-white/[0.04]">
+                    <div className="overflow-x-auto rounded-lg border border-white/[0.06]">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-[#1a1a1a]">
+                          <tr className="bg-white/[0.04]">
                             {fields.filter(f => mappings[f]).map((f) => (
                               <th key={f} className="px-3 py-2 text-left font-medium text-muted-foreground whitespace-nowrap">
                                 {fieldLabels[f] || f}
@@ -792,7 +792,7 @@ export function ImportClient() {
 
             {/* Step 3: Result */}
             {step === "result" && result && (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">Import Results</CardTitle>
                 </CardHeader>
@@ -819,7 +819,7 @@ export function ImportClient() {
                   </div>
 
                   {result.errors.length > 0 && (
-                    <div className="rounded-lg bg-[#1a1a1a] p-4 space-y-2 max-h-48 overflow-y-auto">
+                    <div className="rounded-lg bg-white/[0.04] p-4 space-y-2 max-h-48 overflow-y-auto">
                       <p className="text-xs font-medium text-muted-foreground mb-2">Error Details</p>
                       {result.errors.map((err, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs">
@@ -858,7 +858,7 @@ export function ImportClient() {
         <TabsContent value="ics" className="mt-0">
           <div className="space-y-6 pt-4">
             {!icsFile ? (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">Upload Calendar File</CardTitle>
                   <CardDescription>
@@ -904,7 +904,7 @@ export function ImportClient() {
             ) : (
               <>
                 {/* ICS Preview */}
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle className="text-sm font-medium">Events Preview</CardTitle>
@@ -940,7 +940,7 @@ export function ImportClient() {
                         </div>
 
                         {icsResult.errors.length > 0 && (
-                          <div className="rounded-lg bg-[#1a1a1a] p-4 space-y-2 max-h-48 overflow-y-auto">
+                          <div className="rounded-lg bg-white/[0.04] p-4 space-y-2 max-h-48 overflow-y-auto">
                             <p className="text-xs font-medium text-muted-foreground mb-2">Error Details</p>
                             {icsResult.errors.map((err, i) => (
                               <div key={i} className="flex items-start gap-2 text-xs">
@@ -960,10 +960,10 @@ export function ImportClient() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="overflow-x-auto rounded-lg border border-white/[0.04] max-h-64 overflow-y-auto">
+                      <div className="overflow-x-auto rounded-lg border border-white/[0.06] max-h-64 overflow-y-auto">
                         <table className="w-full text-xs">
                           <thead className="sticky top-0">
-                            <tr className="bg-[#1a1a1a]">
+                            <tr className="bg-white/[0.04]">
                               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Title</th>
                               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Date</th>
                               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Location</th>
@@ -1020,7 +1020,7 @@ export function ImportClient() {
           <div className="space-y-6 pt-4">
             {/* Upload zone */}
             {!aiImporting && !aiResult && !aiError && (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">AI-Powered Import</CardTitle>
                   <CardDescription>
@@ -1071,7 +1071,7 @@ export function ImportClient() {
                         {aiFiles.length} file{aiFiles.length > 1 ? "s" : ""} selected
                       </p>
                       {aiFiles.map((file, i) => (
-                        <div key={i} className="flex items-center justify-between rounded-xl bg-[#1a1a1a] p-3">
+                        <div key={i} className="flex items-center justify-between rounded-xl bg-white/[0.04] p-3">
                           <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
                               <FileSpreadsheet className="h-4 w-4 text-purple-400" />
@@ -1111,7 +1111,7 @@ export function ImportClient() {
 
             {/* Progress */}
             {aiImporting && (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardContent className="py-10">
                   <div className="flex flex-col items-center gap-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-500/10">
@@ -1129,7 +1129,7 @@ export function ImportClient() {
             {/* Success */}
             {aiResult && !aiImporting && (
               <>
-                <Card className="border-0 bg-[#111111]">
+                <Card className="glass">
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">Import Complete</CardTitle>
                     <CardDescription>
@@ -1140,7 +1140,7 @@ export function ImportClient() {
                     {/* Summary grid */}
                     <div className="grid grid-cols-2 gap-3">
                       {aiResult.summary.entities > 0 && (
-                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                        <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10">
                             <Table2 className="h-4 w-4 text-indigo-400" />
                           </div>
@@ -1151,7 +1151,7 @@ export function ImportClient() {
                         </div>
                       )}
                       {aiResult.summary.contacts > 0 && (
-                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                        <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/10">
                             <CheckCircle2 className="h-4 w-4 text-cyan-400" />
                           </div>
@@ -1162,7 +1162,7 @@ export function ImportClient() {
                         </div>
                       )}
                       {aiResult.summary.projects > 0 && (
-                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                        <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
                             <ArrowRight className="h-4 w-4 text-amber-400" />
                           </div>
@@ -1173,7 +1173,7 @@ export function ImportClient() {
                         </div>
                       )}
                       {aiResult.summary.tasks > 0 && (
-                        <div className="flex items-center gap-3 rounded-xl bg-[#1a1a1a] p-3">
+                        <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
                             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                           </div>
@@ -1186,7 +1186,7 @@ export function ImportClient() {
                     </div>
 
                     {aiResult.errors && aiResult.errors.length > 0 && (
-                      <div className="rounded-lg bg-[#1a1a1a] p-4 space-y-2 max-h-48 overflow-y-auto">
+                      <div className="rounded-lg bg-white/[0.04] p-4 space-y-2 max-h-48 overflow-y-auto">
                         <p className="text-xs font-medium text-muted-foreground mb-2">Warnings</p>
                         {aiResult.errors.map((err, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs">
@@ -1213,7 +1213,7 @@ export function ImportClient() {
 
             {/* Error */}
             {aiError && !aiImporting && (
-              <Card className="border-0 bg-[#111111]">
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium text-red-400">Import Failed</CardTitle>
                   <CardDescription>

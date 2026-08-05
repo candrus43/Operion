@@ -230,7 +230,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
           {/* Upload card */}
           <button
             onClick={() => router.push("/import")}
-            className="group relative rounded-xl bg-[#111111] border border-white/[0.04] p-5 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all w-full"
+            className="group relative rounded-xl glass border border-white/[0.06] p-5 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all w-full"
           >
             <div className="flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
@@ -247,7 +247,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
           {/* Tell us card */}
           <button
             onClick={() => setState("quick-start-input")}
-            className="group relative rounded-xl bg-[#111111] border border-white/[0.04] p-5 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all w-full"
+            className="group relative rounded-xl glass border border-white/[0.06] p-5 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all w-full"
           >
             <div className="flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
@@ -308,7 +308,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
               onKeyDown={handleKeyDown}
               placeholder='I run Riverside Hotel, ABC Corp, and a gas station on Main St. I also have a commercial property at 456 Oak.'
               rows={4}
-              className="w-full rounded-xl bg-[#111111] border border-white/[0.06] px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/30 resize-none transition-all"
+              className="w-full rounded-xl glass border border-white/[0.06] px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/30 resize-none transition-all"
               disabled={isSubmitting}
             />
 
@@ -323,7 +323,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
                 "inline-flex items-center justify-center gap-2 w-full rounded-lg text-sm font-medium h-11 px-6 transition-all",
                 description.trim() && !isSubmitting
                   ? "bg-amber-500 text-black hover:bg-amber-400"
-                  : "bg-[#1a1a1a] text-muted-foreground cursor-not-allowed"
+                  : "bg-white/[0.04] text-muted-foreground cursor-not-allowed"
               )}
             >
               {isSubmitting ? (
@@ -359,7 +359,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
       <div className="relative mb-8">
         <div className="absolute inset-0 rounded-full bg-amber-500/10 blur-3xl scale-150" />
         <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-blue-500/20 ring-1 ring-white/[0.06]">
-          <img src="/logo.svg" className="h-9 w-9" alt="Operion" />
+          <img src="/logo.png" className="h-9 w-9" alt="Operion" />
         </div>
       </div>
 
@@ -378,7 +378,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
         {/* Connect Google — primary card */}
         <a
           href="/api/auth/signin/google?callbackUrl=/home"
-          className="group relative rounded-xl bg-[#111111] border border-amber-500/20 p-5 text-left hover:bg-[#151515] hover:border-amber-500/30 transition-all w-full overflow-hidden block"
+          className="group relative rounded-xl glass border border-amber-500/20 p-5 text-left hover:bg-white/[0.03] hover:border-amber-500/30 transition-all w-full overflow-hidden block"
         >
           {/* Subtle highlight ring */}
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-500/5 to-transparent" />
@@ -402,7 +402,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
         {/* Connect Microsoft */}
         <a
           href="/api/auth/signin/microsoft?callbackUrl=/home"
-          className="group relative rounded-xl bg-[#111111] border border-[#0078D4]/20 p-5 text-left hover:bg-[#151515] hover:border-[#0078D4]/30 transition-all w-full overflow-hidden block"
+          className="group relative rounded-xl glass border border-[#0078D4]/20 p-5 text-left hover:bg-white/[0.03] hover:border-[#0078D4]/30 transition-all w-full overflow-hidden block"
         >
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0078D4]/5 to-transparent" />
           <div className="relative flex items-center gap-4">
@@ -420,7 +420,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
         {/* Upload spreadsheet */}
         <button
           onClick={() => router.push("/import")}
-          className="group relative rounded-xl bg-[#111111] border border-white/[0.04] p-5 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all w-full"
+          className="group relative rounded-xl glass border border-white/[0.06] p-5 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all w-full"
         >
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
@@ -437,7 +437,7 @@ export function WelcomeScreen({ userName }: { userName: string }) {
         {/* Tell us about your business */}
         <button
           onClick={() => setState("quick-start-input")}
-          className="group relative rounded-xl bg-[#111111] border border-white/[0.04] p-5 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all w-full"
+          className="group relative rounded-xl glass border border-white/[0.06] p-5 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all w-full"
         >
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">

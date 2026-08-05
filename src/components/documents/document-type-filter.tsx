@@ -41,10 +41,10 @@ export default function DocumentTypeFilter({ currentType }: { currentType: strin
         }
       }}
     >
-      <SelectTrigger className="w-[180px] bg-[#111111] border-0">
+      <SelectTrigger className="w-[180px] glass border-0">
         <SelectValue placeholder="All Types" />
       </SelectTrigger>
-      <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+      <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
         <SelectItem value="all">All Types</SelectItem>
         {DOC_TYPES.map((t) => (
           <SelectItem key={t} value={t}>{typeLabels[t]}</SelectItem>

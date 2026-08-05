@@ -165,8 +165,8 @@ export default function EditProjectPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 w-32 bg-[#1a1a1a] rounded" />
-          <div className="h-96 bg-[#111111] rounded-xl" />
+          <div className="h-6 w-32 bg-white/[0.04] rounded" />
+          <div className="h-96 glass rounded-xl" />
         </div>
       </div>
     )
@@ -188,7 +188,7 @@ export default function EditProjectPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/10">
@@ -209,7 +209,7 @@ export default function EditProjectPage() {
                 placeholder="e.g. Grand Hotel Renovation"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -223,7 +223,7 @@ export default function EditProjectPage() {
                 placeholder="Describe the project scope, goals, and key deliverables..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="bg-[#1a1a1a] border-0 resize-none"
+                className="bg-white/[0.04] border-0 resize-none"
               />
             </div>
 
@@ -232,10 +232,10 @@ export default function EditProjectPage() {
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger id="status" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="status" className="bg-white/[0.04] border-0">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     {statuses.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
                         {s.label}
@@ -247,10 +247,10 @@ export default function EditProjectPage() {
               <div className="space-y-2">
                 <Label htmlFor="phase">Phase</Label>
                 <Select value={phase} onValueChange={setPhase}>
-                  <SelectTrigger id="phase" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="phase" className="bg-white/[0.04] border-0">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     {phases.map((p) => (
                       <SelectItem key={p.value} value={p.value}>
                         {p.label}
@@ -270,7 +270,7 @@ export default function EditProjectPage() {
                 placeholder="e.g. 2500000"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
               />
             </div>
 
@@ -283,7 +283,7 @@ export default function EditProjectPage() {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
               <div className="space-y-2">
@@ -293,7 +293,7 @@ export default function EditProjectPage() {
                   type="date"
                   value={targetDate}
                   onChange={(e) => setTargetDate(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
             </div>
@@ -302,10 +302,10 @@ export default function EditProjectPage() {
             <div className="space-y-2">
               <Label htmlFor="entityId">Entity</Label>
               <Select value={entityId} onValueChange={setEntityId}>
-                <SelectTrigger id="entityId" className="bg-[#1a1a1a] border-0">
+                <SelectTrigger id="entityId" className="bg-white/[0.04] border-0">
                   <SelectValue placeholder="Select an entity (optional)" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                   <SelectItem value="none">None</SelectItem>
                   {entities.map((e) => (
                     <SelectItem key={e.id} value={e.id}>
@@ -348,7 +348,7 @@ export default function EditProjectPage() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative z-10 w-full max-w-md rounded-xl bg-[#181818] border border-white/[0.06] p-6 shadow-2xl">
+          <div className="relative z-10 w-full max-w-md rounded-xl glass p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 shrink-0">
                 <AlertTriangle className="h-5 w-5 text-red-400" />

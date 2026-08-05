@@ -101,7 +101,7 @@ export default async function CalendarPage() {
       </div>
 
       {meetings.length === 0 ? (
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-500/10 mb-4">
               <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -137,7 +137,7 @@ export default async function CalendarPage() {
                     href={`/meetings/${meeting.id}/edit`}
                     className="block group"
                   >
-                    <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors">
+                    <Card className="glass hover:bg-white/[0.07] transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-start gap-4 min-w-0">

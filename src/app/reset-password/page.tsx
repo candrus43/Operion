@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -62,7 +63,7 @@ function ResetPasswordForm() {
   // Missing or invalid token
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+      <AuthShell>
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-3">
             <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
@@ -76,7 +77,7 @@ function ResetPasswordForm() {
             </div>
           </div>
 
-          <Card className="border-0 bg-[#111111] shadow-2xl">
+          <Card className="glass shadow-2xl">
             <CardContent className="pt-6 pb-6">
               <div className="rounded-lg bg-amber-500/10 px-3 py-4 text-sm text-amber-400 flex items-start gap-3 border border-amber-500/20">
                 <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -104,13 +105,13 @@ function ResetPasswordForm() {
             </CardFooter>
           </Card>
         </div>
-      </div>
+      </AuthShell>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+      <AuthShell>
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-3">
             <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
@@ -124,7 +125,7 @@ function ResetPasswordForm() {
             </div>
           </div>
 
-          <Card className="border-0 bg-[#111111] shadow-2xl">
+          <Card className="glass shadow-2xl">
             <CardContent className="pt-6 pb-6">
               <div className="rounded-lg bg-emerald-500/10 px-3 py-4 text-sm text-emerald-400 flex items-start gap-3 border border-emerald-500/20">
                 <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
@@ -143,12 +144,12 @@ function ResetPasswordForm() {
             </CardFooter>
           </Card>
         </div>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
@@ -162,7 +163,7 @@ function ResetPasswordForm() {
           </div>
         </div>
 
-        <Card className="border-0 bg-[#111111] shadow-2xl">
+        <Card className="glass shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="pb-4">
               <CardTitle className="text-lg">New password</CardTitle>
@@ -184,7 +185,7 @@ function ResetPasswordForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <div className="space-y-2">
@@ -196,7 +197,7 @@ function ResetPasswordForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
@@ -215,13 +216,13 @@ function ResetPasswordForm() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
 function ResetPasswordSkeleton() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
@@ -233,7 +234,7 @@ function ResetPasswordSkeleton() {
           </div>
         </div>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 

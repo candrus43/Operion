@@ -238,7 +238,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
       </div>
 
       {/* AI Post Generator */}
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+      <div className="rounded-xl glass border border-white/[0.06] p-5">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="h-4 w-4 text-amber-400" />
           <h2 className="text-sm font-semibold">AI Post Generator</h2>
@@ -287,7 +287,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
               onChange={(e) => setEditBody(e.target.value)}
               className="w-full min-h-[120px] bg-transparent text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none resize-none leading-relaxed"
             />
-            <div className="flex items-center gap-2 pt-2 border-t border-white/[0.04]">
+            <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
               <Button size="sm" onClick={saveDraft} disabled={saving}>
                 {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <PenLine className="h-3.5 w-3.5 mr-1.5" />}
                 Save Draft
@@ -297,7 +297,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
                   type="date"
                   value={scheduleDate}
                   onChange={(e) => setScheduleDate(e.target.value)}
-                  className="h-8 rounded-lg bg-[#111111] border border-white/[0.06] px-2 text-xs text-zinc-300 focus:outline-none focus:border-white/[0.15]"
+                  className="h-8 rounded-lg glass border border-white/[0.06] px-2 text-xs text-zinc-300 focus:outline-none focus:border-white/[0.15]"
                 />
                 <Button size="sm" variant="secondary" onClick={schedulePost} disabled={saving || !scheduleDate}>
                   <Calendar className="h-3.5 w-3.5 mr-1.5" />
@@ -323,7 +323,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
       </div>
 
       {/* Ready-to-customize library */}
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+      <div className="rounded-xl glass border border-white/[0.06] p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="flex items-center gap-2">
@@ -366,7 +366,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
               key={idea}
               type="button"
               onClick={() => { setTopic(idea); window.scrollTo({ top: 0, behavior: "smooth" }) }}
-              className="rounded-lg border border-white/[0.05] bg-[#111111]/70 px-3 py-2.5 text-left text-xs text-zinc-400 transition-colors hover:border-amber-400/30 hover:text-zinc-200"
+              className="rounded-lg border border-white/[0.05] glass/70 px-3 py-2.5 text-left text-xs text-zinc-400 transition-colors hover:border-amber-400/30 hover:text-zinc-200"
             >
               <span className="mr-2 text-amber-400">→</span>{idea}
             </button>
@@ -375,7 +375,7 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
       </div>
 
       {/* Content Calendar */}
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+      <div className="rounded-xl glass border border-white/[0.06] p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-blue-400" />
@@ -459,8 +459,8 @@ export function ContentHub({ initialPosts }: { initialPosts: Post[] }) {
       </div>
 
       {/* Posts List */}
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04]">
+      <div className="rounded-xl glass border border-white/[0.06] overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
             <PenLine className="h-4 w-4 text-zinc-400" />
             <h2 className="text-sm font-semibold">All Posts</h2>

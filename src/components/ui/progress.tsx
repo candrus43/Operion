@@ -14,7 +14,7 @@ function Progress({ className, value = 0, max = 100, ...props }: ProgressProps) 
   return (
     <div
       className={cn(
-        "relative h-2 w-full overflow-hidden rounded-full bg-[#1a1a1a]",
+        "relative h-2 w-full overflow-hidden rounded-full bg-white/[0.04]",
         className
       )}
       {...props}

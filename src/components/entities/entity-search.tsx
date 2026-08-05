@@ -53,7 +53,7 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search entities..."
-          className="pl-9 bg-[#111111] border-0"
+          className="pl-9 glass border-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -67,7 +67,7 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
 
           return (
             <Link key={entity.id} href={`/entities/${entity.id}`}>
-              <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-all hover:scale-[1.01] cursor-pointer group">
+              <Card className="glass hover:bg-white/[0.07] transition-all hover:scale-[1.01] cursor-pointer group">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -93,19 +93,19 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center rounded-lg bg-[#1a1a1a] py-2">
+                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
                       <div className="text-lg font-semibold">{entity._count.projects}</div>
                       <div className="text-[10px] text-muted-foreground">Projects</div>
                     </div>
-                    <div className="text-center rounded-lg bg-[#1a1a1a] py-2">
+                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
                       <div className="text-lg font-semibold">{entity._count.tasks}</div>
                       <div className="text-[10px] text-muted-foreground">Tasks</div>
                     </div>
-                    <div className="text-center rounded-lg bg-[#1a1a1a] py-2">
+                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
                       <div className="text-lg font-semibold">{entity._count.documents}</div>
                       <div className="text-[10px] text-muted-foreground">Docs</div>
                     </div>
-                    <div className="text-center rounded-lg bg-[#1a1a1a] py-2">
+                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
                       <div className="text-lg font-semibold">{entity._count.contacts}</div>
                       <div className="text-[10px] text-muted-foreground">Contacts</div>
                     </div>
@@ -119,7 +119,7 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
 
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
             <Building2 className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium">No entities found</h3>

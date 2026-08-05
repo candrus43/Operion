@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useEffect, useRef, useState } from "react"
 import { signIn } from "next-auth/react"
 import { Sparkles, AlertTriangle } from "lucide-react"
@@ -40,7 +41,7 @@ export default function DemoLoginPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#08080a]">
+      <AuthShell>
         <div className="flex flex-col items-center gap-4 text-center px-6">
           <AlertTriangle className="h-10 w-10 text-amber-400" />
           <h1 className="text-lg font-semibold text-white">Demo unavailable</h1>
@@ -54,12 +55,12 @@ export default function DemoLoginPage() {
             ← Back to Operion
           </a>
         </div>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#08080a]">
+    <AuthShell>
       <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-2xl animate-pulse" />
@@ -80,6 +81,6 @@ export default function DemoLoginPage() {
         </div>
         <div className="h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-violet-400 to-transparent animate-pulse" />
       </div>
-    </div>
+    </AuthShell>
   )
 }

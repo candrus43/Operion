@@ -221,7 +221,7 @@ export function EAWorkspace({
       </div>
 
       {/* Section 1: Daily Task Queue */}
-      <Card className="bg-[#111111] border-white/[0.04]">
+      <Card className="glass border-white/[0.06]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <ListTodo className="h-4 w-4 text-violet-400" />
@@ -243,7 +243,7 @@ export function EAWorkspace({
               {taskList.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors group"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-white/[0.06] transition-colors group"
                 >
                   <button
                     onClick={() => handleComplete(task.id)}
@@ -294,7 +294,7 @@ export function EAWorkspace({
       </Card>
 
       {/* Section 2: Blocked & Waiting */}
-      <Card className="bg-[#111111] border-white/[0.04]">
+      <Card className="glass border-white/[0.06]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Clock className="h-4 w-4 text-amber-400" />
@@ -313,7 +313,7 @@ export function EAWorkspace({
               {blockedWaitingTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-white/[0.06] transition-colors"
                 >
                   <div className="shrink-0 h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
                     <Clock className="h-4 w-4 text-amber-400" />
@@ -360,7 +360,7 @@ export function EAWorkspace({
       </Card>
 
       {/* Section 3: Submitted for Review */}
-      <Card className="bg-[#111111] border-purple-500/10">
+      <Card className="glass border-purple-500/10">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <ClipboardList className="h-4 w-4 text-purple-400" />
@@ -379,7 +379,7 @@ export function EAWorkspace({
               {submittedForReview.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#1a1a1a] transition-colors"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-white/[0.06] transition-colors"
                 >
                   <div className="shrink-0 h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center">
                     <CheckCircle2 className="h-4 w-4 text-purple-400" />
@@ -423,7 +423,7 @@ export function EAWorkspace({
       {/* Section 3 + 4: Calendar + Follow-ups side by side */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Calendar Management */}
-        <Card className="bg-[#111111] border-white/[0.04]">
+        <Card className="glass border-white/[0.06]">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Calendar className="h-4 w-4 text-sky-400" />
@@ -444,7 +444,7 @@ export function EAWorkspace({
                 {upcomingMeetings.map((meeting) => (
                   <div
                     key={meeting.id}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[#1a1a1a] transition-colors"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/[0.06] transition-colors"
                   >
                     <div className="shrink-0 w-12 text-center">
                       <div className="text-xs text-muted-foreground">
@@ -487,7 +487,7 @@ export function EAWorkspace({
         </Card>
 
         {/* Follow-Up Tracker */}
-        <Card className="bg-[#111111] border-white/[0.04]">
+        <Card className="glass border-white/[0.06]">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <RefreshCw className="h-4 w-4 text-emerald-400" />
@@ -506,7 +506,7 @@ export function EAWorkspace({
                 {completedTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-[#1a1a1a] transition-colors text-sm"
+                    className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-white/[0.06] transition-colors text-sm"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                     <span className="flex-1 truncate text-muted-foreground">{task.title}</span>
@@ -518,14 +518,14 @@ export function EAWorkspace({
               </div>
             )}
             {/* Quick follow-up creation */}
-            <div className="mt-3 space-y-2 border-t border-white/[0.04] pt-3">
+            <div className="mt-3 space-y-2 border-t border-white/[0.06] pt-3">
               <p className="text-xs text-muted-foreground">Quick follow-up task</p>
               <div className="flex gap-2">
                 <Input
                   placeholder="Task title..."
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="h-8 text-xs bg-[#1a1a1a] border-white/[0.06]"
+                  className="h-8 text-xs bg-white/[0.04] border-white/[0.06]"
                 />
                 <Button
                   size="sm"
@@ -538,7 +538,7 @@ export function EAWorkspace({
               </div>
               <div className="flex gap-2">
                 <Select value={newProjectId} onValueChange={setNewProjectId}>
-                  <SelectTrigger className="h-7 text-xs bg-[#1a1a1a] border-white/[0.06]">
+                  <SelectTrigger className="h-7 text-xs bg-white/[0.04] border-white/[0.06]">
                     <SelectValue placeholder="Project" />
                   </SelectTrigger>
                   <SelectContent>
@@ -549,7 +549,7 @@ export function EAWorkspace({
                   </SelectContent>
                 </Select>
                 <Select value={newAssigneeId} onValueChange={setNewAssigneeId}>
-                  <SelectTrigger className="h-7 text-xs bg-[#1a1a1a] border-white/[0.06]">
+                  <SelectTrigger className="h-7 text-xs bg-white/[0.04] border-white/[0.06]">
                     <SelectValue placeholder="Assignee" />
                   </SelectTrigger>
                   <SelectContent>
@@ -566,7 +566,7 @@ export function EAWorkspace({
       </div>
 
       {/* Section 5: Executive Notes */}
-      <Card className="bg-[#111111] border-white/[0.04]">
+      <Card className="glass border-white/[0.06]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <StickyNote className="h-4 w-4 text-rose-400" />
@@ -578,7 +578,7 @@ export function EAWorkspace({
             placeholder="Write quick notes, reminders, or things to discuss with the executive..."
             value={notes}
             onChange={(e) => saveNotes(e.target.value)}
-            className="min-h-[120px] bg-[#1a1a1a] border-white/[0.06] text-sm resize-y"
+            className="min-h-[120px] bg-white/[0.04] border-white/[0.06] text-sm resize-y"
           />
           <p className="text-[11px] text-muted-foreground/50 mt-2">
             Notes are saved automatically. {notes.length > 0 && `${notes.length} characters`}

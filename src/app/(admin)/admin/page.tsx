@@ -83,7 +83,7 @@ function KPICard({
   sub?: string
 }) {
   return (
-    <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5 flex flex-col gap-3">
+    <div className="rounded-xl glass border border-white/[0.06] p-5 flex flex-col gap-3">
       <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium uppercase tracking-wider">
         <Icon className={cn("h-3.5 w-3.5", accent)} />
         {label}
@@ -99,7 +99,7 @@ async function AIInsights({ metrics }: { metrics: Record<string, any> }) {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY
   if (!OPENAI_API_KEY) {
     return (
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+      <div className="rounded-xl glass border border-white/[0.06] p-5">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="h-4 w-4 text-amber-400" />
           <h3 className="text-sm font-semibold">AI Insights</h3>
@@ -175,7 +175,7 @@ Respond as a bullet list. Each bullet: a specific observation followed by a conc
 
 function InsightDisplay({ lines }: { lines: string[] }) {
   return (
-    <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+    <div className="rounded-xl glass border border-white/[0.06] p-5">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="h-4 w-4 text-amber-400" />
         <h3 className="text-sm font-semibold">AI Insights</h3>
@@ -194,7 +194,7 @@ function InsightDisplay({ lines }: { lines: string[] }) {
 
 function InsightFallback() {
   return (
-    <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+    <div className="rounded-xl glass border border-white/[0.06] p-5">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="h-4 w-4 text-amber-400" />
         <h3 className="text-sm font-semibold">AI Insights</h3>
@@ -222,7 +222,7 @@ function ConversionFunnel({
   const maxVal = Math.max(signups, 1)
 
   return (
-    <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+    <div className="rounded-xl glass border border-white/[0.06] p-5">
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="h-4 w-4 text-blue-400" />
         <h3 className="text-sm font-semibold">Trial Conversion Funnel</h3>
@@ -237,7 +237,7 @@ function ConversionFunnel({
                 <span className="text-xs text-zinc-500 ml-1">({stage.pct}%)</span>
               </span>
             </div>
-            <div className="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
+            <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
               <div
                 className={cn("h-full rounded-full transition-all", stage.color)}
                 style={{ width: `${Math.max((stage.value / maxVal) * 100, 1)}%` }}
@@ -258,7 +258,7 @@ function ConversionFunnel({
 // ── Churn Watchlist ───────────────────────────────────────────────
 function ChurnWatchlist({ orgs }: { orgs: any[] }) {
   return (
-    <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+    <div className="rounded-xl glass border border-white/[0.06] p-5">
       <div className="flex items-center gap-2 mb-4">
         <AlertTriangle className="h-4 w-4 text-amber-400" />
         <h3 className="text-sm font-semibold">Churn Watchlist</h3>
@@ -270,7 +270,7 @@ function ChurnWatchlist({ orgs }: { orgs: any[] }) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs text-zinc-500 border-b border-white/[0.04]">
+              <tr className="text-xs text-zinc-500 border-b border-white/[0.06]">
                 <th className="text-left py-2 font-medium">Organization</th>
                 <th className="text-left py-2 font-medium">Owner</th>
                 <th className="text-right py-2 font-medium">Inactive (Days)</th>

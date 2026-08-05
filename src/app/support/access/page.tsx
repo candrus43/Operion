@@ -92,9 +92,9 @@ function SupportAccessInner() {
   const loginUrl = `/login?callbackUrl=/support/access?token=${encodeURIComponent(token || "")}`
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#080808]">
+    <div className="flex min-h-screen items-center justify-center bg-[#08080a]">
       <div className="w-full max-w-md mx-4">
-        <div className="rounded-xl border border-[#262626] bg-[#111111] p-8 shadow-2xl">
+        <div className="rounded-xl border border-[#262626] glass p-8 shadow-2xl">
           {/* Header */}
           <div className="flex flex-col items-center text-center mb-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10 mb-4">
@@ -162,7 +162,7 @@ function SupportAccessInner() {
               <Button
                 onClick={() => router.push("/login")}
                 variant="outline"
-                className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-muted-foreground mt-2"
+                className="border-[#262626] bg-white/[0.04] hover:bg-[#222] text-muted-foreground mt-2"
               >
                 <ArrowRight className="h-4 w-4 mr-2" />
                 Go to Login
@@ -179,7 +179,7 @@ export default function SupportAccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#080808]">
+        <div className="flex min-h-screen items-center justify-center bg-[#08080a]">
           <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
         </div>
       }

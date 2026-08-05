@@ -98,7 +98,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/10">
@@ -119,7 +119,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                 placeholder="e.g. Robert Ashford"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -133,7 +133,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                   placeholder="e.g. Meridian Construction"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
               <div className="space-y-2">
@@ -143,7 +143,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                   placeholder="e.g. President"
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
             </div>
@@ -158,7 +158,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                   placeholder="e.g. (619) 555-0142"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
               <div className="space-y-2">
@@ -169,7 +169,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                   placeholder="e.g. rashford@meridian.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
             </div>
@@ -178,10 +178,10 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
             <div className="space-y-2">
               <Label htmlFor="entityId">Entity</Label>
               <Select value={entityId} onValueChange={setEntityId}>
-                <SelectTrigger id="entityId" className="bg-[#1a1a1a] border-0">
+                <SelectTrigger id="entityId" className="bg-white/[0.04] border-0">
                   <SelectValue placeholder="None" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                   <SelectItem value="none">None</SelectItem>
                   {entities.map((e) => (
                     <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
@@ -199,7 +199,7 @@ export function ContactForm({ entities, contact, isEdit }: ContactFormProps) {
                 placeholder="Additional notes about this contact..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="bg-[#1a1a1a] border-0 resize-none"
+                className="bg-white/[0.04] border-0 resize-none"
               />
             </div>
 

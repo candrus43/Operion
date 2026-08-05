@@ -246,7 +246,7 @@ export default function SettingsPage() {
 
       {/* Organization Section — OWNER only */}
       {isOwner && (
-        <Card className="border-[#262626] bg-[#111111]">
+        <Card className="border-[#262626] glass">
           <CardHeader>
             <CardTitle className="text-lg">Organization</CardTitle>
             <CardDescription>
@@ -285,7 +285,7 @@ export default function SettingsPage() {
       )}
 
       {/* Profile Section */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Profile</CardTitle>
           <CardDescription>
@@ -405,7 +405,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Branding Section */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Branding</CardTitle>
           <CardDescription>
@@ -420,7 +420,7 @@ export default function SettingsPage() {
 
       {/* Billing Section — Fix 4: OWNER only */}
       {hasSubscription && isOwner && (
-        <Card className="border-[#262626] bg-[#111111]">
+        <Card className="border-[#262626] glass">
           <CardHeader>
             <CardTitle className="text-lg">Billing</CardTitle>
             <CardDescription>
@@ -435,7 +435,7 @@ export default function SettingsPage() {
               onClick={handleManageBilling}
               disabled={portalLoading}
               variant="outline"
-              className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+              className="border-[#262626] bg-white/[0.04] hover:bg-[#222]"
             >
               {portalLoading ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -462,7 +462,7 @@ export default function SettingsPage() {
       )}
 
       {/* Connected Accounts Section */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Connected Accounts</CardTitle>
           <CardDescription>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
           {/* Google */}
           <div className="flex items-center justify-between rounded-lg border border-[#262626] bg-[#0d0d0d] p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1a1a1a]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.04]">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"
@@ -530,7 +530,7 @@ export default function SettingsPage() {
               ) : (
                 <a
                   href="/api/auth/signin/google?callbackUrl=/settings"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-9 px-3"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-9 px-3"
                 >
                   <Link className="mr-2 h-4 w-4" />
                   Connect Google
@@ -542,7 +542,7 @@ export default function SettingsPage() {
           {/* Microsoft */}
           <div className="flex items-center justify-between rounded-lg border border-[#262626] bg-[#0d0d0d] p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1a1a1a]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.04]">
                 <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
                   <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
                   <path d="M20 1H11V10H20V1Z" fill="#7FBA00"/>
@@ -586,7 +586,7 @@ export default function SettingsPage() {
               ) : (
                 <a
                   href="/api/auth/signin/microsoft?callbackUrl=/settings"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-9 px-3"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-9 px-3"
                 >
                   <Link className="mr-2 h-4 w-4" />
                   Connect Microsoft
@@ -598,7 +598,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Data Export Section */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Data Export</CardTitle>
           <CardDescription>
@@ -611,7 +611,7 @@ export default function SettingsPage() {
             onClick={handleExport}
             disabled={exporting}
             variant="outline"
-            className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+            className="border-[#262626] bg-white/[0.04] hover:bg-[#222]"
           >
             {exporting ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

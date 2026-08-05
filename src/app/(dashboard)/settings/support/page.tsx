@@ -195,7 +195,7 @@ export default function SupportSettingsPage() {
       </div>
 
       {!isOwner && (
-        <Card className="border-[#262626] bg-[#111111]">
+        <Card className="border-[#262626] glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0" />
@@ -212,7 +212,7 @@ export default function SupportSettingsPage() {
           <Separator className="bg-[#262626]" />
 
           {/* Grant Support Access Card */}
-          <Card className="border-[#262626] bg-[#111111]">
+          <Card className="border-[#262626] glass">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Key className="h-5 w-5 text-blue-400" />
@@ -282,7 +282,7 @@ export default function SupportSettingsPage() {
                       onClick={handleCopy}
                       variant="outline"
                       size="sm"
-                      className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222] shrink-0 h-9"
+                      className="border-[#262626] bg-white/[0.04] hover:bg-[#222] shrink-0 h-9"
                     >
                       {copied ? (
                         <Check className="h-4 w-4 text-green-400" />
@@ -308,7 +308,7 @@ export default function SupportSettingsPage() {
                     <SelectTrigger className="border-[#262626] bg-[#0d0d0d] text-white w-full sm:w-48">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-[#262626] bg-[#111111]">
+                    <SelectContent className="border-[#262626] glass">
                       <SelectItem value="30">30 minutes</SelectItem>
                       <SelectItem value="120">2 hours</SelectItem>
                       <SelectItem value="480">8 hours</SelectItem>
@@ -319,7 +319,7 @@ export default function SupportSettingsPage() {
                 {/* Write Access Toggle */}
                 <div className="flex items-center justify-between rounded-lg border border-[#262626] bg-[#0d0d0d] p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1a1a1a]">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.04]">
                       <Pencil className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
@@ -336,7 +336,7 @@ export default function SupportSettingsPage() {
                     className={
                       writeAccess
                         ? "bg-blue-600 hover:bg-blue-700 text-white text-xs h-8"
-                        : "border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-muted-foreground text-xs h-8"
+                        : "border-[#262626] bg-white/[0.04] hover:bg-[#222] text-muted-foreground text-xs h-8"
                     }
                   >
                     {writeAccess ? "Enabled" : "Disabled"}
@@ -361,7 +361,7 @@ export default function SupportSettingsPage() {
           </Card>
 
           {/* Past Sessions */}
-          <Card className="border-[#262626] bg-[#111111]">
+          <Card className="border-[#262626] glass">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <History className="h-5 w-5 text-muted-foreground" />
@@ -388,7 +388,7 @@ export default function SupportSettingsPage() {
                       className="flex items-center justify-between rounded-lg border border-[#262626] bg-[#0d0d0d] p-4"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1a1a1a]">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
                           {session.status === "revoked" ? (
                             <XCircle className="h-4 w-4 text-red-400" />
                           ) : (

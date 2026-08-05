@@ -16,7 +16,7 @@ export default async function HelpPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-6 space-y-3">
+        <div className="rounded-xl glass border border-white/[0.06] p-6 space-y-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
             <BookOpen className="h-5 w-5 text-blue-400" />
           </div>
@@ -26,7 +26,7 @@ export default async function HelpPage() {
           </p>
         </div>
 
-        <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-6 space-y-3">
+        <div className="rounded-xl glass border border-white/[0.06] p-6 space-y-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
             <MessageCircle className="h-5 w-5 text-violet-400" />
           </div>
@@ -37,7 +37,7 @@ export default async function HelpPage() {
         </div>
       </div>
 
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-6 space-y-3">
+      <div className="rounded-xl glass border border-white/[0.06] p-6 space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
             <Mail className="h-5 w-5 text-emerald-400" />

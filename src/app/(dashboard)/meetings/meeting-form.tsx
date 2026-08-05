@@ -126,7 +126,7 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
@@ -147,7 +147,7 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
                 placeholder="e.g. Weekly construction walkthrough"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -161,7 +161,7 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
                   type="datetime-local"
                   value={dateTime}
                   onChange={(e) => setDateTime(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                   required
                 />
               </div>
@@ -172,7 +172,7 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
                   placeholder="e.g. Conference Room A"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
             </div>
@@ -181,10 +181,10 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
             <div className="space-y-2">
               <Label htmlFor="projectId">Project</Label>
               <Select value={projectId} onValueChange={setProjectId}>
-                <SelectTrigger id="projectId" className="bg-[#1a1a1a] border-0">
+                <SelectTrigger id="projectId" className="bg-white/[0.04] border-0">
                   <SelectValue placeholder="None" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                   <SelectItem value="none">None</SelectItem>
                   {projects.map((p) => (
                     <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
@@ -202,7 +202,7 @@ export function MeetingForm({ projects, meeting, isEdit }: MeetingFormProps) {
                 placeholder="Meeting notes or agenda..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="bg-[#1a1a1a] border-0 resize-none"
+                className="bg-white/[0.04] border-0 resize-none"
               />
             </div>
 

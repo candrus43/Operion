@@ -169,17 +169,17 @@ export default async function CustomersPage({
             name="search"
             defaultValue={search}
             placeholder="Search by name or email..."
-            className="h-9 w-64 rounded-lg bg-[#111111] border border-white/[0.06] pl-9 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-white/[0.15]"
+            className="h-9 w-64 rounded-lg glass border border-white/[0.06] pl-9 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-white/[0.15]"
           />
         </form>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-[#111111] border border-white/[0.04] overflow-hidden">
+      <div className="rounded-xl glass border border-white/[0.06] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.04] bg-[#0a0a0a]/50">
+              <tr className="border-b border-white/[0.06] bg-[#0a0a0a]/50">
                 <th className="text-left py-3 px-4 text-xs font-medium text-zinc-500">
                   <SortHeader field="name" label="Organization" />
                 </th>

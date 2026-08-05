@@ -53,13 +53,13 @@ export default async function BlogPostPage({ params }: Props) {
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
 
   return (
-    <div className="min-h-screen bg-[#080808]">
+    <div className="min-h-screen bg-[#08080a]">
       {/* Navigation */}
-      <header className="border-b border-white/[0.04] backdrop-blur-sm bg-[#080808]/80 sticky top-0 z-50">
+      <header className="border-b border-white/[0.06] backdrop-blur-sm bg-[#08080a]/80 sticky top-0 z-50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <img src="/logo.svg" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
+              <img src="/logo.png" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
               <span className="text-base font-semibold tracking-tight">Operion</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Header */}
         <header className="mb-10">
-          <span className="inline-flex items-center rounded-full border border-white/[0.06] bg-[#1a1a1a] px-3 py-1 text-xs font-medium text-violet-400/80 mb-4">
+          <span className="inline-flex items-center rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1 text-xs font-medium text-violet-400/80 mb-4">
             {post.category}
           </span>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl leading-[1.2] mb-4">
@@ -173,11 +173,11 @@ export default async function BlogPostPage({ params }: Props) {
       </article>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04]">
+      <footer className="border-t border-white/[0.06]">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-50" />
+              <img src="/logo.png" alt="Operion" className="h-5 w-5 opacity-50" />
               <span className="text-xs text-muted-foreground">
                 &copy; {new Date().getFullYear()} Operion
               </span>

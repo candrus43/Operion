@@ -117,7 +117,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
@@ -138,7 +138,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
                 placeholder="e.g. Review title commitment for Route 66"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -152,7 +152,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
                 placeholder="Describe the task..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="bg-[#1a1a1a] border-0 resize-none"
+                className="bg-white/[0.04] border-0 resize-none"
               />
             </div>
 
@@ -161,10 +161,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger id="status" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="status" className="bg-white/[0.04] border-0">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="TODO">To Do</SelectItem>
                     <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                     <SelectItem value="DONE">Done</SelectItem>
@@ -176,10 +176,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="priority">Priority</Label>
                 <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger id="priority" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="priority" className="bg-white/[0.04] border-0">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="CRITICAL">Critical</SelectItem>
                     <SelectItem value="HIGH">High</SelectItem>
                     <SelectItem value="MEDIUM">Medium</SelectItem>
@@ -198,7 +198,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
                   placeholder="e.g. Contracts, Design..."
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
               <div className="space-y-2">
@@ -208,7 +208,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
               </div>
             </div>
@@ -218,10 +218,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="projectId">Project</Label>
                 <Select value={projectId} onValueChange={setProjectId}>
-                  <SelectTrigger id="projectId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="projectId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">None</SelectItem>
                     {projects.map((p) => (
                       <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
@@ -232,10 +232,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="entityId">Entity</Label>
                 <Select value={entityId} onValueChange={setEntityId}>
-                  <SelectTrigger id="entityId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="entityId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">None</SelectItem>
                     {entities.map((e) => (
                       <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
@@ -250,10 +250,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="assigneeId">Assignee</Label>
                 <Select value={assigneeId} onValueChange={setAssigneeId}>
-                  <SelectTrigger id="assigneeId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="assigneeId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">Unassigned</SelectItem>
                     {users.map((u) => (
                       <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
@@ -264,10 +264,10 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
               <div className="space-y-2">
                 <Label htmlFor="dependsOnId">Depends On</Label>
                 <Select value={dependsOnId} onValueChange={setDependsOnId}>
-                  <SelectTrigger id="dependsOnId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="dependsOnId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="No dependency" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">No dependency</SelectItem>
                     {availableDeps.map((t) => (
                       <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
@@ -286,7 +286,7 @@ export function TaskForm({ users, entities, projects, allTasks, task, isEdit }: 
                 placeholder="Additional notes..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="bg-[#1a1a1a] border-0 resize-none"
+                className="bg-white/[0.04] border-0 resize-none"
               />
             </div>
 

@@ -45,7 +45,7 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
   }
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader>
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-violet-400" />

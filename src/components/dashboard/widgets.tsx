@@ -33,7 +33,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon: Icon, accent, subtitle, href }: StatCardProps) {
   const card = (
-    <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors">
+    <Card className="glass hover:bg-white/[0.07] transition-colors">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
         <Icon className={cn("h-4 w-4", accent || "text-muted-foreground")} />
@@ -95,7 +95,7 @@ export async function CriticalTasks({ orgId }: CriticalTasksProps) {
   }
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10">
@@ -118,7 +118,7 @@ export async function CriticalTasks({ orgId }: CriticalTasksProps) {
             <Link
               key={task.id}
               href={`/tasks/${task.id}`}
-              className="flex items-start gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group cursor-pointer"
+              className="flex items-start gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors p-3 group cursor-pointer"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate group-hover:text-white transition-colors">
@@ -196,7 +196,7 @@ export async function UpcomingDeadlines({ orgId }: UpcomingDeadlinesProps) {
   }
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
@@ -221,7 +221,7 @@ export async function UpcomingDeadlines({ orgId }: UpcomingDeadlinesProps) {
               <Link
                 key={task.id}
                 href={`/tasks/${task.id}`}
-                className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group cursor-pointer"
+                className="flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors p-3 group cursor-pointer"
               >
                 <div className={cn(
                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-semibold",
@@ -280,7 +280,7 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
   }
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10">
@@ -303,7 +303,7 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
             <Link
               key={project.id}
               href={`/projects/${project.id}`}
-              className="block rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group"
+              className="block rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors p-3 group"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 min-w-0">
@@ -457,7 +457,7 @@ export async function ActivityFeed({ orgId }: ActivityFeedProps) {
   })
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
@@ -502,7 +502,7 @@ export async function ActivityFeed({ orgId }: ActivityFeedProps) {
                 <Link
                   key={item.id}
                   href={item.link}
-                  className="flex items-start gap-3 rounded-lg hover:bg-[#1a1a1a] transition-colors px-3 py-2 group cursor-pointer"
+                  className="flex items-start gap-3 rounded-lg hover:bg-white/[0.06] transition-colors px-3 py-2 group cursor-pointer"
                 >
                   {content}
                 </Link>
@@ -542,7 +542,7 @@ export async function WaitingOn({ orgId }: WaitingOnProps) {
   })
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -573,7 +573,7 @@ export async function WaitingOn({ orgId }: WaitingOnProps) {
               <Link
                 key={task.id}
                 href={`/tasks/${task.id}`}
-                className="rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors p-3 group cursor-pointer border-l-2 border-amber-500/30 hover:border-amber-500/50"
+                className="rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors p-3 group cursor-pointer border-l-2 border-amber-500/30 hover:border-amber-500/50"
               >
                 <p className="text-sm font-medium truncate group-hover:text-white transition-colors">
                   {task.title}

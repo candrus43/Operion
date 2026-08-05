@@ -258,7 +258,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
                 Invite Member
               </Button>
             </DialogTrigger>
-            <DialogContent className="border-[#262626] bg-[#111111] sm:max-w-md">
+            <DialogContent className="border-[#262626] glass sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Invite Team Member</DialogTitle>
                 <DialogDescription>
@@ -296,7 +296,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-[#262626] bg-[#111111]">
+                    <SelectContent className="border-[#262626] glass">
                       <SelectItem value="EXECUTIVE_ASSISTANT">EA (Executive Assistant)</SelectItem>
                       <SelectItem value="OPERATIONS_MANAGER">Ops Manager</SelectItem>
                       <SelectItem value="STAFF">Staff</SelectItem>
@@ -309,7 +309,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
                 <Button
                   variant="outline"
                   onClick={() => setInviteOpen(false)}
-                  className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                  className="border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                 >
                   Cancel
                 </Button>
@@ -339,7 +339,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
       <Separator className="bg-[#262626]" />
 
       {/* Team Members Table */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Members</CardTitle>
           <CardDescription>
@@ -373,7 +373,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
                   <TableRow key={user.id} className="border-[#262626]">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a1a1a] text-sm font-medium">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.04] text-sm font-medium">
                           {user.image ? (
                             <img
                               src={user.image}
@@ -417,7 +417,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
                               </span>
                             )}
                           </SelectTrigger>
-                          <SelectContent className="border-[#262626] bg-[#111111]">
+                          <SelectContent className="border-[#262626] glass">
                             <SelectItem value="EXECUTIVE_ASSISTANT">EA</SelectItem>
                             <SelectItem value="OPERATIONS_MANAGER">Ops Manager</SelectItem>
                             <SelectItem value="STAFF">Staff</SelectItem>
@@ -469,7 +469,7 @@ export function TeamPage({ currentUserId, currentUserRole, orgId }: TeamPageProp
       </Card>
 
       {/* Role Descriptions */}
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Role Permissions</CardTitle>
           <CardDescription>

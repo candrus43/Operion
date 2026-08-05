@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState } from "react"
 import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail } from "lucide-react"
 
@@ -23,7 +24,7 @@ export default function TrialExpiredPage() {
     }
   }
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-5xl space-y-10">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -43,7 +44,7 @@ export default function TrialExpiredPage() {
         {/* Plans */}
         <div className="grid gap-6 sm:grid-cols-3">
           {/* Solo */}
-          <div className="relative rounded-2xl bg-[#111111] border border-white/[0.06] p-6 flex flex-col">
+          <div className="relative rounded-2xl glass border border-white/[0.06] p-6 flex flex-col">
             <div className="mb-5">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1 text-xs font-medium text-muted-foreground mb-3">
                 <Zap className="h-3 w-3" />
@@ -97,7 +98,7 @@ export default function TrialExpiredPage() {
               <button
                 onClick={() => redirectToCheckout("SOLO", "monthly")}
                 disabled={checkingOut === "SOLO_monthly"}
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-11 px-8 w-full"
               >
                 {checkingOut === "SOLO_monthly" ? "Redirecting..." : "Monthly Billing"}
               </button>
@@ -105,7 +106,7 @@ export default function TrialExpiredPage() {
           </div>
 
           {/* Team */}
-          <div className="relative rounded-2xl bg-[#111111] border border-amber-500/20 p-6 flex flex-col ring-1 ring-amber-500/10">
+          <div className="relative rounded-2xl glass border border-amber-500/20 p-6 flex flex-col ring-1 ring-amber-500/10">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-0.5 text-[10px] font-semibold text-black">
               RECOMMENDED
             </div>
@@ -164,7 +165,7 @@ export default function TrialExpiredPage() {
               <button
                 onClick={() => redirectToCheckout("TEAM", "monthly")}
                 disabled={checkingOut === "TEAM_monthly"}
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-11 px-8 w-full"
               >
                 {checkingOut === "TEAM_monthly" ? "Redirecting..." : "Monthly Billing"}
               </button>
@@ -172,7 +173,7 @@ export default function TrialExpiredPage() {
           </div>
 
           {/* Enterprise */}
-          <div className="relative rounded-2xl bg-[#111111] border border-white/[0.06] p-6 flex flex-col">
+          <div className="relative rounded-2xl glass border border-white/[0.06] p-6 flex flex-col">
             <div className="mb-5">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1 text-xs font-medium text-muted-foreground mb-3">
                 <Building2 className="h-3 w-3" />
@@ -218,7 +219,7 @@ export default function TrialExpiredPage() {
             <div className="space-y-2">
               <a
                 href="mailto:hello@operion.ai"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-11 px-8 w-full"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-11 px-8 w-full"
               >
                 <Mail className="h-4 w-4" />
                 Contact us
@@ -240,6 +241,6 @@ export default function TrialExpiredPage() {
           </p>
         </div>
       </div>
-    </div>
+    </AuthShell>
   )
 }

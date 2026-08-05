@@ -113,7 +113,7 @@ export default function ProfileSettingsPage() {
 
       <Separator className="bg-[#262626]" />
 
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardHeader>
           <CardTitle className="text-lg">Personal Information</CardTitle>
           <CardDescription>

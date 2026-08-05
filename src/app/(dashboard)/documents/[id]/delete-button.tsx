@@ -52,7 +52,7 @@ export function DocumentDeleteButton({ documentId, documentName }: DocumentDelet
           Delete
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#111111] border border-white/[0.05]">
+      <DialogContent className="glass border border-white/[0.05]">
         <DialogHeader>
           <DialogTitle>Delete Document</DialogTitle>
           <DialogDescription>

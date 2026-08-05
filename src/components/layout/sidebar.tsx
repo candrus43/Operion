@@ -77,12 +77,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex flex-col border-r bg-sidebar transition-all duration-300",
+        "relative flex h-full flex-col border-r border-white/[0.06] bg-[#08080a]/70 backdrop-blur-2xl transition-all duration-300",
         collapsed ? "w-16" : "w-60"
       )}
     >
       {/* Logo */}
-      <div className="flex h-14 items-center justify-between px-4 border-b border-sidebar-border">
+      <div className="flex h-14 items-center justify-between px-4 border-b border-white/[0.06]">
         {!collapsed && (
           <Link href="/" className="flex items-center gap-2 min-w-0">
             {logoUrl ? (
@@ -93,8 +93,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               />
             ) : (
               <>
-                <img src="/logo.svg" alt="" className="h-7 w-7 shrink-0" />
-                <span className="text-lg font-bold tracking-tight">Operion</span>
+                <img src="/logo.png" alt="" className="h-7 w-7 shrink-0" />
+                <span className="text-lg font-semibold tracking-tight">Operion</span>
               </>
             )}
           </Link>
@@ -108,7 +108,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 className="h-6 w-6 object-contain"
               />
             ) : (
-              <img src="/logo.svg" alt="" className="h-6 w-6" />
+              <img src="/logo.png" alt="" className="h-6 w-6" />
             )}
           </Link>
         )}
@@ -132,10 +132,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         )}
       </div>
 
-      <Separator />
+      <Separator className="bg-white/[0.06]" />
 
       {/* Main Navigation */}
-      <nav className="flex-1 space-y-1 p-2 overflow-y-auto">
+      <nav className="flex-1 space-y-0.5 p-2 overflow-y-auto">
         {mainNavItems
           .filter((item) => {
             // Fix 3: Gate EA Workspace link by role, not tier
@@ -143,7 +143,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             return true
           })
           .map((item) => {
-          const isActive = pathname === item.href || 
+          const isActive = pathname === item.href ||
             (item.href !== "/" && pathname.startsWith(item.href))
           const Icon = item.icon
           return (
@@ -151,23 +151,26 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-sidebar-accent group",
+                "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                  ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_20px_rgba(139,92,246,0.08)]"
+                  : "text-white/50 hover:bg-white/[0.04] hover:text-white/90"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-accent-foreground")} />
+              <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/40 group-hover:text-white/70")} />
               {!collapsed && <span>{item.label}</span>}
+              {!collapsed && isActive && (
+                <span className="ml-auto h-1 w-1 rounded-full bg-violet-400" />
+              )}
             </Link>
           )
         })}
       </nav>
 
-      <Separator />
+      <Separator className="bg-white/[0.06]" />
 
       {/* Bottom Navigation */}
-      <div className="p-2 space-y-1">
+      <div className="p-2 space-y-0.5">
         {bottomNavItems
           .filter((item) => {
             // Hide Pricing for ACTIVE subscribers
@@ -182,13 +185,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-sidebar-accent group",
+                "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/40 hover:text-sidebar-foreground"
+                  ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                  : "text-white/40 hover:bg-white/[0.04] hover:text-white/80"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-accent-foreground")} />
+              <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/35 group-hover:text-white/60")} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           )
@@ -204,13 +207,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-sidebar-accent group",
+                  "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/40 hover:text-sidebar-foreground"
+                    ? "bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                    : "text-white/40 hover:bg-white/[0.04] hover:text-white/80"
                 )}
               >
-                <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-sidebar-accent-foreground")} />
+                <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "text-violet-300" : "text-white/35 group-hover:text-white/60")} />
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             )

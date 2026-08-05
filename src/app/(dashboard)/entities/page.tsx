@@ -49,7 +49,7 @@ export default async function EntitiesPage() {
       <div className={`rounded-lg border p-4 ${
         atLimit
           ? "border-amber-500/20 bg-amber-500/[0.06]"
-          : "border-white/[0.04] bg-[#111111]"
+          : "border-white/[0.06] glass"
       }`}>
         <div className="flex items-center gap-3">
           {atLimit ? (
@@ -101,7 +101,7 @@ export default async function EntitiesPage() {
 
       {entities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
             <Building2 className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium">No entities yet</h3>

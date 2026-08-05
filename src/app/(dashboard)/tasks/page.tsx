@@ -91,7 +91,7 @@ export default async function TasksPage(props: {
         </Link>
       </div>
 
-      <Suspense fallback={<div className="rounded-xl bg-[#111111] h-96 animate-pulse" />}>
+      <Suspense fallback={<div className="rounded-xl glass h-96 animate-pulse" />}>
         <TaskListClient
           tasks={JSON.parse(JSON.stringify(tasks))}
           users={users}

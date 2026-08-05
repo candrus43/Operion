@@ -100,7 +100,7 @@ export function TrialBanner() {
   // TRIAL with >3 days — subtle banner, dismissible
   if (status === "TRIAL" && daysRemaining !== null && daysRemaining > 3) {
     return (
-      <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-[#0d0d0d] border-b border-white/[0.04]">
+      <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-[#0d0d0d] border-b border-white/[0.06]">
         <div className="flex items-center gap-2 min-w-0">
           <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           <p className="text-xs text-muted-foreground">

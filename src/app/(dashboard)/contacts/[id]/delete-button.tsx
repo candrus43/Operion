@@ -52,7 +52,7 @@ export function ContactDeleteButton({ contactId, contactName }: ContactDeleteBut
           Delete
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#111111] border border-white/[0.05]">
+      <DialogContent className="glass border border-white/[0.05]">
         <DialogHeader>
           <DialogTitle>Delete Contact</DialogTitle>
           <DialogDescription>

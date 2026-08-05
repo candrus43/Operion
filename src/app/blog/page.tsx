@@ -72,13 +72,13 @@ export default function BlogIndexPage() {
   const featuredSecondary = livePosts.slice(1, 3)
 
   return (
-    <div className="min-h-screen bg-[#080808]">
+    <div className="min-h-screen bg-[#08080a]">
       {/* Navigation */}
-      <header className="border-b border-white/[0.04] backdrop-blur-sm bg-[#080808]/80 sticky top-0 z-50">
+      <header className="border-b border-white/[0.06] backdrop-blur-sm bg-[#08080a]/80 sticky top-0 z-50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <img src="/logo.svg" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
+              <img src="/logo.png" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
               <span className="text-base font-semibold tracking-tight">Operion</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ export default function BlogIndexPage() {
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] bg-[#111111] text-sm font-medium h-10 px-6 transition-all hover:bg-[#1a1a1a]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] glass text-sm font-medium h-10 px-6 transition-all hover:bg-white/[0.06]"
             >
               Start free trial
             </Link>
@@ -143,13 +143,13 @@ export default function BlogIndexPage() {
       {/* Category Filters */}
       <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <button className="rounded-full border border-white/[0.08] bg-[#111111] px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-[#1a1a1a]">
+          <button className="rounded-full border border-white/[0.08] glass px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06]">
             All
           </button>
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              className="rounded-full border border-white/[0.04] bg-transparent px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-[#111111] hover:text-foreground"
+              className="rounded-full border border-white/[0.06] bg-transparent px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:glass hover:text-foreground"
             >
               {cat}
             </button>
@@ -167,10 +167,10 @@ export default function BlogIndexPage() {
           {/* Primary Feature */}
           <Link
             href={`/blog/${featuredPrimary.slug}`}
-            className="group block rounded-2xl border border-white/[0.06] bg-[#111111] overflow-hidden hover:border-white/[0.1] transition-all duration-300 mb-4"
+            className="group block rounded-2xl border border-white/[0.06] glass overflow-hidden hover:border-white/[0.1] transition-all duration-300 mb-4"
           >
             <div className="p-6 sm:p-8">
-              <span className="inline-flex items-center rounded-full border border-white/[0.06] bg-[#1a1a1a] px-3 py-1 text-xs font-medium text-violet-400/80 mb-4">
+              <span className="inline-flex items-center rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1 text-xs font-medium text-violet-400/80 mb-4">
                 {featuredPrimary.category}
               </span>
               <h3 className="text-xl font-bold tracking-tight sm:text-2xl mb-3 group-hover:text-violet-300 transition-colors">
@@ -199,9 +199,9 @@ export default function BlogIndexPage() {
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="group block rounded-xl border border-white/[0.04] bg-[#111111] p-5 sm:p-6 hover:border-white/[0.08] transition-all duration-300"
+                  className="group block rounded-xl border border-white/[0.06] glass p-5 sm:p-6 hover:border-white/[0.08] transition-all duration-300"
                 >
-                  <span className="inline-flex items-center rounded-full border border-white/[0.04] bg-[#1a1a1a] px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground mb-3">
+                  <span className="inline-flex items-center rounded-full border border-white/[0.06] bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground mb-3">
                     {post.category}
                   </span>
                   <h3 className="text-base font-semibold mb-2 group-hover:text-violet-300 transition-colors">
@@ -235,7 +235,7 @@ export default function BlogIndexPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-white/[0.04] bg-[#111111] p-5 hover:border-white/[0.08] transition-all duration-300"
+              className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-white/[0.06] glass p-5 hover:border-white/[0.08] transition-all duration-300"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -285,7 +285,7 @@ export default function BlogIndexPage() {
       {/* Newsletter */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
         <div className="mx-auto max-w-xl">
-          <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-8 sm:p-10 text-center">
+          <div className="rounded-2xl glass border border-white/[0.06] p-8 sm:p-10 text-center">
             <h2 className="text-xl font-bold tracking-tight sm:text-2xl mb-3">
               One email. What to pay attention to this week.
             </h2>
@@ -299,7 +299,7 @@ export default function BlogIndexPage() {
               <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-1 h-10 rounded-lg border border-[#262626] bg-[#1a1a1a] px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/[0.15] transition-colors"
+                className="flex-1 h-10 rounded-lg border border-[#262626] bg-white/[0.04] px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/[0.15] transition-colors"
               />
               <button
                 type="submit"
@@ -316,11 +316,11 @@ export default function BlogIndexPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04]">
+      <footer className="border-t border-white/[0.06]">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-50" />
+              <img src="/logo.png" alt="Operion" className="h-5 w-5 opacity-50" />
               <span className="text-xs text-muted-foreground">
                 &copy; {new Date().getFullYear()} Operion
               </span>
