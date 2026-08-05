@@ -6,7 +6,6 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { AIBriefingAI } from "@/components/dashboard/ai-briefing-ai"
 import { StatCard, CriticalTasks, UpcomingDeadlines, ActiveProjects, ActivityFeed, WaitingOn } from "@/components/dashboard/widgets"
-import { HealthScore } from "@/components/dashboard/health-score"
 import { WelcomeScreen } from "@/components/onboarding/welcome-screen"
 import { PostPaymentOnboarding } from "@/components/onboarding/PostPaymentOnboarding"
 import { CheckoutSuccessToast } from "@/components/dashboard/checkout-success-toast"
@@ -47,7 +46,7 @@ export default async function DashboardPage({
 
   // Quick counts for stat cards
   // Note: org is fetched inside Promise.all below — trial expiration check comes right after
-  let entityCount = 0, activeProjectCount = 0, openTaskCount = 0, waitingOnCount = 0, docCount = 0, contactCount = 0
+  let entityCount = 0, activeProjectCount = 0, openTaskCount = 0, waitingOnCount = 0, docCount = 0, contactCount = 0, overdueTaskCount = 0, blockedTaskCount = 0
   let org: { subscriptionStatus: string; trialEndDate: Date | null; subscriptionTier: string; lastNotificationGeneration: Date | null } | null = null
   let awaitingReviewTasks: any[] = []
 
@@ -57,6 +56,8 @@ export default async function DashboardPage({
       prisma.project.count({ where: { organizationId: orgId, status: { notIn: ["COMPLETED", "CANCELLED"] } } }),
       prisma.task.count({ where: { organizationId: orgId, status: { not: "DONE" } } }),
       prisma.task.count({ where: { organizationId: orgId, status: "WAITING_ON" } }),
+      prisma.task.count({ where: { organizationId: orgId, dueDate: { lt: new Date() }, status: { not: "DONE" } } }),
+      prisma.task.count({ where: { organizationId: orgId, status: "BLOCKED" } }),
       prisma.document.count({ where: { organizationId: orgId } }),
       prisma.contact.count({ where: { organizationId: orgId } }),
       prisma.organization.findUnique({
@@ -83,6 +84,8 @@ export default async function DashboardPage({
       activeProjectCount,
       openTaskCount,
       waitingOnCount,
+      overdueTaskCount,
+      blockedTaskCount,
       docCount,
       contactCount,
       org,
@@ -118,107 +121,6 @@ export default async function DashboardPage({
       console.error("Failed to generate notifications on dashboard load:", err)
     })
   }
-
-  // ── Health Score Calculation ──────────────────────────────────
-  const now = new Date()
-  const sevenDaysAgo = new Date(now)
-  sevenDaysAgo.setDate(now.getDate() - 7)
-  const fourteenDaysAgo = new Date(now)
-  fourteenDaysAgo.setDate(now.getDate() - 14)
-  const weekStart = new Date(now)
-  weekStart.setDate(now.getDate() - now.getDay())
-  weekStart.setHours(0, 0, 0, 0)
-
-  const [
-    overdueTasks,
-    stalledProjectsRaw,
-    unassignedOldTasks,
-    recentlyCompleted,
-    weeklyCompleted,
-  ] = await (async () => {
-    try {
-      return await Promise.all([
-        prisma.task.count({
-          where: {
-            organizationId: orgId,
-            dueDate: { lt: now },
-            status: { not: "DONE" },
-          },
-        }),
-        prisma.project.findMany({
-          where: {
-            organizationId: orgId,
-            status: { in: ["ACTIVE", "ON_HOLD"] },
-          },
-          include: {
-            tasks: {
-              where: { updatedAt: { gte: fourteenDaysAgo } },
-              select: { id: true },
-            },
-          },
-        }),
-        prisma.task.count({
-          where: {
-            organizationId: orgId,
-            assigneeId: null,
-            status: { not: "DONE" },
-            createdAt: { lt: sevenDaysAgo },
-          },
-        }),
-        prisma.task.count({
-          where: {
-            organizationId: orgId,
-            status: "DONE",
-            updatedAt: { gte: sevenDaysAgo },
-          },
-        }),
-        prisma.task.count({
-          where: {
-            organizationId: orgId,
-            status: "DONE",
-            updatedAt: { gte: weekStart },
-          },
-        }),
-      ]) as [number, any[], number, number, number]
-    } catch (err) {
-      console.error("Dashboard health score fetch failed:", err)
-      return [0, [], 0, 0, 0] as [number, any[], number, number, number]
-    }
-  })()
-
-  // Calculate stalled projects: those with no recently updated tasks
-  const stalledProjectCount = stalledProjectsRaw.filter(p => p.tasks.length === 0).length
-
-  // Compute health score
-  let healthScore = 100
-  const deductions: string[] = []
-
-  // -5 for each overdue task (max -25)
-  const overduePenalty = Math.min(overdueTasks * 5, 25)
-  if (overdueTasks > 0) {
-    healthScore -= overduePenalty
-    deductions.push(`${overdueTasks} overdue task${overdueTasks > 1 ? "s" : ""}`)
-  }
-
-  // -5 for each stalled project
-  if (stalledProjectCount > 0) {
-    healthScore -= stalledProjectCount * 5
-    deductions.push(`${stalledProjectCount} stalled project${stalledProjectCount > 1 ? "s" : ""}`)
-  }
-
-  // -3 for each unassigned task > 7 days
-  if (unassignedOldTasks > 0) {
-    healthScore -= unassignedOldTasks * 3
-    deductions.push(`${unassignedOldTasks} unassigned task${unassignedOldTasks > 1 ? "s" : ""}`)
-  }
-
-  // +2 for each completed task in last 7 days
-  if (recentlyCompleted > 0) {
-    healthScore += recentlyCompleted * 2
-  }
-
-  // Cap at 0-100
-  healthScore = Math.max(0, Math.min(100, healthScore))
 
   // ── Tier / Trial Info ─────────────────────────────────────────
   const tier = org?.subscriptionTier || "SOLO"
@@ -274,15 +176,24 @@ export default async function DashboardPage({
         )}
       </div>
 
-      {/* Row 2: Health Score + Stat Cards */}
+      {/* Row 2: Portfolio pulse + Stat Cards */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-        {/* Health Score takes 2 columns on large screens */}
-        <div className="lg:col-span-2">
-          <HealthScore
-            score={healthScore}
-            deductions={deductions}
-            weeklyCompleted={weeklyCompleted}
-          />
+        {/* Raw attention counts keep the next moves visible. */}
+        <div className="lg:col-span-2 rounded-xl glass border border-white/[0.06] p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Needs attention</p>
+              <p className="mt-2 text-sm text-white/65">Keep your next moves visible.</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
+              <Link href="/tasks" className="rounded-full bg-rose-500/10 px-2.5 py-1 text-rose-300 hover:bg-rose-500/20">
+                {overdueTaskCount} overdue
+              </Link>
+              <Link href="/tasks?status=BLOCKED" className="rounded-full bg-amber-500/10 px-2.5 py-1 text-amber-300 hover:bg-amber-500/20">
+                {blockedTaskCount} blocked
+              </Link>
+            </div>
+          </div>
         </div>
         {/* Stat cards take remaining 5 columns */}
         <div className="lg:col-span-5 grid gap-4 grid-cols-2 sm:grid-cols-3">
