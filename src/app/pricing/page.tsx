@@ -122,7 +122,13 @@ const features = [
 
   return (
     <div className="min-h-screen bg-[#08080a]">
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+      <nav className="border-b border-white/[0.06] px-5 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-medium"><img src="/logo.svg" alt="Operion" className="h-7 w-7" /> Operion</Link>
+          <div className="flex items-center gap-5 text-sm text-muted-foreground"><Link href="/blog" className="hover:text-foreground">Blog</Link><Link href="/login" className="hover:text-foreground">Sign in</Link></div>
+        </div>
+      </nav>
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">

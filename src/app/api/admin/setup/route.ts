@@ -13,6 +13,8 @@ function slugify(name: string): string {
 }
 
 export async function GET(req: Request) {
+  const limit = await applyRateLimit(req, { maxRequests: 10, windowMs: 300_000 })
+  if (limit) return limit
   // When an email is supplied, distinguish a new setup from an existing
   // account that can be upgraded through setup.
   try {

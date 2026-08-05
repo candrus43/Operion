@@ -865,6 +865,7 @@ export default function LandingPage() {
               {[
                 { href: "/pricing", label: "Pricing" },
                 { href: "/login", label: "Sign In" },
+                { href: "/blog", label: "Blog" },
                 { href: "/help", label: "Help" },
                 { href: "/terms", label: "Terms" },
                 { href: "/privacy", label: "Privacy" },

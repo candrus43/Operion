@@ -43,6 +43,7 @@ function LoginForm() {
     setLoading(true)
     setError("")
 
+    try {
     const result = await signIn("credentials", {
       email,
       password,
@@ -61,6 +62,10 @@ function LoginForm() {
       } else {
         window.location.href = redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/home"
       }
+    }
+    } catch {
+      setError("Unable to sign in right now. Please try again.")
+      setLoading(false)
     }
   }
 
@@ -117,7 +122,7 @@ function LoginForm() {
               {isDemo && (
                 <div className="rounded-lg bg-violet-500/10 px-3 py-2.5 text-sm text-violet-300 flex items-center gap-2 border border-violet-500/20">
                   <Monitor className="h-4 w-4 shrink-0" />
-                  Demo access — password: password123
+                  Demo access — password: demo123!
                 </div>
               )}
               <div className="space-y-2">
@@ -125,7 +130,7 @@ function LoginForm() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@movement.com"
+                  placeholder="email@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -207,7 +212,7 @@ function LoginForm() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground">
-          By continuing, you agree to Operion&apos;s Terms of Service and Privacy Policy.
+          By continuing, you agree to Operion&apos;s {" "}<Link href="/terms" className="hover:text-foreground hover:underline">Terms of Service</Link>{" "}and <Link href="/privacy" className="hover:text-foreground hover:underline">Privacy Policy</Link>.
         </p>
       </div>
     </AuthShell>
