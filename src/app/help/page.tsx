@@ -90,7 +90,7 @@ export default function HelpPage() {
       )}
 
       <a
-        href="mailto:support@operion.app"
+        href="mailto:Hello@Operion.Online"
         className="block rounded-xl glass border border-white/[0.06] p-6 space-y-3 hover:border-white/[0.12] hover:bg-white/[0.02] transition-all"
       >
         <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export default function HelpPage() {
           <div>
             <h3 className="font-semibold">Need more help?</h3>
             <p className="text-sm text-muted-foreground">
-              Reach out to our support team at support@operion.app
+              Reach out to our support team at Hello@Operion.Online
             </p>
           </div>
         </div>
