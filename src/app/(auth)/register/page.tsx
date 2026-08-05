@@ -2,7 +2,7 @@
 
 import { AuthShell } from "@/components/auth/auth-shell"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get("redirect") || "/home"
   const [name, setName] = useState("")
   const [organizationName, setOrganizationName] = useState("")
   const [email, setEmail] = useState("")
@@ -37,7 +39,7 @@ export default function RegisterPage() {
       return
     }
 
-    router.push("/login?registered=true")
+    router.push(`/login?registered=true&redirect=${encodeURIComponent(redirect)}`)
   }
 
   return (

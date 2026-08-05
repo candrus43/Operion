@@ -23,6 +23,7 @@ function LoginForm() {
   const showRegistered = searchParams.get("registered") === "true"
   const isDemo = searchParams.get("demo") === "true"
   const emailParam = searchParams.get("email") || ""
+  const redirect = searchParams.get("redirect") || "/home"
 
   useEffect(() => {
     fetch("/api/settings/logo")
@@ -59,7 +60,7 @@ function LoginForm() {
       if (isSuperAdmin) {
         router.push("/admin")
       } else {
-        router.push("/home")
+        router.push(redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/home" )
       }
       router.refresh()
     }

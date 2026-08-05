@@ -303,7 +303,7 @@ export default function LandingPage() {
                   Explore the Product
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/register?redirect=/home"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] px-9 text-[15px] font-medium tracking-[-0.01em] text-white backdrop-blur-md transition-all duration-500 hover:border-violet-400/40 hover:bg-white/[0.06] sm:w-auto"
                 >
                   Start Free Trial
@@ -555,8 +555,8 @@ export default function LandingPage() {
             </Reveal>
             <Reveal delay={160}>
               <p className="mx-auto mt-6 max-w-xl text-center text-[15px] leading-[1.75] text-white/40">
-                Start with a 14-day free trial. No credit card required. Setup fees include
-                white-glove onboarding.
+                Start with a 14-day free trial — no credit card required. Upgrade after your trial
+                when you’re ready for white-glove onboarding.
               </p>
             </Reveal>
 
@@ -643,7 +643,7 @@ export default function LandingPage() {
 
                     <div className="relative mt-10 pt-2">
                       <Link
-                        href="/pricing"
+                        href="/register?redirect=/home"
                         className={`group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium tracking-[-0.01em] transition-all duration-500 ${
                           plan.highlighted
                             ? "bg-white text-black hover:shadow-[0_0_40px_rgba(255,255,255,0.28)]"
@@ -831,7 +831,7 @@ export default function LandingPage() {
                   Explore the Product
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/register?redirect=/home"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] px-9 text-[15px] font-medium tracking-[-0.01em] text-white backdrop-blur-md transition-all duration-500 hover:border-violet-400/40 hover:bg-white/[0.06] sm:w-auto"
                 >
                   Start Free Trial
