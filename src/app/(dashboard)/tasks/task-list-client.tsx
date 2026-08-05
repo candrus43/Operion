@@ -49,10 +49,19 @@ interface TaskListClientProps {
 
 const priorityColor = (p: string) => {
   switch (p) {
-    case "CRITICAL": return "bg-red-500/10 text-red-400 border-red-500/20"
-    case "HIGH": return "bg-orange-500/10 text-orange-400 border-orange-500/20"
-    case "MEDIUM": return "bg-blue-500/10 text-blue-400 border-blue-500/20"
-    default: return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+    case "CRITICAL": return "bg-rose-500/10 text-rose-300 border-rose-500/20"
+    case "HIGH": return "bg-amber-500/10 text-amber-300 border-amber-500/20"
+    case "MEDIUM": return "bg-sky-500/10 text-sky-300 border-sky-500/20"
+    default: return "bg-slate-500/10 text-slate-300 border-slate-500/20"
+  }
+}
+
+const priorityDot = (p: string) => {
+  switch (p) {
+    case "CRITICAL": return "bg-rose-400 shadow-[0_0_9px_rgba(251,113,133,0.7)]"
+    case "HIGH": return "bg-amber-400 shadow-[0_0_9px_rgba(251,191,36,0.6)]"
+    case "MEDIUM": return "bg-sky-400 shadow-[0_0_9px_rgba(56,189,248,0.6)]"
+    default: return "bg-slate-400"
   }
 }
 
@@ -167,8 +176,18 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
     return new Date(dateStr) < new Date()
   }
 
+  const statusSummary = [
+    ["BLOCKED", "Blocked", "text-rose-300 bg-rose-400/10 border-rose-400/15"],
+    ["IN_PROGRESS", "In Progress", "text-sky-300 bg-sky-400/10 border-sky-400/15"],
+    ["DONE", "Done", "text-emerald-300 bg-emerald-400/10 border-emerald-400/15"],
+  ] as const
+
   return (
     <div className="space-y-4">
+      {/* Status summary */}
+      <div className="flex flex-wrap items-center gap-2">
+        {statusSummary.map(([status, label, style]) => <button key={status} onClick={() => setStatusFilter(statusFilter === status ? "all" : status)} className={cn("rounded-full border px-3 py-1 text-[11px] transition-all", style, statusFilter === status && "ring-1 ring-white/25")}>{initialTasks.filter((t) => t.status === status).length} {label}</button>)}
+      </div>
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -238,9 +257,9 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
 
       {/* Table - Desktop */}
       <div className="hidden md:block rounded-xl glass overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="max-h-[min(70vh,720px)] overflow-auto">
           <table className="w-full">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-[#101014]/95 backdrop-blur-xl">
               <tr className="border-b border-white/[0.05] text-xs text-muted-foreground">
                 <th className="text-left p-3 pl-4 w-[40%]">
                   <button onClick={() => toggleSort("title")} className="flex items-center gap-1 hover:text-foreground transition-colors font-medium">
@@ -279,7 +298,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
                 filteredTasks.map((task) => (
                   <tr
                     key={task.id}
-                    className="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors group"
+                    className={cn("border-b border-white/[0.02] hover:bg-white/[0.03] transition-colors group", isOverdue(task.dueDate) && task.status !== "DONE" && "border-l-2 border-l-rose-400/60 bg-rose-500/[0.035]")}
                   >
                     <td className="p-3 pl-4">
                       <div className="flex items-center gap-2">
@@ -289,8 +308,9 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
                           title="Cycle status"
                         />
                         <Link href={`/tasks/${task.id}`} className="flex-1 min-w-0">
-                          <span className="text-sm font-medium truncate block group-hover:text-white transition-colors">
-                            {task.title}
+                          <span className="flex items-center gap-2 text-sm font-medium truncate group-hover:text-white transition-colors">
+                            <span className={cn("h-2 w-2 shrink-0 rounded-full", priorityDot(task.priority))} aria-label={`${task.priority} priority`} />
+                            <span className="truncate">{task.title}</span>
                           </span>
                           {task.category && (
                             <span className="text-[10px] text-muted-foreground/50">{task.category}</span>
@@ -376,7 +396,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
             <Link
               key={task.id}
               href={`/tasks/${task.id}`}
-              className="block rounded-xl glass hover:bg-white/[0.07] transition-colors p-4 group"
+              className={cn("block rounded-xl glass hover:bg-white/[0.07] transition-colors p-4 group", isOverdue(task.dueDate) && task.status !== "DONE" && "border-l-2 border-l-rose-400/60 bg-rose-500/[0.035]")}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -385,7 +405,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
                       onClick={(e) => { e.preventDefault(); cycleStatus(task) }}
                       className="h-4 w-4 shrink-0 rounded-full border-2 border-zinc-600 hover:border-emerald-400 transition-colors cursor-pointer"
                     />
-                    <p className="text-sm font-medium truncate group-hover:text-white transition-colors">{task.title}</p>
+                    <p className="flex items-center gap-2 text-sm font-medium truncate group-hover:text-white transition-colors"><span className={cn("h-2 w-2 shrink-0 rounded-full", priorityDot(task.priority))} />{task.title}</p>
                     {task.dependsOn && <span className="text-[10px] text-amber-400/60 shrink-0">🔗</span>}
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">

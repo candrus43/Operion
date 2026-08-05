@@ -14,6 +14,8 @@ import {
   Store,
   Landmark,
   MoreHorizontal,
+  BriefcaseBusiness,
+  Home,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -23,8 +25,10 @@ const entityTypeConfig: Record<string, { icon: typeof Building2; color: string; 
   GAS_STATION: { icon: Fuel, color: "bg-red-500/10 text-red-400 border-red-500/20", label: "Gas Station" },
   COMMERCIAL_PROPERTY: { icon: Building2, color: "bg-blue-500/10 text-blue-400 border-blue-500/20", label: "Commercial" },
   INVESTMENT: { icon: Landmark, color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", label: "Investment" },
-  OTHER: { icon: Building2, color: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20", label: "Other" },
+  OTHER: { icon: BriefcaseBusiness, color: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20", label: "Other" },
 }
+
+const typeFilters = ["ALL", "BUSINESS", "HOTEL", "GAS_STATION", "COMMERCIAL_PROPERTY", "INVESTMENT", "OTHER"]
 
 interface Entity {
   id: string
@@ -35,16 +39,16 @@ interface Entity {
 
 export default function EntitySearch({ entities }: { entities: Entity[] }) {
   const [search, setSearch] = useState("")
+  const [typeFilter, setTypeFilter] = useState("ALL")
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return entities
-    const q = search.toLowerCase()
-    return entities.filter(
-      (e) =>
-        e.name.toLowerCase().includes(q) ||
-        (entityTypeConfig[e.type]?.label || "").toLowerCase().includes(q)
-    )
-  }, [entities, search])
+    const q = search.toLowerCase().trim()
+    return entities.filter((e) => {
+      const matchesType = typeFilter === "ALL" || e.type === typeFilter
+      const matchesSearch = !q || e.name.toLowerCase().includes(q) || (entityTypeConfig[e.type]?.label || "").toLowerCase().includes(q)
+      return matchesType && matchesSearch
+    })
+  }, [entities, search, typeFilter])
 
   return (
     <>
@@ -59,6 +63,14 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
         />
       </div>
 
+      {/* Type filter chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {typeFilters.map((type) => {
+          const label = type === "ALL" ? "All types" : entityTypeConfig[type]?.label || type
+          return <button key={type} onClick={() => setTypeFilter(type)} className={cn("shrink-0 rounded-full border px-3 py-1.5 text-xs transition-all", typeFilter === type ? "border-violet-400/40 bg-violet-400/15 text-violet-200 shadow-[0_0_18px_rgba(167,139,250,0.12)]" : "border-white/[0.08] bg-white/[0.025] text-white/45 hover:border-white/20 hover:text-white/80")}>{label}</button>
+        })}
+      </div>
+
       {/* Entity Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((entity) => {
@@ -67,12 +79,12 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
 
           return (
             <Link key={entity.id} href={`/entities/${entity.id}`}>
-              <Card className="glass hover:bg-white/[0.07] transition-all hover:scale-[1.01] cursor-pointer group">
+              <Card className="glass card-glow hover:bg-white/[0.07] transition-all cursor-pointer group overflow-hidden relative">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", config.color)}>
-                        <Icon className="h-5 w-5" />
+                      <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl ring-1 shadow-lg", config.color)}>
+                        <Icon className="h-6 w-6" />
                       </div>
                       <div>
                         <CardTitle className="text-base group-hover:text-white transition-colors">
@@ -92,23 +104,10 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
-                      <div className="text-lg font-semibold">{entity._count.projects}</div>
-                      <div className="text-[10px] text-muted-foreground">Projects</div>
-                    </div>
-                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
-                      <div className="text-lg font-semibold">{entity._count.tasks}</div>
-                      <div className="text-[10px] text-muted-foreground">Tasks</div>
-                    </div>
-                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
-                      <div className="text-lg font-semibold">{entity._count.documents}</div>
-                      <div className="text-[10px] text-muted-foreground">Docs</div>
-                    </div>
-                    <div className="text-center rounded-lg bg-white/[0.04] py-2">
-                      <div className="text-lg font-semibold">{entity._count.contacts}</div>
-                      <div className="text-[10px] text-muted-foreground">Contacts</div>
-                    </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.07] px-2.5 py-1 text-[10px] text-sky-200/70">{entity._count.projects} projects</span>
+                    <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.07] px-2.5 py-1 text-[10px] text-amber-200/70">{entity._count.tasks} tasks</span>
+                    <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.07] px-2.5 py-1 text-[10px] text-violet-200/70">{entity._count.documents} docs</span>
                   </div>
                 </CardContent>
               </Card>

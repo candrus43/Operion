@@ -101,10 +101,15 @@ export default async function ProjectsPage(props: {
 
   // Progress bar color helper
   const progressColor = (pct: number) => {
-    if (pct >= 75) return "bg-emerald-500"
-    if (pct >= 50) return "bg-blue-500"
-    if (pct >= 25) return "bg-amber-500"
-    return "bg-red-500"
+    if (pct >= 75) return "from-emerald-500 to-teal-400"
+    if (pct >= 50) return "from-blue-500 to-cyan-400"
+    if (pct >= 25) return "from-amber-500 to-yellow-400"
+    return "from-rose-500 to-orange-400"
+  }
+
+  const phaseAccent: Record<string, string> = {
+    ACQUISITION: "border-t-blue-400", DUE_DILIGENCE: "border-t-amber-400", DESIGN: "border-t-sky-400",
+    PERMITTING: "border-t-amber-400", CONSTRUCTION: "border-t-emerald-400", CLOSEOUT: "border-t-slate-400", OPERATIONS: "border-t-emerald-400",
   }
 
   return (
@@ -140,7 +145,7 @@ export default async function ProjectsPage(props: {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Link key={project.id} href={`/projects/${project.id}`}>
-            <Card className="glass hover:bg-white/[0.07] transition-all hover:scale-[1.01] cursor-pointer group h-full">
+            <Card className={cn("glass border-t-[3px] hover:bg-white/[0.07] transition-all hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(96,165,250,0.08)] cursor-pointer group h-full", phaseAccent[project.phase] || "border-t-slate-400")}>
               <CardContent className="p-5 space-y-4">
                 {/* Top row: name + status */}
                 <div className="flex items-start justify-between gap-2">
@@ -181,7 +186,7 @@ export default async function ProjectsPage(props: {
                   </Badge>
                   {project.budget && (
                     <span className="text-[11px] text-muted-foreground/50">
-                      ${project.budget.toLocaleString()}
+                      ${project.budget.toLocaleString()} budget
                     </span>
                   )}
                 </div>
@@ -196,7 +201,7 @@ export default async function ProjectsPage(props: {
                   </div>
                   <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
                     <div
-                      className={cn("h-full rounded-full transition-all", progressColor(project.progress))}
+                      className={cn("h-full rounded-full bg-gradient-to-r transition-all", progressColor(project.progress))}
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
