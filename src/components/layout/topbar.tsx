@@ -214,8 +214,11 @@ export function Topbar({ user }: TopbarProps) {
                         onClick={() => {
                           markAsRead(notif.id)
                           if (notif.link) {
+                            // Close the popover before navigating. A hard navigation is
+                            // intentional here: router.push can be coalesced when the
+                            // current page is already the same collection route.
                             setNotifOpen(false)
-                            router.push(notif.link)
+                            window.location.assign(notif.link)
                           }
                         }}
                       >
