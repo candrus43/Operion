@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "Operion — AI Chief of Staff for Multi-Entity Management",
     description:
       "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
-    url: "https://www.operion.online",
+    url: "https://operion.ctonew.app",
     siteName: "Operion",
     images: [
       {

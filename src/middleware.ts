@@ -21,7 +21,7 @@ export default auth((req) => {
                        req.nextUrl.pathname === "/admin/login"
 
   const isDemoRoute = req.nextUrl.pathname === "/demo-login"
-  const isDebugRoute = req.nextUrl.pathname.startsWith("/api/debug")
+  const isDebugRoute = req.nextUrl.pathname === "/api/debug/auth-config"
   const isStripeWebhook = req.nextUrl.pathname === "/api/stripe/webhook"
   const isStripeApi = req.nextUrl.pathname.startsWith("/api/stripe/")
   const isSupportAccessApi = req.nextUrl.pathname === "/api/support/access"

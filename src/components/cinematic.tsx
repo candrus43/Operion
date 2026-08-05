@@ -282,12 +282,6 @@ export function CinematicNav() {
           </Link>
 
           <div className="hidden items-center gap-1 sm:flex">
-            <Link
-              href="/admin/login"
-              className="mr-2 text-[10px] text-white/25 transition-colors hover:text-white/50"
-            >
-              Admin
-            </Link>
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -342,13 +336,6 @@ export function CinematicNav() {
             >
               Explore the Product
               <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/admin/login"
-              onClick={() => setOpen(false)}
-              className="px-3 pt-2 text-[10px] text-white/25"
-            >
-              Admin
             </Link>
           </div>
         </div>
@@ -509,7 +496,7 @@ export function DashboardShowcase() {
             <div className="flex flex-1 justify-center">
               <div className="flex h-6 w-64 max-w-[60%] items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03]">
                 <span className="font-mono text-[10px] tracking-wide text-white/35">
-                  app.operion.online
+                  747f7260a6742ead05417bb94870b599.ctonew.app
                 </span>
               </div>
             </div>

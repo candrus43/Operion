@@ -29,6 +29,7 @@ const mainNavItems = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
   { href: "/entities", label: "Entities", icon: Building2 },
   { href: "/projects", label: "Projects", icon: FolderKanban },
+  { href: "/meetings", label: "Meetings", icon: Users },
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/contacts", label: "Contacts", icon: Users },
@@ -82,9 +83,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       )}
     >
       {/* Logo */}
-      <div className="flex h-14 items-center justify-between px-4 border-b border-white/[0.06]">
+      <div className={cn("flex items-center border-b border-white/[0.06]", collapsed ? "h-20 flex-col justify-center gap-1 px-1" : "h-14 justify-between px-4")}>
         {!collapsed && (
-          <Link href="/" className="flex items-center gap-2 min-w-0">
+          <Link href="/home" className="flex items-center gap-2 min-w-0">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -100,7 +101,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </Link>
         )}
         {collapsed && (
-          <Link href="/" className="mx-auto">
+          <Link href="/home" className="mx-auto">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -116,6 +117,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={onToggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className={cn("h-7 w-7 shrink-0", collapsed && "hidden")}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -125,6 +127,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={onToggle}
+            aria-label="Expand sidebar"
             className="h-7 w-7 shrink-0 rotate-180 mx-auto mt-2"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -178,7 +181,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             return true
           })
           .map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
           const Icon = item.icon
           return (
             <Link
@@ -200,7 +203,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Admin-only links */}
         {userRole && (userRole === "OWNER" || userRole === "EXECUTIVE_ASSISTANT") &&
           adminNavItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
             const Icon = item.icon
             return (
               <Link

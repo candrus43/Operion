@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   // Only expose auth config in development
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

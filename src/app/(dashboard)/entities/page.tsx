@@ -115,7 +115,7 @@ export default async function EntitiesPage() {
                 Add Your First Entity
               </Button>
               <p className="text-xs text-amber-400">
-                You've reached your plan's entity limit.
+                You&apos;ve reached your plan&apos;s entity limit.
                 <Link href="/pricing" className="ml-1 underline underline-offset-2 hover:text-amber-300">Upgrade to add more</Link>
               </p>
             </div>

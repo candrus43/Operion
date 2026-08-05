@@ -187,6 +187,7 @@ export function Topbar({ user }: TopbarProps) {
             variant="ghost"
             size="icon"
             className="h-9 w-9 relative"
+            aria-label="Open notifications"
             onClick={() => setNotifOpen(!notifOpen)}
           >
             <Bell className="h-4 w-4" />
@@ -263,7 +264,7 @@ export function Topbar({ user }: TopbarProps) {
                       className="w-full px-4 py-2.5 text-xs text-muted-foreground hover:text-white hover:bg-white/[0.06] transition-colors text-center border-t border-white/[0.06]"
                       onClick={() => {
                         setNotifOpen(false)
-                        router.push("/home")
+                        router.push("/notifications")
                       }}
                     >
                       View all notifications
@@ -284,7 +285,7 @@ export function Topbar({ user }: TopbarProps) {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
+            <Button variant="ghost" aria-label="Open account menu" className="h-8 w-8 rounded-full p-0">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="text-xs bg-sidebar-accent">
                   {user?.name?.split(" ").map((n: string) => n[0]).join("") || "U"}

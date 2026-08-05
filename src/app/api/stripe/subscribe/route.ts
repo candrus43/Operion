@@ -2,8 +2,12 @@ import { NextResponse } from "next/server"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
 import { prisma } from "@/lib/db"
 import { applyRateLimit } from "@/lib/rate-limit"
+import { auth } from "@/lib/auth"
 
 export async function GET(request: Request) {
+  const session = await auth()
+  if (!session?.user) return NextResponse.redirect(new URL("/login?redirect=/pricing", request.url))
+  const sessionOrgId = (session.user as any).organizationId
   const limit = await applyRateLimit(request, { maxRequests: 60, windowMs: 60_000 })
   if (limit) return limit
 
@@ -33,7 +37,7 @@ export async function GET(request: Request) {
 
     // Look up org by Stripe customer ID instead of orgId to avoid exposing orgId in URLs
     const org = await prisma.organization.findFirst({
-      where: { stripeCustomerId: customerId },
+      where: { stripeCustomerId: customerId, id: sessionOrgId },
       select: { id: true, subscriptionStatus: true },
     })
 
