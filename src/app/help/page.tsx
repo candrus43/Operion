@@ -55,7 +55,7 @@ export default function HelpPage() {
         </Link>
 
         <button
-          onClick={() => setOpenFaq(openFaq === 0 ? null : 0)}
+          onClick={() => setOpenFaq(openFaq !== null ? null : 0)}
           className="rounded-xl glass border border-white/[0.06] p-6 space-y-3 text-left hover:border-white/[0.12] hover:bg-white/[0.02] transition-all cursor-pointer"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
