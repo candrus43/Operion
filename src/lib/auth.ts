@@ -127,9 +127,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ;(user as any).organizationId = existingUser.organizationId
             ;(user as any).isSuperAdmin = existingUser.isSuperAdmin
           } else {
-            // console.log("[AUTH signIn] New Google user — no existing DB user for email:", user.email)
-            // For now, allow sign-in even without DB user (JWT-only session)
-            // The user will need onboarding to create an organization
+            // OAuth accounts must be invited/created through the normal onboarding flow.
+            // Never issue an organization-less JWT session.
+            return false
           }
         } catch (e) {
           console.error("[AUTH signIn] Error looking up user:", e)
@@ -149,7 +149,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ;(user as any).organizationId = existingUser.organizationId
             ;(user as any).isSuperAdmin = existingUser.isSuperAdmin
           } else {
-            // console.log("[AUTH signIn] New Microsoft user — no existing DB user for email:", user.email)
+            // OAuth accounts must be invited/created through the normal onboarding flow.
+            return false
           }
         } catch (e) {
           console.error("[AUTH signIn] Error looking up user for Microsoft:", e)

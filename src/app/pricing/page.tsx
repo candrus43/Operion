@@ -126,7 +126,7 @@ const features = [
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-            <img src="/logo.png" className="h-6 w-6" alt="Operion" />
+            <img src="/logo.svg" className="h-6 w-6" alt="Operion" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Simple, transparent pricing
@@ -229,7 +229,7 @@ const features = [
                   </>
                 ) : (
                   <a
-                    href="mailto:hello@operion.ai"
+                    href="mailto:Hello@operion.online"
                     className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                   >
                     <Mail className="h-4 w-4" />

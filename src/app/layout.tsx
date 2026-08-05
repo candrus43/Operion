@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description:
     "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: "/icon.svg",
+    apple: "/icon.svg",
   },
   openGraph: {
     title: "Operion — AI Chief of Staff for Multi-Entity Management",
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     siteName: "Operion",
     images: [
       {
-        url: "/icon.png",
-        width: 512,
-        height: 512,
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
         alt: "Operion",
       },
     ],
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Operion — AI Chief of Staff for Multi-Entity Management",
     description:
       "One dashboard for every business you run. AI-powered briefings, cross-entity search, and white-glove setup.",
-    images: ["/icon.png"],
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,

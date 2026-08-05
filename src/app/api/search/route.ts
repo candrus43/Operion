@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { title: { contains: query } },
-          { description: { contains: query } },
+          { title: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, title: true, description: true, status: true },
@@ -39,8 +39,8 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { name: { contains: query } },
-          { description: { contains: query } },
+          { name: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, description: true, status: true },
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { name: { contains: query } },
+          { name: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, type: true },
@@ -62,10 +62,10 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { name: { contains: query } },
-          { url: { contains: query } },
-          { filePath: { contains: query } },
-          { notes: { contains: query } },
+          { name: { contains: query, mode: "insensitive" } },
+          { url: { contains: query, mode: "insensitive" } },
+          { filePath: { contains: query, mode: "insensitive" } },
+          { notes: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, type: true },
@@ -76,9 +76,9 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { name: { contains: query } },
-          { company: { contains: query } },
-          { email: { contains: query } },
+          { name: { contains: query, mode: "insensitive" } },
+          { company: { contains: query, mode: "insensitive" } },
+          { email: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, company: true },
@@ -89,8 +89,8 @@ export async function GET(req: NextRequest) {
       where: {
         organizationId: orgId,
         OR: [
-          { title: { contains: query } },
-          { notes: { contains: query } },
+          { title: { contains: query, mode: "insensitive" } },
+          { notes: { contains: query, mode: "insensitive" } },
         ],
       },
       select: { id: true, title: true, date: true, location: true },

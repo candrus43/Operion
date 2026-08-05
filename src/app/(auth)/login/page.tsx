@@ -3,7 +3,7 @@
 import { AuthShell } from "@/components/auth/auth-shell"
 import { useState, useEffect, Suspense } from "react"
 import { signIn, getSession } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,6 @@ import { Separator } from "@/components/ui/separator"
 import { CheckCircle2, Monitor } from "lucide-react"
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -58,11 +57,10 @@ function LoginForm() {
       const session = await getSession()
       const isSuperAdmin = (session?.user as any)?.isSuperAdmin
       if (isSuperAdmin) {
-        router.push("/admin")
+        window.location.href = "/admin"
       } else {
-        router.push(redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/home" )
+        window.location.href = redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/home"
       }
-      router.refresh()
     }
   }
 
@@ -185,7 +183,7 @@ function LoginForm() {
               Google
             </a>
             <a
-              href="/api/auth/signin/microsoft?callbackUrl=/home"
+              href="/api/auth/signin/microsoft-entra-id?callbackUrl=/home"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none">
