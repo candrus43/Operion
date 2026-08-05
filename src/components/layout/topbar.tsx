@@ -185,7 +185,7 @@ export function Topbar({ user }: TopbarProps) {
           {notifOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-50 w-80 rounded-lg border border-white/[0.06] glass shadow-xl">
+              <div className="absolute right-0 top-full mt-1 z-50 w-80 rounded-lg border border-white/[0.08] glass-deep shadow-xl">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                   <span className="text-sm font-medium">Notifications</span>
                   <div className="flex items-center gap-2">
