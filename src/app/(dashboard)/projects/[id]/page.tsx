@@ -230,13 +230,13 @@ export default async function ProjectDetailPage({
       </div>
 
       {/* Progress bar */}
-      <Card className="border-0 bg-[#111111]">
+      <Card className="glass">
         <CardContent className="p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Overall Progress</span>
             <span className="text-sm font-bold tabular-nums">{project.progress}%</span>
           </div>
-          <div className="relative h-3 w-full overflow-hidden rounded-full bg-[#1a1a1a]">
+          <div className="relative h-3 w-full overflow-hidden rounded-full bg-white/[0.04]">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-700",
@@ -290,7 +290,7 @@ export default async function ProjectDetailPage({
             color: "text-rose-400",
           },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-[#111111] p-4">
+          <div key={stat.label} className="rounded-xl glass p-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-muted-foreground">{stat.label}</span>
               <stat.icon className={cn("h-4 w-4", stat.color)} />
@@ -302,7 +302,7 @@ export default async function ProjectDetailPage({
 
       {/* Tabbed content */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="bg-[#111111] border border-white/[0.04] p-1 h-auto gap-0">
+        <TabsList className="glass border border-white/[0.06] p-1 h-auto gap-0">
           {[
             { key: "overview", label: "Overview", count: null },
             { key: "tasks", label: "Tasks", count: project.tasks.length },
@@ -312,7 +312,7 @@ export default async function ProjectDetailPage({
             <TabsTrigger
               key={tab.key}
               value={tab.key}
-              className="text-xs px-4 py-1.5 data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-white text-muted-foreground rounded-md"
+              className="text-xs px-4 py-1.5 data-[state=active]:bg-white/[0.04] data-[state=active]:text-white text-muted-foreground rounded-md"
             >
               {tab.label}
               {tab.count !== null && (
@@ -328,7 +328,7 @@ export default async function ProjectDetailPage({
         <TabsContent value="overview" className="mt-6 space-y-6">
           {/* Description */}
           {project.description && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium">Description</CardTitle>
               </CardHeader>
@@ -341,7 +341,7 @@ export default async function ProjectDetailPage({
           )}
 
           {/* Timeline / Phase Visualization */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -400,7 +400,7 @@ export default async function ProjectDetailPage({
 
           {/* Budget detail */}
           {project.budget && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-emerald-400" />
@@ -419,7 +419,7 @@ export default async function ProjectDetailPage({
           )}
 
           {/* AI Risk Assessment placeholder */}
-          <Card className="border-0 bg-[#111111] border border-dashed border-white/[0.05]">
+          <Card className="glass border border-dashed border-white/[0.05]">
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-violet-400" />
@@ -447,7 +447,7 @@ export default async function ProjectDetailPage({
           <div className="space-y-2">
             {project.tasks.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <CheckSquare className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No tasks yet</p>
@@ -466,7 +466,7 @@ export default async function ProjectDetailPage({
                 <Link
                   key={task.id}
                   href={`/tasks/${task.id}`}
-                  className="flex items-start gap-3 rounded-lg bg-[#111111] hover:bg-[#141414] transition-colors p-3 group"
+                  className="flex items-start gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3 group"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -515,7 +515,7 @@ export default async function ProjectDetailPage({
           <div className="space-y-2">
             {project.documents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <FileText className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No documents yet</p>
@@ -529,7 +529,7 @@ export default async function ProjectDetailPage({
                 return (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-3 rounded-lg bg-[#111111] hover:bg-[#141414] transition-colors p-3"
+                    className="flex items-center gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3"
                   >
                     <div
                       className={cn(
@@ -568,7 +568,7 @@ export default async function ProjectDetailPage({
           <div className="space-y-2">
             {project.meetings.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <Calendar className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No meetings yet</p>
@@ -580,7 +580,7 @@ export default async function ProjectDetailPage({
               project.meetings.map((meeting) => (
                 <div
                   key={meeting.id}
-                  className="flex items-start gap-3 rounded-lg bg-[#111111] hover:bg-[#141414] transition-colors p-3"
+                  className="flex items-start gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10 shrink-0">
                     <Calendar className="h-4 w-4 text-sky-400" />

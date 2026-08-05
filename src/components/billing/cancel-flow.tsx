@@ -137,7 +137,7 @@ export function CancelFlow({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border-[#262626] bg-[#111111] text-white sm:max-w-md">
+      <DialogContent className="border-[#262626] glass text-white sm:max-w-md">
         {step === "offers" && (
           <>
             <DialogHeader>
@@ -155,7 +155,7 @@ export function CancelFlow({
               <button
                 onClick={handlePause}
                 disabled={isLoading}
-                className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-[#1a1a1a] p-4 text-left hover:bg-[#222] transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-white/[0.04] p-4 text-left hover:bg-[#222] transition-colors disabled:opacity-50"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
                   <Pause className="h-5 w-5 text-amber-400" />
@@ -179,7 +179,7 @@ export function CancelFlow({
               {subscriptionTier === "TEAM" && (
                 <button
                   onClick={handleDowngrade}
-                  className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-[#1a1a1a] p-4 text-left hover:bg-[#222] transition-colors"
+                  className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-white/[0.04] p-4 text-left hover:bg-[#222] transition-colors"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
                     <ArrowDown className="h-5 w-5 text-blue-400" />
@@ -200,7 +200,7 @@ export function CancelFlow({
               {/* Schedule Call */}
               <button
                 onClick={handleScheduleCall}
-                className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-[#1a1a1a] p-4 text-left hover:bg-[#222] transition-colors"
+                className="w-full flex items-center gap-4 rounded-lg border border-[#262626] bg-white/[0.04] p-4 text-left hover:bg-[#222] transition-colors"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
                   <Calendar className="h-5 w-5 text-green-400" />
@@ -263,7 +263,7 @@ export function CancelFlow({
                       className={`w-full flex items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
                         selectedReason === reason.value
                           ? "border-blue-500/50 bg-blue-500/10 text-white"
-                          : "border-[#262626] bg-[#1a1a1a] text-muted-foreground hover:bg-[#222] hover:text-white"
+                          : "border-[#262626] bg-white/[0.04] text-muted-foreground hover:bg-[#222] hover:text-white"
                       }`}
                     >
                       <div

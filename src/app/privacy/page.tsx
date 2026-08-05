@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react"
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#080808]">
+    <div className="min-h-screen bg-[#08080a]">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Back link */}
         <Link

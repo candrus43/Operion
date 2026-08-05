@@ -33,7 +33,7 @@ export function HealthScore({ score, deductions, weeklyCompleted, className }: H
   const offset = circumference - (score / 100) * circumference
 
   return (
-    <div className={cn("rounded-xl bg-[#111111] border border-white/[0.04] p-5", className)}>
+    <div className={cn("rounded-xl glass border border-white/[0.06] p-5", className)}>
       <div className="flex items-start gap-4">
         {/* Score ring */}
         <div className="relative shrink-0">
@@ -93,7 +93,7 @@ export function HealthScore({ score, deductions, weeklyCompleted, className }: H
       </div>
 
       {/* Momentum streak */}
-      <div className="mt-4 pt-4 border-t border-white/[0.04]">
+      <div className="mt-4 pt-4 border-t border-white/[0.06]">
         <div className="flex items-center gap-2">
           <Zap className="h-3.5 w-3.5 text-amber-400" />
           <span className="text-xs text-muted-foreground">

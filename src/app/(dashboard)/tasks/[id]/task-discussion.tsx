@@ -206,7 +206,7 @@ export function TaskDiscussion({ taskId }: { taskId: string }) {
   }
 
   return (
-    <Card className="border-0 bg-[#111111]">
+    <Card className="glass">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-amber-400" />
@@ -224,10 +224,10 @@ export function TaskDiscussion({ taskId }: { taskId: string }) {
           <div className="space-y-3">
             {[1, 2].map((i) => (
               <div key={i} className="flex gap-3 animate-pulse">
-                <div className="h-8 w-8 rounded-full bg-[#1a1a1a]" />
+                <div className="h-8 w-8 rounded-full bg-white/[0.04]" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3 w-24 bg-[#1a1a1a] rounded" />
-                  <div className="h-3 w-full bg-[#1a1a1a] rounded" />
+                  <div className="h-3 w-24 bg-white/[0.04] rounded" />
+                  <div className="h-3 w-full bg-white/[0.04] rounded" />
                 </div>
               </div>
             ))}
@@ -279,14 +279,14 @@ export function TaskDiscussion({ taskId }: { taskId: string }) {
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Write a comment... Use @ to mention someone"
-            className="min-h-[60px] bg-[#1a1a1a] border-white/[0.06] resize-none text-sm"
+            className="min-h-[60px] bg-white/[0.04] border-white/[0.06] resize-none text-sm"
             disabled={posting}
           />
           {/* @mention dropdown */}
           {showMentionDropdown && filteredMembers.length > 0 && (
             <div
               ref={dropdownRef}
-              className="absolute bottom-full left-0 mb-1 w-56 max-h-[180px] overflow-y-auto rounded-lg border border-white/[0.06] bg-[#1a1a1a] shadow-xl z-50"
+              className="absolute bottom-full left-0 mb-1 w-56 max-h-[180px] overflow-y-auto rounded-lg border border-white/[0.06] bg-white/[0.04] shadow-xl z-50"
             >
               {filteredMembers.map((member, idx) => (
                 <button

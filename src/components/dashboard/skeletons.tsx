@@ -15,7 +15,7 @@ export function DashboardSkeleton() {
       {/* Stats Row */}
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-xl bg-[#111111] p-4 space-y-3">
+          <div key={i} className="rounded-xl glass p-4 space-y-3">
             <div className="flex items-center justify-between">
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-4 rounded" />
@@ -28,7 +28,7 @@ export function DashboardSkeleton() {
       {/* Critical + Deadlines Row */}
       <div className="grid gap-6 lg:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="rounded-xl bg-[#111111] p-5 space-y-3">
+          <div key={i} className="rounded-xl glass p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Skeleton className="h-7 w-7 rounded-lg" />
               <Skeleton className="h-5 w-36" />
@@ -43,7 +43,7 @@ export function DashboardSkeleton() {
       {/* Projects + Activity Row */}
       <div className="grid gap-6 lg:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="rounded-xl bg-[#111111] p-5 space-y-3">
+          <div key={i} className="rounded-xl glass p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Skeleton className="h-7 w-7 rounded-lg" />
               <Skeleton className="h-5 w-36" />
@@ -56,7 +56,7 @@ export function DashboardSkeleton() {
       </div>
 
       {/* Waiting On */}
-      <div className="rounded-xl bg-[#111111] p-5 space-y-3">
+      <div className="rounded-xl glass p-5 space-y-3">
         <div className="flex items-center gap-2">
           <Skeleton className="h-7 w-7 rounded-lg" />
           <Skeleton className="h-5 w-44" />

@@ -115,7 +115,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -146,7 +146,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -170,23 +170,23 @@ export function EntityTabs({ entity }: EntityTabsProps) {
             </Card>
 
             {/* Quick Summary */}
-            <Card className="border-0 bg-[#111111] md:col-span-2">
+            <Card className="glass md:col-span-2">
               <CardHeader>
                 <CardTitle className="text-sm">Activity Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="text-center rounded-xl bg-[#1a1a1a] p-4">
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
                     <div className="text-2xl font-bold">{entity._count?.projects || entity.projects.length}</div>
                     <div className="text-xs text-muted-foreground mt-1">Active Projects</div>
                   </div>
-                  <div className="text-center rounded-xl bg-[#1a1a1a] p-4">
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
                     <div className="text-2xl font-bold">
                       {entity.tasks.filter((t: any) => t.status !== "DONE").length}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">Open Tasks</div>
                   </div>
-                  <div className="text-center rounded-xl bg-[#1a1a1a] p-4">
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
                     <div className="text-2xl font-bold">
                       {entity.tasks.filter((t: any) => t.priority === "CRITICAL" && t.status !== "DONE").length}
                     </div>
@@ -203,7 +203,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
           <div className="space-y-3">
             {entity.projects.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <FolderKanban className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No projects yet</p>
@@ -211,7 +211,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
               </div>
             ) : (
               entity.projects.map((project: any) => (
-                <Card key={project.id} className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors cursor-pointer">
+                <Card key={project.id} className="glass hover:bg-white/[0.07] transition-colors cursor-pointer">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div>
@@ -255,7 +255,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
           <div className="space-y-2">
             {entity.tasks.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <CheckSquare className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No tasks yet</p>
@@ -265,7 +265,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
               entity.tasks.map((task: any) => (
                 <div
                   key={task.id}
-                  className="flex items-start gap-3 rounded-lg bg-[#111111] hover:bg-[#141414] transition-colors p-3 cursor-pointer"
+                  className="flex items-start gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3 cursor-pointer"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -307,7 +307,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
           <div className="space-y-2">
             {entity.documents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <FileText className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No documents yet</p>
@@ -319,7 +319,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
                 return (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-3 rounded-lg bg-[#111111] hover:bg-[#141414] transition-colors p-3 cursor-pointer"
+                    className="flex items-center gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3 cursor-pointer"
                   >
                     <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg shrink-0", dc.color)}>
                       <FileText className="h-4 w-4" />
@@ -347,7 +347,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
           <div className="space-y-2">
             {entity.contacts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <Users className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <p className="text-base font-medium">No contacts yet</p>
@@ -356,7 +356,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {entity.contacts.map((contact: any) => (
-                  <Card key={contact.id} className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors cursor-pointer">
+                  <Card key={contact.id} className="glass hover:bg-white/[0.07] transition-colors cursor-pointer">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 shrink-0">

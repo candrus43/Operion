@@ -166,7 +166,7 @@ export default function AIChatPage() {
         </div>
         <h2 className="text-xl font-semibold mb-2">AI Features Not Configured</h2>
         <p className="text-muted-foreground max-w-md mb-6">
-          AI features require an OpenAI API key. Add <code className="bg-[#1a1a1a] px-1.5 py-0.5 rounded text-sm">OPENAI_API_KEY</code> to
+          AI features require an OpenAI API key. Add <code className="bg-white/[0.04] px-1.5 py-0.5 rounded text-sm">OPENAI_API_KEY</code> to
           your environment variables to continue.
         </p>
         <Button variant="outline" onClick={() => setApiKeyMissing(false)}>
@@ -215,7 +215,7 @@ export default function AIChatPage() {
                         key={prompt}
                         onClick={() => sendMessage(prompt)}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#111111] border border-white/[0.05] px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-[#171717] hover:border-white/[0.08] hover:shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed group"
+                        className="inline-flex items-center gap-2 rounded-xl glass border border-white/[0.05] px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.07] hover:border-white/[0.08] hover:shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed group"
                       >
                         <Sparkles className="h-3.5 w-3.5 text-violet-400/50 group-hover:text-violet-400/80 transition-colors" />
                         <span>{prompt}</span>
@@ -247,7 +247,7 @@ export default function AIChatPage() {
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-violet-500/20">
               <Sparkles className="h-4 w-4 text-violet-400" />
             </div>
-            <div className="rounded-[20px] rounded-tl-md bg-[#0f0f0f] border border-white/[0.04] px-5 py-3.5">
+            <div className="rounded-[20px] rounded-tl-md bg-[#0f0f0f] border border-white/[0.06] px-5 py-3.5">
               <div className="flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400/30 animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400/30 animate-bounce" style={{ animationDelay: "120ms" }} />
@@ -280,7 +280,7 @@ export default function AIChatPage() {
               "absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl transition-all duration-200",
               input.trim()
                 ? "bg-violet-500 hover:bg-violet-400 text-white shadow-sm shadow-violet-500/20"
-                : "bg-[#1a1a1a] text-muted-foreground/40"
+                : "bg-white/[0.04] text-muted-foreground/40"
             )}
           >
             {loading ? (
@@ -403,7 +403,7 @@ function MarkdownContent({ content }: { content: string }) {
               )
             }
             return (
-              <code className={cn("block bg-[#080808] border border-white/[0.06] rounded-xl px-4 py-3 my-3 text-[13px] font-mono leading-relaxed text-foreground/80 overflow-x-auto", className)} {...props}>
+              <code className={cn("block bg-[#08080a] border border-white/[0.06] rounded-xl px-4 py-3 my-3 text-[13px] font-mono leading-relaxed text-foreground/80 overflow-x-auto", className)} {...props}>
                 {children}
               </code>
             )

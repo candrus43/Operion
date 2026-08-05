@@ -143,12 +143,12 @@ const features = [
 ]
 
   return (
-    <div className="min-h-screen bg-[#080808]">
+    <div className="min-h-screen bg-[#08080a]">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-            <img src="/logo.svg" className="h-6 w-6" alt="Operion" />
+            <img src="/logo.png" className="h-6 w-6" alt="Operion" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Simple, transparent pricing
@@ -173,7 +173,7 @@ const features = [
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-xl border-0 bg-[#111111] shadow-2xl flex flex-col${
+              className={`relative rounded-xl glass shadow-2xl flex flex-col${
                 plan.highlighted ? " ring-2 ring-primary/30 lg:scale-[1.04]" : ""
               }`}
             >
@@ -234,7 +234,7 @@ const features = [
                       className={`inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors disabled:opacity-50 ${
                         plan.highlighted
                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                          : "border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                          : "border border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                       }`}
                     >
                       {checkingOut === plan.plan ? "Redirecting..." : "Start Free Trial"}
@@ -247,7 +247,7 @@ const features = [
                 ) : (
                   <a
                     href="mailto:hello@operion.ai"
-                    className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                    className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full transition-colors border border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                   >
                     <Mail className="h-4 w-4" />
                     Contact us
@@ -267,7 +267,7 @@ const features = [
             {features.map((item) => (
               <div
                 key={item.title}
-                className="rounded-xl bg-[#111111] border border-white/[0.04] p-5"
+                className="rounded-xl glass border border-white/[0.06] p-5"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground/5 mb-3">
                   <item.icon className="h-4 w-4 text-primary" />
@@ -281,7 +281,7 @@ const features = [
 
         {/* CTA */}
         <div className="mt-20 text-center">
-          <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-10 max-w-2xl mx-auto">
+          <div className="rounded-2xl glass border border-white/[0.06] p-10 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold tracking-tight mb-2">Ready to get started?</h2>
             <p className="text-muted-foreground mb-6">
               Join entrepreneurs who trust Operion as their AI Chief of Staff.
@@ -297,7 +297,7 @@ const features = [
               </button>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-[#262626] bg-white/[0.04] text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-[#222]"
               >
                 Sign in
               </Link>

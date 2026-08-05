@@ -158,7 +158,7 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-white/[0.06] bg-[#08080a]/60 px-4 backdrop-blur-xl">
       <Button
         variant="ghost"
         size="icon"
@@ -179,11 +179,11 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
           onFocus={() => setShowShortcut(true)}
           onBlur={() => setShowShortcut(false)}
           placeholder="Search across all entities..."
-          className="pl-9 pr-16 h-9 bg-muted/50 border-transparent focus:bg-background transition-colors"
+          className="pl-9 pr-16 h-9 border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.05] focus:bg-white/[0.06] transition-colors"
         />
         <div
           className={cn(
-            "absolute right-2 top-1.5 flex items-center gap-0.5 rounded-md bg-background/50 px-1.5 py-0.5 text-[10px] text-muted-foreground/60 border border-white/[0.04] transition-opacity pointer-events-none",
+            "absolute right-2 top-1.5 flex items-center gap-0.5 rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/40 border border-white/[0.05] transition-opacity pointer-events-none",
             showShortcut || !searchQuery ? "opacity-100" : "opacity-0"
           )}
         >
@@ -211,8 +211,8 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
           {notifOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-50 w-80 rounded-lg border border-white/[0.06] bg-[#111111] shadow-xl">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04]">
+              <div className="absolute right-0 top-full mt-1 z-50 w-80 rounded-lg border border-white/[0.06] glass shadow-xl">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                   <span className="text-sm font-medium">Notifications</span>
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
@@ -243,7 +243,7 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
                       <div
                         key={notif.id}
                         className={cn(
-                          "flex items-start gap-3 px-4 py-3 hover:bg-[#1a1a1a] transition-colors cursor-pointer border-b border-white/[0.02]",
+                          "flex items-start gap-3 px-4 py-3 hover:bg-white/[0.06] transition-colors cursor-pointer border-b border-white/[0.02]",
                           !notif.read && "bg-white/[0.02]"
                         )}
                         onClick={() => {
@@ -272,7 +272,7 @@ export function Topbar({ onMenuClick, user }: TopbarProps) {
                   )}
                   {notifications.length > 0 && (
                     <button
-                      className="w-full px-4 py-2.5 text-xs text-muted-foreground hover:text-white hover:bg-[#1a1a1a] transition-colors text-center border-t border-white/[0.04]"
+                      className="w-full px-4 py-2.5 text-xs text-muted-foreground hover:text-white hover:bg-white/[0.06] transition-colors text-center border-t border-white/[0.06]"
                       onClick={() => {
                         setNotifOpen(false)
                         router.push("/home")

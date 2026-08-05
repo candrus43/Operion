@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -76,22 +77,21 @@ export default async function TasksPage(props: {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
-          <p className="text-muted-foreground mt-1">
-            {taskCount} {taskCount === 1 ? "task" : "tasks"} across your organization
-          </p>
-        </div>
-        <Link href="/tasks/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Task
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Operations"
+        title="Tasks"
+        description={`${taskCount} ${taskCount === 1 ? "task" : "tasks"} across your organization`}
+        actions={
+          <Link href="/tasks/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Task
+            </Button>
+          </Link>
+        }
+      />
 
-      <Suspense fallback={<div className="rounded-xl bg-[#111111] h-96 animate-pulse" />}>
+      <Suspense fallback={<div className="rounded-xl glass h-96 animate-pulse" />}>
         <TaskListClient
           tasks={JSON.parse(JSON.stringify(tasks))}
           users={users}

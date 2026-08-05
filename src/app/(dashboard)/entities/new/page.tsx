@@ -112,7 +112,7 @@ export default function NewEntityPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
@@ -133,7 +133,7 @@ export default function NewEntityPage() {
                 placeholder="e.g. The Grand Hotel"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -142,10 +142,10 @@ export default function NewEntityPage() {
             <div className="space-y-2">
               <Label htmlFor="type">Entity Type</Label>
               <Select value={type} onValueChange={(v) => { setType(v); setMetadata({}) }}>
-                <SelectTrigger id="type" className="bg-[#1a1a1a] border-0">
+                <SelectTrigger id="type" className="bg-white/[0.04] border-0">
                   <SelectValue placeholder="Select a type..." />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                   {entityTypes.map((et) => (
                     <SelectItem key={et.value} value={et.value}>
                       {et.label}
@@ -168,7 +168,7 @@ export default function NewEntityPage() {
                         placeholder={field.placeholder}
                         value={metadata[field.key] || ""}
                         onChange={(e) => setMetadata({ ...metadata, [field.key]: e.target.value })}
-                        className="bg-[#1a1a1a] border-0"
+                        className="bg-white/[0.04] border-0"
                       />
                     </div>
                   ))}

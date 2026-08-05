@@ -137,8 +137,8 @@ export default function EditEntityPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 w-32 bg-[#1a1a1a] rounded" />
-          <div className="h-64 bg-[#111111] rounded-xl" />
+          <div className="h-6 w-32 bg-white/[0.04] rounded" />
+          <div className="h-64 glass rounded-xl" />
         </div>
       </div>
     )
@@ -161,7 +161,7 @@ export default function EditEntityPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
@@ -180,7 +180,7 @@ export default function EditEntityPage() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -188,10 +188,10 @@ export default function EditEntityPage() {
             <div className="space-y-2">
               <Label htmlFor="type">Entity Type</Label>
               <Select value={type} onValueChange={(v) => { setType(v); setMetadata({}) }}>
-                <SelectTrigger id="type" className="bg-[#1a1a1a] border-0">
+                <SelectTrigger id="type" className="bg-white/[0.04] border-0">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                   {entityTypes.map((et) => (
                     <SelectItem key={et.value} value={et.value}>
                       {et.label}
@@ -213,7 +213,7 @@ export default function EditEntityPage() {
                         placeholder={field.placeholder}
                         value={metadata[field.key] || ""}
                         onChange={(e) => setMetadata({ ...metadata, [field.key]: e.target.value })}
-                        className="bg-[#1a1a1a] border-0"
+                        className="bg-white/[0.04] border-0"
                       />
                     </div>
                   ))}

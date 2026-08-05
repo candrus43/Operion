@@ -58,7 +58,7 @@ export default function CancelledPage() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center p-4">
-      <Card className="w-full max-w-lg border-[#262626] bg-[#111111]">
+      <Card className="w-full max-w-lg border-[#262626] glass">
         <CardContent className="space-y-8 p-8 text-center">
           {/* Icon */}
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10">
@@ -97,7 +97,7 @@ export default function CancelledPage() {
                 onClick={handleExport}
                 disabled={exporting}
                 variant="outline"
-                className="flex-1 border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-white"
+                className="flex-1 border-[#262626] bg-white/[0.04] hover:bg-[#222] text-white"
               >
                 {exporting ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -110,7 +110,7 @@ export default function CancelledPage() {
               <Button
                 onClick={() => router.push("/home")}
                 variant="outline"
-                className="flex-1 border-[#262626] bg-[#1a1a1a] hover:bg-[#222] text-white"
+                className="flex-1 border-[#262626] bg-white/[0.04] hover:bg-[#222] text-white"
               >
                 <Home className="h-4 w-4 mr-2" />
                 Go to Dashboard

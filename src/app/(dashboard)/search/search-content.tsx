@@ -106,7 +106,7 @@ export function SearchContent() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Search across tasks, projects, entities, documents, contacts..."
-              className="pl-11 pr-24 py-6 text-base bg-[#111111] border-white/[0.06] rounded-2xl focus-visible:ring-violet-500/20 placeholder:text-muted-foreground/50"
+              className="pl-11 pr-24 py-6 text-base glass border-white/[0.06] rounded-2xl focus-visible:ring-violet-500/20 placeholder:text-muted-foreground/50"
               autoFocus
             />
             <Button
@@ -143,7 +143,7 @@ export function SearchContent() {
         <>
           {totalResults === 0 ? (
             <div className="text-center py-16">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#111111] border border-white/[0.04] mx-auto mb-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl glass border border-white/[0.06] mx-auto mb-4">
                 <Search className="h-6 w-6 text-muted-foreground/40" />
               </div>
               <h3 className="text-lg font-medium text-muted-foreground mb-1">
@@ -181,7 +181,7 @@ export function SearchContent() {
                         <Link
                           key={item.id}
                           href={item.link}
-                          className="flex items-center gap-3 rounded-xl bg-[#111111] hover:bg-[#1a1a1a] border border-white/[0.03] hover:border-white/[0.06] px-4 py-3 transition-all group"
+                          className="flex items-center gap-3 rounded-xl glass hover:bg-white/[0.06] border border-white/[0.03] hover:border-white/[0.06] px-4 py-3 transition-all group"
                         >
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate group-hover:text-white transition-colors">
@@ -206,7 +206,7 @@ export function SearchContent() {
       {/* Empty initial state */}
       {!loading && !results && !initialQuery && (
         <div className="text-center py-16">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#111111] border border-white/[0.04] mx-auto mb-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl glass border border-white/[0.06] mx-auto mb-4">
             <Search className="h-6 w-6 text-muted-foreground/40" />
           </div>
           <h3 className="text-lg font-medium text-muted-foreground mb-1">

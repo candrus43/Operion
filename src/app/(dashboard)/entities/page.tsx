@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { prisma } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -49,7 +50,7 @@ export default async function EntitiesPage() {
       <div className={`rounded-lg border p-4 ${
         atLimit
           ? "border-amber-500/20 bg-amber-500/[0.06]"
-          : "border-white/[0.04] bg-[#111111]"
+          : "border-white/[0.06] glass"
       }`}>
         <div className="flex items-center gap-3">
           {atLimit ? (
@@ -75,33 +76,32 @@ export default async function EntitiesPage() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Entities</h1>
-          <p className="text-muted-foreground mt-1">
-            {entities.length} {entities.length === 1 ? "entity" : "entities"} across your portfolio
-          </p>
-        </div>
-        {atLimit ? (
-          <Button disabled className="gap-2 opacity-50 cursor-not-allowed" title="Entity limit reached">
-            <Plus className="h-4 w-4" />
-            Add Entity
-          </Button>
-        ) : (
-          <Link href="/entities/new">
-            <Button className="gap-2">
+      <PageHeader
+        eyebrow="Portfolio"
+        title="Entities"
+        description={`${entities.length} ${entities.length === 1 ? "entity" : "entities"} across your portfolio`}
+        actions={
+          atLimit ? (
+            <Button disabled className="gap-2 opacity-50 cursor-not-allowed" title="Entity limit reached">
               <Plus className="h-4 w-4" />
               Add Entity
             </Button>
-          </Link>
-        )}
-      </div>
+          ) : (
+            <Link href="/entities/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Entity
+              </Button>
+            </Link>
+          )
+        }
+      />
 
       <EntitySearch entities={entities} />
 
       {entities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
             <Building2 className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium">No entities yet</h3>

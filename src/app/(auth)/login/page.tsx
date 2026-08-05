@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState, useEffect, Suspense } from "react"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -65,7 +66,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
@@ -92,7 +93,7 @@ function LoginForm() {
           </div>
         </div>
 
-        <Card className="border-0 bg-[#111111] shadow-2xl">
+        <Card className="glass shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="pb-4">
               <CardTitle className="text-lg">{isDemo ? "Demo access" : "Sign in"}</CardTitle>
@@ -129,7 +130,7 @@ function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <div className="space-y-2">
@@ -141,7 +142,7 @@ function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
                 <div className="flex justify-end">
                   <Link
@@ -164,7 +165,7 @@ function LoginForm() {
                 <Separator className="bg-[#262626]" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#111111] px-2 text-muted-foreground">Or continue with</span>
+                <span className="glass px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
           </div>
@@ -172,7 +173,7 @@ function LoginForm() {
           <CardContent className="pt-2 pb-4 space-y-3">
             <a
               href="/api/auth/signin/google?callbackUrl=/home"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-10 px-4 py-2 w-full"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -184,7 +185,7 @@ function LoginForm() {
             </a>
             <a
               href="/api/auth/signin/microsoft?callbackUrl=/home"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-10 px-4 py-2 w-full"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none">
                 <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
@@ -210,13 +211,13 @@ function LoginForm() {
           By continuing, you agree to Operion&apos;s Terms of Service and Privacy Policy.
         </p>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
 function LoginSkeleton() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         {/* Branded loading — Operion logo with pulsing card skeleton */}
         <div className="text-center space-y-3">
@@ -230,21 +231,21 @@ function LoginSkeleton() {
         </div>
 
         {/* Card skeleton matching the real login card */}
-        <div className="rounded-xl bg-[#111111] shadow-2xl p-6 space-y-4 animate-pulse">
-          <div className="h-5 w-20 bg-[#1e1e1e] rounded" />
-          <div className="h-4 w-48 bg-[#1e1e1e] rounded" />
+        <div className="rounded-xl glass shadow-2xl p-6 space-y-4 animate-pulse">
+          <div className="h-5 w-20 bg-white/[0.04] rounded" />
+          <div className="h-4 w-48 bg-white/[0.04] rounded" />
           <div className="space-y-2 pt-2">
-            <div className="h-3.5 w-12 bg-[#1e1e1e] rounded" />
-            <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
+            <div className="h-3.5 w-12 bg-white/[0.04] rounded" />
+            <div className="h-10 w-full bg-white/[0.04] rounded-lg" />
           </div>
           <div className="space-y-2">
-            <div className="h-3.5 w-16 bg-[#1e1e1e] rounded" />
-            <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
+            <div className="h-3.5 w-16 bg-white/[0.04] rounded" />
+            <div className="h-10 w-full bg-white/[0.04] rounded-lg" />
           </div>
-          <div className="h-10 w-full bg-[#1e1e1e] rounded-lg" />
+          <div className="h-10 w-full bg-white/[0.04] rounded-lg" />
         </div>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 

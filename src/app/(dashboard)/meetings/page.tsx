@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
@@ -49,23 +50,22 @@ export default async function MeetingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Meetings</h1>
-          <p className="text-muted-foreground mt-1">
-            {meetings.length} {meetings.length === 1 ? "meeting" : "meetings"} scheduled
-          </p>
-        </div>
-        <Link href="/meetings/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Meeting
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Calendar"
+        title="Meetings"
+        description={`${meetings.length} ${meetings.length === 1 ? "meeting" : "meetings"} scheduled`}
+        actions={
+          <Link href="/meetings/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Meeting
+            </Button>
+          </Link>
+        }
+      />
 
       {meetings.length === 0 ? (
-        <Card className="border-[#262626] bg-[#111111]">
+        <Card className="border-[#262626] glass">
           <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10">
               <Calendar className="h-7 w-7 text-emerald-400" />
@@ -77,7 +77,7 @@ export default async function MeetingsPage() {
               </p>
             </div>
             <Link href="/meetings/new">
-              <Button variant="outline" className="border-[#262626] bg-[#1a1a1a] hover:bg-[#222] gap-2">
+              <Button variant="outline" className="border-[#262626] bg-white/[0.04] hover:bg-[#222] gap-2">
                 <Plus className="h-4 w-4" />
                 Schedule Meeting
               </Button>
@@ -100,7 +100,7 @@ export default async function MeetingsPage() {
               <div className="grid gap-3">
                 {upcoming.map((meeting) => (
                   <Link key={meeting.id} href={`/meetings/${meeting.id}/edit`}>
-                    <Card className="border-[#262626] bg-[#111111] hover:bg-[#1a1a1a] transition-colors cursor-pointer group">
+                    <Card className="border-[#262626] glass hover:bg-white/[0.06] transition-colors cursor-pointer group">
                       <CardContent className="p-4 flex items-center gap-4">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
                           <Calendar className="h-5 w-5 text-emerald-400" />
@@ -150,7 +150,7 @@ export default async function MeetingsPage() {
               <div className="grid gap-3">
                 {past.map((meeting) => (
                   <Link key={meeting.id} href={`/meetings/${meeting.id}/edit`}>
-                    <Card className="border-[#262626] bg-[#111111] hover:bg-[#1a1a1a] transition-colors cursor-pointer group opacity-60 hover:opacity-80">
+                    <Card className="border-[#262626] glass hover:bg-white/[0.06] transition-colors cursor-pointer group opacity-60 hover:opacity-80">
                       <CardContent className="p-4 flex items-center gap-4">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-500/10">
                           <Calendar className="h-5 w-5 text-neutral-400" />

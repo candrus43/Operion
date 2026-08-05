@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -40,7 +41,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
@@ -54,7 +55,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <Card className="border-0 bg-[#111111] shadow-2xl">
+        <Card className="glass shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="pb-4">
               <CardTitle className="text-lg">Register</CardTitle>
@@ -74,7 +75,7 @@ export default function RegisterPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <div className="space-y-2">
@@ -85,7 +86,7 @@ export default function RegisterPage() {
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <div className="space-y-2">
@@ -97,7 +98,7 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <div className="space-y-2">
@@ -110,7 +111,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                  className="bg-white/[0.04] border-0 focus-visible:ring-1"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
@@ -125,7 +126,7 @@ export default function RegisterPage() {
                 <Separator className="bg-[#262626]" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#111111] px-2 text-muted-foreground">Or sign up with</span>
+                <span className="glass px-2 text-muted-foreground">Or sign up with</span>
               </div>
             </div>
           </div>
@@ -133,7 +134,7 @@ export default function RegisterPage() {
           <CardContent className="pt-2 pb-4 space-y-3">
             <a
               href="/api/auth/signin/google?callbackUrl=/home"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-10 px-4 py-2 w-full"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -145,7 +146,7 @@ export default function RegisterPage() {
             </a>
             <a
               href="/api/auth/signin/microsoft?callbackUrl=/home"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-[#1a1a1a] hover:bg-[#222] h-10 px-4 py-2 w-full"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none">
                 <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
@@ -172,6 +173,6 @@ export default function RegisterPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }

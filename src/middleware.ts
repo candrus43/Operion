@@ -72,5 +72,5 @@ const isSetupApi = req.nextUrl.pathname === "/api/setup"
 })
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|logo.svg|uploads|dashboard-preview.png|operion-demo.mp4|demo-screenshots).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|logo.png|icon.png|logo.svg|uploads|dashboard-preview.png|operion-demo.mp4|demo-screenshots).*)"],
 }

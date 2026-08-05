@@ -64,7 +64,7 @@ export function PostPaymentOnboarding({ userName }: { userName: string }) {
         <div className="mt-8 grid gap-3 w-full max-w-lg">
           <Link
             href="/entities"
-            className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all flex items-center gap-3"
+            className="rounded-xl glass border border-white/[0.06] p-4 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all flex items-center gap-3"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
               <Building2 className="h-4 w-4 text-blue-400" />
@@ -77,7 +77,7 @@ export function PostPaymentOnboarding({ userName }: { userName: string }) {
 
           <Link
             href="/settings/team"
-            className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 text-left hover:bg-[#151515] hover:border-white/[0.08] transition-all flex items-center gap-3"
+            className="rounded-xl glass border border-white/[0.06] p-4 text-left hover:bg-white/[0.03] hover:border-white/[0.08] transition-all flex items-center gap-3"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
               <svg className="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

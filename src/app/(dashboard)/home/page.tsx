@@ -248,23 +248,23 @@ export default async function DashboardPage({
 
       {/* Row 1: AI Daily Briefing */}
       <Suspense fallback={
-        <div className="rounded-2xl bg-[#111111] border border-white/[0.04] p-6 space-y-4 animate-pulse">
+        <div className="rounded-2xl glass border border-white/[0.06] p-6 space-y-4 animate-pulse">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-60" />
+              <img src="/logo.png" alt="Operion" className="h-5 w-5 opacity-60" />
             </div>
             <div>
-              <div className="h-5 w-40 bg-[#1e1e1e] rounded" />
-              <div className="h-3.5 w-28 bg-[#1e1e1e] rounded mt-1.5" />
+              <div className="h-5 w-40 bg-white/[0.04] rounded" />
+              <div className="h-3.5 w-28 bg-white/[0.04] rounded mt-1.5" />
             </div>
           </div>
-          <div className="h-4 w-3/4 bg-[#1e1e1e] rounded" />
-          <div className="h-4 w-2/3 bg-[#1e1e1e] rounded" />
-          <div className="h-4 w-1/2 bg-[#1e1e1e] rounded" />
+          <div className="h-4 w-3/4 bg-white/[0.04] rounded" />
+          <div className="h-4 w-2/3 bg-white/[0.04] rounded" />
+          <div className="h-4 w-1/2 bg-white/[0.04] rounded" />
           <div className="flex gap-2 pt-2">
-            <div className="h-8 w-24 bg-[#1e1e1e] rounded-full" />
-            <div className="h-8 w-20 bg-[#1e1e1e] rounded-full" />
-            <div className="h-8 w-28 bg-[#1e1e1e] rounded-full" />
+            <div className="h-8 w-24 bg-white/[0.04] rounded-full" />
+            <div className="h-8 w-20 bg-white/[0.04] rounded-full" />
+            <div className="h-8 w-28 bg-white/[0.04] rounded-full" />
           </div>
         </div>
       }>
@@ -314,7 +314,7 @@ export default async function DashboardPage({
           <StatCard label="Contacts" value={contactCount} icon={Users} accent="text-rose-400" href="/contacts" />
         </div>
         {isTrial && trialDaysRemaining !== null && (
-          <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-4 flex flex-col justify-between">
+          <div className="rounded-xl glass border border-white/[0.06] p-4 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
               <Calendar className="h-3.5 w-3.5" />
               Trial
@@ -335,20 +335,20 @@ export default async function DashboardPage({
       {/* Row 3: Critical Tasks + Upcoming Deadlines */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Suspense fallback={
-          <div className="rounded-xl bg-[#111111] p-5 space-y-3">
-            <div className="h-5 w-36 bg-[#1a1a1a] rounded animate-pulse" />
+          <div className="rounded-xl glass p-5 space-y-3">
+            <div className="h-5 w-36 bg-white/[0.04] rounded animate-pulse" />
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 bg-[#1a1a1a] rounded-lg animate-pulse" />
+              <div key={i} className="h-16 bg-white/[0.04] rounded-lg animate-pulse" />
             ))}
           </div>
         }>
           <CriticalTasks orgId={orgId} />
         </Suspense>
         <Suspense fallback={
-          <div className="rounded-xl bg-[#111111] p-5 space-y-3">
-            <div className="h-5 w-36 bg-[#1a1a1a] rounded animate-pulse" />
+          <div className="rounded-xl glass p-5 space-y-3">
+            <div className="h-5 w-36 bg-white/[0.04] rounded animate-pulse" />
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 bg-[#1a1a1a] rounded-lg animate-pulse" />
+              <div key={i} className="h-16 bg-white/[0.04] rounded-lg animate-pulse" />
             ))}
           </div>
         }>
@@ -358,7 +358,7 @@ export default async function DashboardPage({
 
       {/* Awaiting My Review — shows READY_FOR_REVIEW tasks for owner */}
       {awaitingReviewTasks.length > 0 && (
-        <div className="rounded-xl bg-[#111111] border border-purple-500/10 p-5">
+        <div className="rounded-xl glass border border-purple-500/10 p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
               <CheckSquare className="h-3.5 w-3.5 text-purple-400" />
@@ -373,7 +373,7 @@ export default async function DashboardPage({
               <Link
                 key={task.id}
                 href={`/tasks/${task.id}`}
-                className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] p-3 transition-colors group"
+                className="flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate group-hover:text-white transition-colors">
@@ -407,7 +407,7 @@ export default async function DashboardPage({
       )}
 
       {awaitingReviewTasks.length === 0 && (
-        <div className="rounded-xl bg-[#111111] border border-white/[0.04] p-5">
+        <div className="rounded-xl glass border border-white/[0.06] p-5">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
               <CheckSquare className="h-3.5 w-3.5 text-purple-400" />
@@ -421,20 +421,20 @@ export default async function DashboardPage({
       {/* Row 4: Active Projects + Activity Feed */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Suspense fallback={
-          <div className="rounded-xl bg-[#111111] p-5 space-y-3">
-            <div className="h-5 w-36 bg-[#1a1a1a] rounded animate-pulse" />
+          <div className="rounded-xl glass p-5 space-y-3">
+            <div className="h-5 w-36 bg-white/[0.04] rounded animate-pulse" />
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 bg-[#1a1a1a] rounded-lg animate-pulse" />
+              <div key={i} className="h-20 bg-white/[0.04] rounded-lg animate-pulse" />
             ))}
           </div>
         }>
           <ActiveProjects orgId={orgId} />
         </Suspense>
         <Suspense fallback={
-          <div className="rounded-xl bg-[#111111] p-5 space-y-3">
-            <div className="h-5 w-36 bg-[#1a1a1a] rounded animate-pulse" />
+          <div className="rounded-xl glass p-5 space-y-3">
+            <div className="h-5 w-36 bg-white/[0.04] rounded animate-pulse" />
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-10 bg-[#1a1a1a] rounded-lg animate-pulse" />
+              <div key={i} className="h-10 bg-white/[0.04] rounded-lg animate-pulse" />
             ))}
           </div>
         }>
@@ -444,11 +444,11 @@ export default async function DashboardPage({
 
       {/* Row 5: Waiting On (full width) */}
       <Suspense fallback={
-        <div className="rounded-xl bg-[#111111] p-5 space-y-3">
-          <div className="h-5 w-44 bg-[#1a1a1a] rounded animate-pulse" />
+        <div className="rounded-xl glass p-5 space-y-3">
+          <div className="h-5 w-44 bg-white/[0.04] rounded animate-pulse" />
           <div className="grid gap-2 grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-24 bg-[#1a1a1a] rounded-lg animate-pulse" />
+              <div key={i} className="h-24 bg-white/[0.04] rounded-lg animate-pulse" />
             ))}
           </div>
         </div>

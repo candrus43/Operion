@@ -100,7 +100,7 @@ export default async function DocumentDetailPage({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* View Document */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Document</CardTitle>
             </CardHeader>
@@ -110,7 +110,7 @@ export default async function DocumentDetailPage({
                   <a
                     href={document.filePath}
                     download
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] px-4 py-3 text-sm transition-colors"
+                    className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors"
                   >
                     <Download className="h-4 w-4 text-sky-400" />
                     <span>Download File</span>
@@ -121,7 +121,7 @@ export default async function DocumentDetailPage({
                       href={document.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] px-4 py-3 text-sm transition-colors ml-3"
+                      className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors ml-3"
                     >
                       <ExternalLink className="h-4 w-4 text-muted-foreground" />
                       <span>External Link</span>
@@ -133,7 +133,7 @@ export default async function DocumentDetailPage({
                   href={document.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] px-4 py-3 text-sm transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors"
                 >
                   <ExternalLink className="h-4 w-4 text-sky-400" />
                   <span>View Document</span>
@@ -156,7 +156,7 @@ export default async function DocumentDetailPage({
 
         {/* Sidebar — Metadata */}
         <div className="space-y-4">
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Metadata</CardTitle>
             </CardHeader>

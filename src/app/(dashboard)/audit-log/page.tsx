@@ -47,7 +47,7 @@ export default async function AuditLogPage() {
         </p>
       </div>
 
-      <Card className="border-[#262626] bg-[#111111]">
+      <Card className="border-[#262626] glass">
         <CardContent className="p-0">
           {logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -83,7 +83,7 @@ export default async function AuditLogPage() {
                   {logs.map((log) => (
                     <tr
                       key={log.id}
-                      className="border-b border-[#1a1a1a] hover:bg-[#0d0d0d] transition-colors"
+                      className="border-b border-white/[0.06] hover:bg-white/[0.03] transition-colors"
                     >
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString()}

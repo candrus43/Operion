@@ -203,7 +203,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/10">
@@ -224,7 +224,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
                 placeholder="e.g. Grand Hotel Purchase Agreement.pdf"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#1a1a1a] border-0"
+                className="bg-white/[0.04] border-0"
                 required
               />
             </div>
@@ -233,7 +233,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
             <div className="space-y-2">
               <Label>File</Label>
               {uploadedFile ? (
-                <div className="flex items-center justify-between rounded-lg bg-[#1a1a1a] p-3">
+                <div className="flex items-center justify-between rounded-lg bg-white/[0.04] p-3">
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10">
                       <Paperclip className="h-4 w-4 text-sky-400" />
@@ -257,7 +257,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
                   className={`relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors cursor-pointer ${
                     dragOver
                       ? "border-sky-400/50 bg-sky-400/5"
-                      : "border-white/[0.06] hover:border-white/[0.12] bg-[#1a1a1a]"
+                      : "border-white/[0.06] hover:border-white/[0.12] bg-white/[0.04]"
                   }`}
                   onClick={() => fileInputRef.current?.click()}
                 >
@@ -293,10 +293,10 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
               <div className="space-y-2">
                 <Label htmlFor="type">Type *</Label>
                 <Select value={type} onValueChange={setType}>
-                  <SelectTrigger id="type" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="type" className="bg-white/[0.04] border-0">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     {DOC_TYPES.map((t) => (
                       <SelectItem key={t} value={t}>{typeLabels[t]}</SelectItem>
                     ))}
@@ -311,7 +311,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
                   placeholder="https://drive.example.com/doc.pdf"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="bg-[#1a1a1a] border-0"
+                  className="bg-white/[0.04] border-0"
                 />
                 <p className="text-[11px] text-muted-foreground/50">
                   Link to an external document (e.g. Google Drive, Dropbox)
@@ -324,10 +324,10 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
               <div className="space-y-2">
                 <Label htmlFor="projectId">Project</Label>
                 <Select value={projectId} onValueChange={setProjectId}>
-                  <SelectTrigger id="projectId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="projectId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">None</SelectItem>
                     {projects.map((p) => (
                       <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
@@ -338,10 +338,10 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
               <div className="space-y-2">
                 <Label htmlFor="entityId">Entity</Label>
                 <Select value={entityId} onValueChange={setEntityId}>
-                  <SelectTrigger id="entityId" className="bg-[#1a1a1a] border-0">
+                  <SelectTrigger id="entityId" className="bg-white/[0.04] border-0">
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
                     <SelectItem value="none">None</SelectItem>
                     {entities.map((e) => (
                       <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>

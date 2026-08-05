@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
@@ -85,23 +86,22 @@ export default async function CalendarPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {meetings.length} meeting{meetings.length !== 1 ? "s" : ""} scheduled
-          </p>
-        </div>
-        <Link href="/meetings/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Meeting
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Schedule"
+        title="Calendar"
+        description={`${meetings.length} meeting${meetings.length !== 1 ? "s" : ""} scheduled`}
+        actions={
+          <Link href="/meetings/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Meeting
+            </Button>
+          </Link>
+        }
+      />
 
       {meetings.length === 0 ? (
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-500/10 mb-4">
               <Calendar className="h-8 w-8 text-muted-foreground" />
@@ -137,7 +137,7 @@ export default async function CalendarPage() {
                     href={`/meetings/${meeting.id}/edit`}
                     className="block group"
                   >
-                    <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors">
+                    <Card className="glass hover:bg-white/[0.07] transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-start gap-4 min-w-0">

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -71,20 +72,19 @@ export default async function DocumentsPage({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {documents.length} document{documents.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <Link href="/documents/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Document
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Library"
+        title="Documents"
+        description={`${documents.length} document${documents.length !== 1 ? "s" : ""}`}
+        actions={
+          <Link href="/documents/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Document
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Type filter */}
       <div className="flex items-center gap-3">
@@ -92,7 +92,7 @@ export default async function DocumentsPage({
         <DocumentTypeFilter currentType={typeFilter} />
         {/* Client-side filter using search params */}
         <Link href={`/documents?type=all`}>
-          <Button variant="ghost" size="sm" className={cn("text-xs", typeFilter === "all" && "bg-[#1a1a1a]")}>
+          <Button variant="ghost" size="sm" className={cn("text-xs", typeFilter === "all" && "bg-white/[0.04]")}>
             All
           </Button>
         </Link>
@@ -101,7 +101,7 @@ export default async function DocumentsPage({
             <Button
               variant="ghost"
               size="sm"
-              className={cn("text-xs", typeFilter === t && "bg-[#1a1a1a]")}
+              className={cn("text-xs", typeFilter === t && "bg-white/[0.04]")}
             >
               {typeLabels[t]}
             </Button>
@@ -111,7 +111,7 @@ export default async function DocumentsPage({
 
       {/* Documents list */}
       {documents.length === 0 ? (
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-500/10 mb-4">
               <FileText className="h-8 w-8 text-muted-foreground" />
@@ -129,11 +129,11 @@ export default async function DocumentsPage({
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-xl border-0 bg-[#111111] overflow-hidden">
+        <div className="rounded-xl glass overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/[0.04]">
+                <tr className="border-b border-white/[0.06]">
                   <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Name</th>
                   <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Type</th>
                   <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Project</th>
@@ -147,7 +147,7 @@ export default async function DocumentsPage({
                 {documents.map((doc) => (
                   <tr
                     key={doc.id}
-                    className="border-b border-white/[0.03] hover:bg-[#1a1a1a] transition-colors group"
+                    className="border-b border-white/[0.03] hover:bg-white/[0.06] transition-colors group"
                   >
                     <td className="px-4 py-3">
                       <Link href={`/documents/${doc.id}`} className="hover:text-white transition-colors">

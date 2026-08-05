@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -79,8 +80,8 @@ function AcceptInviteContent() {
 
   if (!token || state === "invalid") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080808] p-4">
-        <Card className="w-full max-w-md bg-[#111111] border-white/[0.06]">
+      <AuthShell>
+        <Card className="w-full max-w-md glass border-white/[0.06]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
               <span className="text-2xl">⚠️</span>
@@ -103,14 +104,14 @@ function AcceptInviteContent() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </AuthShell>
     )
   }
 
   if (state === "expired") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080808] p-4">
-        <Card className="w-full max-w-md bg-[#111111] border-white/[0.06]">
+      <AuthShell>
+        <Card className="w-full max-w-md glass border-white/[0.06]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
               <span className="text-2xl">⏰</span>
@@ -133,14 +134,14 @@ function AcceptInviteContent() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </AuthShell>
     )
   }
 
   if (state === "error") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080808] p-4">
-        <Card className="w-full max-w-md bg-[#111111] border-white/[0.06]">
+      <AuthShell>
+        <Card className="w-full max-w-md glass border-white/[0.06]">
           <CardHeader className="text-center">
             <CardTitle className="text-white">Something went wrong</CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -153,22 +154,22 @@ function AcceptInviteContent() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </AuthShell>
     )
   }
 
   if (state === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080808]">
+      <AuthShell>
         <div className="animate-spin h-8 w-8 border-2 border-white/20 border-t-white rounded-full" />
-      </div>
+      </AuthShell>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#080808] p-4">
-        <Card className="w-full max-w-md bg-[#111111] border-white/[0.06]">
+      <AuthShell>
+        <Card className="w-full max-w-md glass border-white/[0.06]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10">
               <span className="text-2xl">✓</span>
@@ -187,13 +188,13 @@ function AcceptInviteContent() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#080808] p-4">
-      <Card className="w-full max-w-md bg-[#111111] border-white/[0.06]">
+    <AuthShell>
+      <Card className="w-full max-w-md glass border-white/[0.06]">
         <CardHeader className="text-center">
           <CardTitle className="text-white">Accept Invitation</CardTitle>
           <CardDescription className="text-muted-foreground">
@@ -216,7 +217,7 @@ function AcceptInviteContent() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your full name"
-                className="bg-[#1a1a1a] border-white/[0.06]"
+                className="bg-white/[0.04] border-white/[0.06]"
                 required
               />
             </div>
@@ -230,7 +231,7 @@ function AcceptInviteContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="bg-[#1a1a1a] border-white/[0.06]"
+                className="bg-white/[0.04] border-white/[0.06]"
                 required
                 minLength={6}
               />
@@ -245,7 +246,7 @@ function AcceptInviteContent() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="bg-[#1a1a1a] border-white/[0.06]"
+                className="bg-white/[0.04] border-white/[0.06]"
                 required
                 minLength={6}
               />
@@ -259,7 +260,7 @@ function AcceptInviteContent() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </AuthShell>
   )
 }
 
@@ -267,9 +268,9 @@ export default function AcceptInvitePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#080808]">
+        <AuthShell>
           <div className="animate-spin h-8 w-8 border-2 border-white/20 border-t-white rounded-full" />
-        </div>
+        </AuthShell>
       }
     >
       <AcceptInviteContent />

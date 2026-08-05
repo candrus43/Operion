@@ -142,7 +142,7 @@ export default async function EntityDetailPage({
                 {Object.entries(metadata).map(([key, val]) => (
                   <span
                     key={key}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-white/[0.03] text-muted-foreground border border-white/[0.04]"
+                    className="text-[11px] px-2 py-0.5 rounded-md bg-white/[0.03] text-muted-foreground border border-white/[0.06]"
                   >
                     {key}: {String(val)}
                   </span>
@@ -178,7 +178,7 @@ export default async function EntityDetailPage({
           { label: "Documents", value: entity._count.documents, icon: FileText, color: "text-sky-400" },
           { label: "Contacts", value: entity._count.contacts, icon: Users, color: "text-rose-400" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-[#111111] p-4">
+          <div key={stat.label} className="rounded-xl glass p-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-muted-foreground">{stat.label}</span>
               <stat.icon className={cn("h-4 w-4", stat.color)} />

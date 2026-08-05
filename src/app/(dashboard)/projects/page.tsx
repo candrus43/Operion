@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -109,20 +110,19 @@ export default async function ProjectsPage(props: {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground mt-1">
-            {projectCount} {projectCount === 1 ? "project" : "projects"} across your organization
-          </p>
-        </div>
-        <Link href="/projects/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Project
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Portfolio"
+        title="Projects"
+        description={`${projectCount} ${projectCount === 1 ? "project" : "projects"} across your organization`}
+        actions={
+          <Link href="/projects/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Project
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
@@ -140,7 +140,7 @@ export default async function ProjectsPage(props: {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Link key={project.id} href={`/projects/${project.id}`}>
-            <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-all hover:scale-[1.01] cursor-pointer group h-full">
+            <Card className="glass hover:bg-white/[0.07] transition-all hover:scale-[1.01] cursor-pointer group h-full">
               <CardContent className="p-5 space-y-4">
                 {/* Top row: name + status */}
                 <div className="flex items-start justify-between gap-2">
@@ -194,7 +194,7 @@ export default async function ProjectsPage(props: {
                       {project.progress}%
                     </span>
                   </div>
-                  <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[#1a1a1a]">
+                  <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
                     <div
                       className={cn("h-full rounded-full transition-all", progressColor(project.progress))}
                       style={{ width: `${project.progress}%` }}
@@ -234,7 +234,7 @@ export default async function ProjectsPage(props: {
       {/* Empty state */}
       {projects.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1a1a1a] mb-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
             <FolderKanban className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium">No projects yet</h3>
@@ -272,17 +272,17 @@ function FilterBar({
         <Input
           name="search"
           placeholder="Search projects..."
-          className="pl-9 bg-[#111111] border-0"
+          className="pl-9 glass border-0"
         />
       </div>
       <Select
         name="status"
         defaultValue={currentStatus || "all"}
       >
-        <SelectTrigger className="w-[140px] bg-[#111111] border-0 text-sm">
+        <SelectTrigger className="w-[140px] glass border-0 text-sm">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
-        <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+        <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
           <SelectItem value="all">All Statuses</SelectItem>
           {statuses.map((s) => (
             <SelectItem key={s} value={s}>
@@ -295,10 +295,10 @@ function FilterBar({
         name="phase"
         defaultValue={currentPhase || "all"}
       >
-        <SelectTrigger className="w-[150px] bg-[#111111] border-0 text-sm">
+        <SelectTrigger className="w-[150px] glass border-0 text-sm">
           <SelectValue placeholder="Phase" />
         </SelectTrigger>
-        <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+        <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
           <SelectItem value="all">All Phases</SelectItem>
           {phases.map((p) => (
             <SelectItem key={p} value={p}>

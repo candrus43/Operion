@@ -179,7 +179,7 @@ export default async function TaskDetailPage({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Description */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Description</CardTitle>
             </CardHeader>
@@ -194,7 +194,7 @@ export default async function TaskDetailPage({
 
           {/* Dependencies */}
           {task.dependsOn && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Link2 className="h-4 w-4 text-amber-400" />
@@ -202,7 +202,7 @@ export default async function TaskDetailPage({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] p-3">
+                <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Blocked by:</p>
                     <Link
@@ -223,7 +223,7 @@ export default async function TaskDetailPage({
 
           {/* Depended by */}
           {task.dependedBy.length > 0 && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Link2 className="h-4 w-4 text-blue-400" />
@@ -236,7 +236,7 @@ export default async function TaskDetailPage({
                   <Link
                     key={dep.id}
                     href={`/tasks/${dep.id}`}
-                    className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] p-3 transition-colors group"
+                    className="flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate group-hover:text-white transition-colors">{dep.title}</p>
@@ -260,7 +260,7 @@ export default async function TaskDetailPage({
 
           {/* Notes */}
           {task.notes && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium">Notes</CardTitle>
               </CardHeader>
@@ -280,7 +280,7 @@ export default async function TaskDetailPage({
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Quick Info */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Details</CardTitle>
             </CardHeader>
@@ -380,7 +380,7 @@ export default async function TaskDetailPage({
           </Card>
 
           {/* Status Actions */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Actions</CardTitle>
             </CardHeader>

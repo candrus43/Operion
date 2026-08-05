@@ -177,14 +177,14 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
             placeholder="Search tasks..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-[#111111] border-0"
+            className="pl-9 glass border-0"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[130px] bg-[#111111] border-0 text-sm">
+          <SelectTrigger className="w-[130px] glass border-0 text-sm">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+          <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="TODO">To Do</SelectItem>
             <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
@@ -195,10 +195,10 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
           </SelectContent>
         </Select>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-[130px] bg-[#111111] border-0 text-sm">
+          <SelectTrigger className="w-[130px] glass border-0 text-sm">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+          <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
             <SelectItem value="all">All Priorities</SelectItem>
             <SelectItem value="CRITICAL">Critical</SelectItem>
             <SelectItem value="HIGH">High</SelectItem>
@@ -207,10 +207,10 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
           </SelectContent>
         </Select>
         <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-          <SelectTrigger className="w-[130px] bg-[#111111] border-0 text-sm">
+          <SelectTrigger className="w-[130px] glass border-0 text-sm">
             <SelectValue placeholder="Assignee" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border border-white/[0.05]">
+          <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
             <SelectItem value="all">All Assignees</SelectItem>
             {users.map((u) => (
               <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
@@ -224,7 +224,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
             className={`gap-1.5 text-xs ${
               assigneeFilter === currentUserId
                 ? ""
-                : "bg-[#111111] border-0 text-muted-foreground hover:text-foreground"
+                : "glass border-0 text-muted-foreground hover:text-foreground"
             }`}
             onClick={() =>
               setAssigneeFilter(assigneeFilter === currentUserId ? "all" : currentUserId)
@@ -237,7 +237,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
       </div>
 
       {/* Table - Desktop */}
-      <div className="hidden md:block rounded-xl bg-[#111111] overflow-hidden">
+      <div className="hidden md:block rounded-xl glass overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -376,7 +376,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
             <Link
               key={task.id}
               href={`/tasks/${task.id}`}
-              className="block rounded-xl bg-[#111111] hover:bg-[#141414] transition-colors p-4 group"
+              className="block rounded-xl glass hover:bg-white/[0.07] transition-colors p-4 group"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">

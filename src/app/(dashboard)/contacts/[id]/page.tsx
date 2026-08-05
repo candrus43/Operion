@@ -86,14 +86,14 @@ export default async function ContactDetailPage({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Contact Info */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Contact Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 {contact.email && (
-                  <div className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] p-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 shrink-0">
                       <Mail className="h-4 w-4 text-sky-400" />
                     </div>
@@ -106,7 +106,7 @@ export default async function ContactDetailPage({
                   </div>
                 )}
                 {contact.phone && (
-                  <div className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] p-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 shrink-0">
                       <Phone className="h-4 w-4 text-emerald-400" />
                     </div>
@@ -119,7 +119,7 @@ export default async function ContactDetailPage({
                   </div>
                 )}
                 {contact.company && (
-                  <div className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] p-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 shrink-0">
                       <Building2 className="h-4 w-4 text-violet-400" />
                     </div>
@@ -130,7 +130,7 @@ export default async function ContactDetailPage({
                   </div>
                 )}
                 {contact.position && (
-                  <div className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] p-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 shrink-0">
                       <Briefcase className="h-4 w-4 text-amber-400" />
                     </div>
@@ -149,7 +149,7 @@ export default async function ContactDetailPage({
 
           {/* Notes */}
           {contact.notes && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <StickyNote className="h-4 w-4 text-amber-400" />
@@ -164,7 +164,7 @@ export default async function ContactDetailPage({
 
           {/* Linked Projects (via entity) */}
           {contact.entity && contact.entity.projects.length > 0 && (
-            <Card className="border-0 bg-[#111111]">
+            <Card className="glass">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <FolderKanban className="h-4 w-4 text-violet-400" />
@@ -177,7 +177,7 @@ export default async function ContactDetailPage({
                   <Link
                     key={project.id}
                     href={`/projects/${project.id}`}
-                    className="flex items-center gap-3 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] p-3 transition-colors group"
+                    className="flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate group-hover:text-white transition-colors">{project.name}</p>
@@ -195,7 +195,7 @@ export default async function ContactDetailPage({
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Linked Entity */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Linked Entity</CardTitle>
             </CardHeader>
@@ -203,7 +203,7 @@ export default async function ContactDetailPage({
               {contact.entity ? (
                 <Link
                   href={`/entities/${contact.entity.id}`}
-                  className="flex items-center gap-2 rounded-lg bg-[#1a1a1a] hover:bg-[#1e1e1e] p-3 transition-colors group"
+                  className="flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
                 >
                   <Building2 className="h-4 w-4 text-muted-foreground group-hover:text-white transition-colors" />
                   <span className="text-sm group-hover:text-white transition-colors">{contact.entity.name}</span>
@@ -215,7 +215,7 @@ export default async function ContactDetailPage({
           </Card>
 
           {/* Dates */}
-          <Card className="border-0 bg-[#111111]">
+          <Card className="glass">
             <CardHeader>
               <CardTitle className="text-sm font-medium">Details</CardTitle>
             </CardHeader>

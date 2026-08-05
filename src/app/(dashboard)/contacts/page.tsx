@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/layout/page-header"
 import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -60,25 +61,24 @@ export default async function ContactsPage({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {contacts.length} contact{contacts.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <Link href="/contacts/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Contact
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Network"
+        title="Contacts"
+        description={`${contacts.length} contact${contacts.length !== 1 ? "s" : ""}`}
+        actions={
+          <Link href="/contacts/new">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Contact
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <Link href={`/contacts${searchFilter ? `?search=${searchFilter}` : ""}`}>
-          <Button variant="ghost" size="sm" className={entityFilter === "all" ? "bg-[#1a1a1a]" : ""}>
+          <Button variant="ghost" size="sm" className={entityFilter === "all" ? "bg-white/[0.04]" : ""}>
             All
           </Button>
         </Link>
@@ -87,7 +87,7 @@ export default async function ContactsPage({
             key={e.id}
             href={`/contacts?entityId=${e.id}${searchFilter ? `&search=${encodeURIComponent(searchFilter)}` : ""}`}
           >
-            <Button variant="ghost" size="sm" className={entityFilter === e.id ? "bg-[#1a1a1a]" : ""}>
+            <Button variant="ghost" size="sm" className={entityFilter === e.id ? "bg-white/[0.04]" : ""}>
               {e.name}
             </Button>
           </Link>
@@ -96,7 +96,7 @@ export default async function ContactsPage({
 
       {/* Contacts grid */}
       {contacts.length === 0 ? (
-        <Card className="border-0 bg-[#111111]">
+        <Card className="glass">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-500/10 mb-4">
               <Users className="h-8 w-8 text-muted-foreground" />
@@ -121,7 +121,7 @@ export default async function ContactsPage({
               href={`/contacts/${contact.id}`}
               className="block group"
             >
-              <Card className="border-0 bg-[#111111] hover:bg-[#141414] transition-colors h-full">
+              <Card className="glass hover:bg-white/[0.07] transition-colors h-full">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3 min-w-0">

@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthShell } from "@/components/auth/auth-shell"
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -32,7 +33,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#080808]">
+    <AuthShell>
       <div className="w-full max-w-sm space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
@@ -47,7 +48,7 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
-        <Card className="border-0 bg-[#111111] shadow-2xl">
+        <Card className="glass shadow-2xl">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Forgot password</CardTitle>
             <CardDescription>We&apos;ll email you a secure reset link</CardDescription>
@@ -66,7 +67,7 @@ export default function ForgotPasswordPage() {
               </div>
               <Button
                 variant="outline"
-                className="w-full border-[#262626] bg-[#1a1a1a] hover:bg-[#222]"
+                className="w-full border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                 onClick={() => { setSent(false); setEmail("") }}
               >
                 Send another
@@ -86,7 +87,7 @@ export default function ForgotPasswordPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="pl-10 bg-[#1a1a1a] border-0 focus-visible:ring-1"
+                      className="pl-10 bg-white/[0.04] border-0 focus-visible:ring-1"
                     />
                   </div>
                 </div>
@@ -108,6 +109,6 @@ export default function ForgotPasswordPage() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </AuthShell>
   )
 }
