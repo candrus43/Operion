@@ -120,8 +120,32 @@ async function seedDemoAccount(user: { id: string; organizationId: string }) {
   ] })
   const meetingTemplates: readonly [string, number][] = [["Operating review", -14], ["Risk and deadline triage", -4], ["Stakeholder decision meeting", 6], ["Monthly planning session", 17], ["Executive follow-up", 29]]
   for (const [entityIndex, entity] of createdEntities.entries()) for (const [i, [label, offset]] of meetingTemplates.entries()) await prisma.meeting.create({ data: { organizationId, projectId: createdProjects[entityIndex * 5 + (i % 5)].id, title: `${label} — ${entity.name}`, date: days(offset + entityIndex), location: i % 2 ? "Video conference" : `${entity.name} office`, notes: offset < 0 ? `Decisions captured: reviewed open risks, assigned owners, and confirmed next steps for ${entity.name}. Follow-up due next operating review.` : `Agenda: priorities, risks, approvals, and next actions for ${entity.name}.`, isSample: true, createdAt: days(offset < 0 ? offset - 3 : -3) } })
-  const notificationSpecs: readonly [string, string, string, boolean][] = [["DEADLINE", "Lease renewal needs attention", "Riverfront Plaza lease renewal is due in 12 days.", false], ["OVERDUE", "4 tasks are past due", "Review overdue workstream items before tomorrow's briefing.", false], ["MENTION", "Daniel Cho mentioned you", "Daniel asked for the signed Newark financing schedule.", false], ["COMMENT", "New comment on your task", "Elena replied to the Riverfront Plaza action item.", true], ["REMINDER", "Investment committee tomorrow", "Q2 allocation review starts at 10:00 AM.", true], ["STALLED", "Fleet pilot is blocked", "FleetWorks has not confirmed the charging installation date.", false], ["COMPLETED", "Security review completed", "SOC 2 readiness assessment was marked complete.", true], ["WAITING", "Approval needed", "The hospitality vendor bid is waiting on your decision.", false], ["RENEWAL", "Insurance binder expires soon", "Review the property insurance renewal packet.", true], ["ASSIGNED", "New task assigned", "Review the family office estate planning memo.", false]]
-  await prisma.notification.createMany({ data: notificationSpecs.map(([type, title, message, read], i) => ({ organizationId, userId, type, title, message, link: type === "COMMENT" ? "/tasks" : "/home", read, readAt: read ? days(-i - 1) : undefined, createdAt: days(-i * 2) })) })
+  // Keep demo notifications attached to the records they describe. These IDs are
+  // created above during the same seed, so links stay valid after every reseed.
+  const [insuranceDoc, securityDoc] = await Promise.all([
+    prisma.document.findFirst({
+      where: { organizationId, name: "Northeast Portfolio Insurance Binder" },
+      select: { id: true },
+    }),
+    prisma.document.findFirst({
+      where: { organizationId, name: "SOC 2 Readiness Assessment" },
+      select: { id: true },
+    }),
+  ])
+  if (!insuranceDoc || !securityDoc) throw new Error("Demo notification documents were not created")
+  const notificationSpecs: readonly [string, string, string, string, boolean][] = [
+    ["DEADLINE", "Lease renewal needs attention", "Riverfront Plaza lease renewal is due in 12 days.", `/projects/${createdProjects[0].id}`, false],
+    ["OVERDUE", "4 tasks are past due", "Review overdue workstream items before tomorrow's briefing.", "/tasks/task-critical-roof-change-order", false],
+    ["MENTION", "Daniel Cho mentioned you", "Daniel asked for the signed Newark financing schedule.", `/documents/${insuranceDoc.id}`, false],
+    ["COMMENT", "New comment on your task", "Elena replied to the Riverfront Plaza action item.", `/tasks/${createdTasks[1].id}`, true],
+    ["REMINDER", "Investment committee tomorrow", "Q2 allocation review starts at 10:00 AM.", `/projects/${createdProjects[10].id}`, true],
+    ["STALLED", "Fleet pilot is blocked", "FleetWorks has not confirmed the charging installation date.", `/projects/${createdProjects[5].id}`, false],
+    ["COMPLETED", "Security review completed", "SOC 2 readiness assessment was marked complete.", `/documents/${securityDoc.id}`, true],
+    ["WAITING", "Approval needed", "The hospitality vendor bid is waiting on your decision.", `/entities/${hospitality.id}`, false],
+    ["RENEWAL", "Insurance binder expires soon", "Review the property insurance renewal packet.", `/documents/${insuranceDoc.id}`, true],
+    ["ASSIGNED", "New task assigned", "Review the family office estate planning memo.", `/entities/${familyOffice.id}`, false],
+  ]
+  await prisma.notification.createMany({ data: notificationSpecs.map(([type, title, message, link, read], i) => ({ organizationId, userId, type, title, message, link, read, readAt: read ? days(-i - 1) : undefined, createdAt: days(-i * 2) })) })
   await prisma.auditLog.createMany({ data: [...createdEntities.map((e, i) => ({ organizationId, userId, action: "CREATE", entity: "Entity", entityId: e.id, details: JSON.stringify({ name: e.name }), createdAt: days(-14 + i) })), ...createdProjects.slice(0, 24).map((p, i) => ({ organizationId, userId, action: i % 4 === 0 ? "UPDATE" : "CREATE", entity: "Project", entityId: p.id, details: JSON.stringify({ source: "demo operating history" }), createdAt: days(-12 + (i % 12)) })), ...createdTasks.slice(0, 48).map((t, i) => ({ organizationId, userId, action: i % 5 === 0 ? "UPDATE" : "CREATE", entity: "Task", entityId: t.id, details: JSON.stringify({ title: t.title, status: t.status }), createdAt: days(-10 + (i % 10)) })), { organizationId, userId, action: "UPDATE", entity: "Task", entityId: "task-critical-roof-change-order", details: JSON.stringify({ change: "priority", from: "HIGH", to: "CRITICAL" }), createdAt: days(-1) }, { organizationId, userId, action: "CREATE", entity: "Comment", entityId: "task-critical-roof-change-order", details: JSON.stringify({ content: "Change order discussion added" }), createdAt: days(-1) }, { organizationId, userId, action: "CREATE", entity: "Document", entityId: "document-roof-change-order", details: JSON.stringify({ name: "Hudson roof change order" }), createdAt: days(-2) }] })
 }
 
