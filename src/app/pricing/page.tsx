@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 export default function PricingPage() {
   const { data: session } = useSession()
+  const searchParams = useSearchParams()
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
   useEffect(() => {
     const status = searchParams.get("checkout")
