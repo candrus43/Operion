@@ -7,17 +7,17 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "Operion — AI Chief of Staff for Multi-Entity Portfolio Management",
+  title: "Operion — Your AI Chief of Staff for Every Business You Run",
   description:
-    "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
+    "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard, without anything falling through the cracks.",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",
   },
   openGraph: {
-    title: "Operion — AI Chief of Staff for Multi-Entity Management",
+    title: "Operion — Your AI Chief of Staff for Every Business You Run",
     description:
-      "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
+      "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard, without anything falling through the cracks.",
     url: "https://operion.ctonew.app",
     siteName: "Operion",
     images: [
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Operion — AI Chief of Staff for Multi-Entity Management",
+    title: "Operion — Your AI Chief of Staff for Every Business You Run",
     description:
-      "One dashboard for every business you run. AI-powered briefings, cross-entity search, and white-glove setup.",
+      "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard.",
     images: ["/og-image.svg"],
   },
   robots: {
