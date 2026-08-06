@@ -59,7 +59,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <img src="/logo.svg" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
+              <img src="/logo.png" alt="Operion" className="h-8 w-8 group-hover:opacity-90 transition-opacity" />
               <span className="text-base font-semibold tracking-tight">Operion</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src="/logo.svg" alt="Operion" className="h-5 w-5 opacity-50" />
+              <img src="/logo.png" alt="Operion" className="h-5 w-5 opacity-50" />
               <span className="text-xs text-muted-foreground">
                 &copy; {new Date().getFullYear()} Operion
               </span>

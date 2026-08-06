@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description:
     "Run every business you own from one dashboard. Operion uses AI to surface risks, track deadlines, and tell you what needs attention — before you ask.",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/icon.png",
+    apple: "/icon.png",
   },
   openGraph: {
     title: "Operion — AI Chief of Staff for Multi-Entity Management",

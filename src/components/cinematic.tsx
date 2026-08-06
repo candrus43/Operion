@@ -274,7 +274,7 @@ export function CinematicNav() {
         >
           <Link href="/" className="group flex items-center gap-2.5">
             <img
-              src="/logo.svg"
+              src="/logo.png"
               alt="Operion"
               className="h-7 w-7 transition-transform duration-700 group-hover:scale-110"
             />

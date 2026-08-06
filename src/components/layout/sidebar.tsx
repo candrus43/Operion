@@ -94,7 +94,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               />
             ) : (
               <>
-                <img src="/logo.svg" alt="" className="h-7 w-7 shrink-0" />
+                <img src="/logo.png" alt="" className="h-7 w-7 shrink-0" />
                 <span className="text-lg font-semibold tracking-tight">Operion</span>
               </>
             )}
@@ -109,7 +109,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 className="h-6 w-6 object-contain"
               />
             ) : (
-              <img src="/logo.svg" alt="" className="h-6 w-6" />
+              <img src="/logo.png" alt="" className="h-6 w-6" />
             )}
           </Link>
         )}

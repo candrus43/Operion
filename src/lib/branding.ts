@@ -6,7 +6,7 @@ const LOGO_PREFIX = "logo."
 
 /**
  * Checks the filesystem for an uploaded logo file.
- * Returns the public URL path (e.g. /uploads/branding/logo.svg) or null.
+ * Returns the public URL path (e.g. /uploads/branding/logo.png) or null.
  */
 export function getBranding(): { logoUrl: string | null } {
   try {

@@ -67,7 +67,7 @@ function ResetPasswordForm() {
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-3">
             <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
-              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
+              <img src="/logo.png" alt="Operion" className="h-7 w-7" />
             </Link>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Invalid link</h1>
@@ -115,7 +115,7 @@ function ResetPasswordForm() {
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-3">
             <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
-              <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
+              <img src="/logo.png" alt="Operion" className="h-7 w-7" />
             </Link>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Password reset</h1>
@@ -153,7 +153,7 @@ function ResetPasswordForm() {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
-            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
+            <img src="/logo.png" alt="Operion" className="h-7 w-7" />
           </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Set new password</h1>
@@ -226,7 +226,7 @@ function ResetPasswordSkeleton() {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors">
-            <img src="/logo.svg" alt="Operion" className="h-7 w-7" />
+            <img src="/logo.png" alt="Operion" className="h-7 w-7" />
           </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Reset password</h1>
