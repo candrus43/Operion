@@ -150,7 +150,7 @@ const personas = [
 
 const pricingPlans = [
   {
-    name: "Solo",
+    name: "Founder",
     setupFee: "$2,500",
     price: "$249",
     period: "/month",
@@ -169,18 +169,18 @@ const pricingPlans = [
     highlighted: false,
   },
   {
-    name: "Team",
+    name: "Studio",
     setupFee: "$5,000",
     price: "$499",
     period: "/month",
     description: "For owners who delegate to an EA, ops manager, or staff.",
     features: [
       "Up to 5 user seats",
-      "Everything in Solo, plus:",
+      "Everything in Founder, plus:",
       "Delegate tasks with assignments & deadlines",
       "Role-based permissions — limit what each person sees",
       "Full audit trail — every change logged by person & time",
-      "Team AI briefing — priorities distributed across staff",
+      "Studio AI briefing — priorities distributed across staff",
       "Priority support",
       "White-glove setup included",
     ],
@@ -566,22 +566,20 @@ export default function LandingPage() {
                   className="h-full"
                 >
                   <div
-                    className={`relative flex h-full flex-col overflow-hidden rounded-3xl p-8 ${
+                    className={`relative flex h-full flex-col overflow-hidden rounded-3xl p-8 ring-gradient glass-deep ${
                       plan.highlighted
-                        ? "ring-gradient glass-deep shadow-[0_40px_100px_-40px_rgba(124,58,237,0.55)] lg:-translate-y-3"
-                        : "glass lift"
+                        ? "shadow-[0_40px_100px_-40px_rgba(124,58,237,0.55)] lg:-translate-y-3"
+                        : "shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]"
                     }`}
                   >
+                    <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-violet-500/20 blur-[80px]" />
                     {plan.highlighted && (
-                      <>
-                        <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-violet-500/20 blur-[80px]" />
-                        <div className="relative mb-6 flex justify-start">
-                          <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/25 bg-violet-400/10 px-3 py-1 text-[11px] font-medium tracking-[0.04em] text-violet-200">
-                            <Sparkles className="h-3 w-3" />
-                            Most popular
-                          </span>
-                        </div>
-                      </>
+                      <div className="relative mb-6 flex justify-start">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/25 bg-violet-400/10 px-3 py-1 text-[11px] font-medium tracking-[0.04em] text-violet-200">
+                          <Sparkles className="h-3 w-3" />
+                          Most popular
+                        </span>
+                      </div>
                     )}
 
                     <div className="relative">

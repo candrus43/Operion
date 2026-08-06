@@ -49,7 +49,7 @@ export default function PricingPage() {
 
   const plans = [
   {
-    name: "Solo",
+    name: "Founder",
     setupFee: "$2,500",
     setupPeriod: "one-time",
     plan: "SOLO" as const,
@@ -71,7 +71,7 @@ export default function PricingPage() {
     highlighted: false,
   },
   {
-    name: "Team",
+    name: "Studio",
     setupFee: "$5,000",
     setupPeriod: "one-time",
     plan: "TEAM" as const,
@@ -80,11 +80,11 @@ export default function PricingPage() {
     description: "For owners who delegate to an EA, ops manager, or staff.",
     features: [
       { text: "Up to 5 user seats", included: true },
-      { text: "Everything in Solo, plus:", included: true },
+      { text: "Everything in Founder, plus:", included: true },
       { text: "Delegate tasks with assignments & deadlines", included: true },
       { text: "Role-based permissions — limit what each person sees", included: true },
       { text: "Full audit trail — every change logged by person & time", included: true },
-      { text: "Team AI briefing — priorities distributed across staff", included: true },
+      { text: "Studio AI briefing — priorities distributed across staff", included: true },
       { text: "Priority support", included: true },
       { text: "White-glove setup", included: true },
     ],
