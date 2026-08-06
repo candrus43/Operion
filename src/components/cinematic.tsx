@@ -486,23 +486,6 @@ export function DashboardShowcase() {
             willChange: "transform",
           }}
         >
-          {/* Browser chrome */}
-          <div className="flex items-center gap-2 border-b border-white/[0.05] bg-gradient-to-b from-[#17171b] to-[#101013] px-2 py-3 sm:gap-3 sm:px-4">
-            <div className="flex shrink-0 gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/70" />
-            </div>
-            <div className="flex flex-1 justify-center">
-              <div className="flex h-6 w-64 max-w-[60%] items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03]">
-                <span className="font-mono text-[10px] tracking-wide text-white/35">
-                  747f7260a6742ead05417bb94870b599.ctonew.app
-                </span>
-              </div>
-            </div>
-            <div className="w-6 shrink-0 sm:w-12" />
-          </div>
-
           {/* Screenshot */}
           <div className="relative">
             <img
@@ -511,8 +494,6 @@ export function DashboardShowcase() {
               className="w-full select-none"
               draggable={false}
             />
-            {/* Cover the demo user's topbar */}
-            <div className="absolute inset-x-0 top-0 z-10 h-[44px] bg-[#0b0b0e]" />
             {/* Sheen sweep */}
             <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
               <div className="animate-sheen absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
