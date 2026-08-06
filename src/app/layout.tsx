@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Operion",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Operion",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Operion — Your AI Chief of Staff for Every Business You Run",
     description:
       "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard.",
-    images: ["/og-image.svg"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,

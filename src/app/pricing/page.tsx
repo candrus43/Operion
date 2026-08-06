@@ -160,18 +160,22 @@ const features = [
         <div className="grid gap-8 lg:grid-cols-2 max-w-4xl mx-auto">
           {plans.map((plan) => (
             <div
-              key={plan.name}
-              className={`relative rounded-xl glass shadow-2xl flex flex-col${
-                plan.highlighted ? " ring-2 ring-primary/30 lg:scale-[1.04]" : ""
-              }`}
+            key={plan.name}
+            className={`relative flex flex-col overflow-hidden rounded-3xl ring-gradient glass-deep ${
+              plan.highlighted
+                ? "shadow-[0_40px_100px_-40px_rgba(124,58,237,0.55)] lg:-translate-y-3"
+                : "shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]"
+            }`}
             >
-              {plan.highlighted && (
-                <div className="absolute -top-3 left-0 right-0 flex justify-center">
-                  <span className="inline-flex items-center rounded-full bg-primary text-primary-foreground text-xs px-3 py-0.5 font-medium">
-                    Most popular
-                  </span>
-                </div>
-              )}
+            <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-violet-500/20 blur-[80px]" />
+            {plan.highlighted && (
+              <div className="relative mt-8 px-8">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/25 bg-violet-400/10 px-3 py-1 text-[11px] font-medium tracking-[0.04em] text-violet-200">
+                  <Sparkles className="h-3 w-3" />
+                  Most popular
+                </span>
+              </div>
+            )}
               <div className="p-6 pb-4">
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
