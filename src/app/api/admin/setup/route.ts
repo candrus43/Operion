@@ -61,94 +61,51 @@ export async function POST(req: Request) {
     }
 
     const normalizedEmail = email.trim().toLowerCase()
-    const existing = await prisma.user.findFirst({
-      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
-    })
     const passwordHash = await hash(password, 12)
+    const orgName = organizationName?.trim() || "Operion Admin"
+    const baseSlug = slugify(orgName) || "operion-admin"
 
-    if (existing) {
-      if (existing.isSuperAdmin) {
-        return NextResponse.json({ error: "Super admin already exists" }, { status: 403 })
+    // Serializable isolation makes the empty-database check and the first user
+    // creation one atomic operation. Concurrent first-run requests cannot both
+    // observe an empty users table and successfully commit.
+    return await prisma.$transaction(async (tx) => {
+      const userCount = await tx.user.count()
+      if (userCount > 0) {
+        return NextResponse.json(
+          { error: "Admin setup is only available before the first user is created" },
+          { status: 403 },
+        )
       }
 
-      // Setup is also the recovery path for an account created before it was
-      // promoted to admin. Keep its identity, reset its credentials, and
-      // attach it to an org if the old account has no organization.
-      let organizationId = existing.organizationId
-      if (!organizationId) {
-        const orgName = organizationName?.trim() || "Operion Admin"
-        const baseSlug = slugify(orgName) || "operion-admin"
-        let slug = baseSlug
-        let suffix = 1
-        while (await prisma.organization.findUnique({ where: { slug } })) {
-          suffix++
-          slug = `${baseSlug}-${suffix}`
-        }
-        const org = await prisma.organization.create({
-          data: {
-            name: orgName,
-            slug,
-            subscriptionStatus: "ACTIVE",
-            subscriptionTier: "TEAM",
-          },
-        })
-        organizationId = org.id
+      let slug = baseSlug
+      let suffix = 1
+      while (await tx.organization.findUnique({ where: { slug } })) {
+        suffix++
+        slug = `${baseSlug}-${suffix}`
       }
 
-      const user = await prisma.user.update({
-        where: { id: existing.id },
+      const org = await tx.organization.create({
+        data: {
+          name: orgName,
+          slug,
+          subscriptionStatus: "ACTIVE",
+          subscriptionTier: "TEAM",
+        },
+      })
+
+      const user = await tx.user.create({
         data: {
           name,
+          email: normalizedEmail,
           passwordHash,
           role: "OWNER",
           isSuperAdmin: true,
-          organizationId,
+          organizationId: org.id,
         },
       })
 
       return NextResponse.json({ id: user.id, name: user.name, email: user.email })
-    }
-
-    // Only create a new admin when no super admin exists. Existing users are
-    // handled above so a stale non-admin account can be upgraded safely.
-    const existingSuperAdmin = await prisma.user.findFirst({
-      where: { isSuperAdmin: true },
-      select: { id: true },
-    })
-    if (existingSuperAdmin) {
-      return NextResponse.json({ error: "Super admin already exists" }, { status: 403 })
-    }
-
-    const orgName = organizationName?.trim() || "Operion Admin"
-    const baseSlug = slugify(orgName) || "operion-admin"
-    let slug = baseSlug
-    let suffix = 1
-    while (await prisma.organization.findUnique({ where: { slug } })) {
-      suffix++
-      slug = `${baseSlug}-${suffix}`
-    }
-
-    const org = await prisma.organization.create({
-      data: {
-        name: orgName,
-        slug,
-        subscriptionStatus: "ACTIVE",
-        subscriptionTier: "TEAM",
-      },
-    })
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email: normalizedEmail,
-        passwordHash,
-        role: "OWNER",
-        isSuperAdmin: true,
-        organizationId: org.id,
-      },
-    })
-
-    return NextResponse.json({ id: user.id, name: user.name, email: user.email })
+    }, { isolationLevel: "Serializable" })
   } catch (error) {
     console.error("Admin setup error:", error)
     const message = process.env.NODE_ENV === "development" && error instanceof Error ? error.message : "Internal server error"
