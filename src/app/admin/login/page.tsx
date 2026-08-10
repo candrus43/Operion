@@ -2,7 +2,7 @@
 
 import { AuthShell } from "@/components/auth/auth-shell"
 import { useState, useEffect, Suspense } from "react"
-import { signIn, useSession } from "next-auth/react"
+import { getSession, signIn, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -98,8 +98,15 @@ function AdminLoginForm() {
       return
     }
 
-    // Check if user is super admin by polling the session
-    // The middleware will handle redirects if not authorized
+    const session = await getSession()
+    const isSuperAdmin = (session?.user as any)?.isSuperAdmin
+
+    if (!isSuperAdmin) {
+      setError("This account does not have admin access. Please use a super admin account.")
+      setLoading(false)
+      return
+    }
+
     router.push("/admin")
     router.refresh()
     setLoading(false)
