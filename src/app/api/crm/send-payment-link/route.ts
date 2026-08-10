@@ -1,0 +1,99 @@
+import { NextResponse } from "next/server"
+import { Resend } from "resend"
+
+const PAYMENT_LINKS = {
+  Founder: "https://buy.stripe.com/cNi5kDg8teC77Rmf3e1w0l",
+  Studio: "https://buy.stripe.com/6oUfZhe0leC7gnSf3e1w0m",
+} as const
+
+const PLAN_DETAILS = {
+  Founder: "$249/mo + $2,500 one-time setup",
+  Studio: "$499/mo + $5,000 one-time setup",
+} as const
+
+type Plan = keyof typeof PAYMENT_LINKS
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+}
+
+export async function POST(request: Request) {
+  const apiKey = process.env.CRM_API_KEY
+  if (!apiKey || request.headers.get("x-api-key") !== apiKey) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Request body must be valid JSON" }, { status: 400 })
+  }
+
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Request body must be a JSON object" }, { status: 400 })
+  }
+
+  const { customerEmail, customerName, plan } = body as Record<string, unknown>
+  if (typeof customerEmail !== "string" || !customerEmail.trim()) {
+    return NextResponse.json({ error: "customerEmail is required" }, { status: 400 })
+  }
+  if (typeof customerName !== "string" || !customerName.trim()) {
+    return NextResponse.json({ error: "customerName is required" }, { status: 400 })
+  }
+  if (plan !== "Founder" && plan !== "Studio") {
+    return NextResponse.json({ error: "plan must be Founder or Studio" }, { status: 400 })
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY
+  if (!resendApiKey) {
+    console.error("RESEND_API_KEY is not configured")
+    return NextResponse.json({ error: "Email service is not configured" }, { status: 500 })
+  }
+
+  const selectedPlan = plan as Plan
+  const name = escapeHtml(customerName.trim())
+  const paymentLink = PAYMENT_LINKS[selectedPlan]
+  const details = PLAN_DETAILS[selectedPlan]
+  const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="margin:0;background:#f5f5f5;color:#171717;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;padding:32px 16px;">
+  <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e5e5e5;border-radius:12px;padding:40px;">
+    <h1 style="margin:0 0 24px;color:#111;font-size:26px;">Welcome to Operion</h1>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 16px;">Hi ${name},</p>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 16px;">Congratulations on choosing Operion <strong>${selectedPlan}</strong>. We’re excited to help you run your business with greater clarity and leverage.</p>
+    <p style="font-size:16px;line-height:1.6;margin:0 0 24px;">Your plan: <strong>${selectedPlan}</strong> (${details}).</p>
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${paymentLink}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;padding:14px 28px;border-radius:7px;font-weight:600;">Complete your payment</a>
+    </div>
+    <p style="font-size:14px;line-height:1.6;color:#525252;margin:0 0 12px;">This link covers your monthly subscription. The one-time setup fee invoice will follow separately.</p>
+    <p style="font-size:16px;line-height:1.6;margin:24px 0 0;">Best,<br><strong>The Operion Team</strong></p>
+  </div>
+</body>
+</html>`
+
+  try {
+    const { error } = await new Resend(resendApiKey).emails.send({
+      from: "Operion <operion-18a31dd3@ctomail.io>",
+      to: customerEmail.trim(),
+      subject: "Welcome to Operion — Complete Your Setup",
+      html,
+    })
+
+    if (error) {
+      console.error("Failed to send payment link email:", error)
+      return NextResponse.json({ error: "Failed to send payment link email" }, { status: 502 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Payment link email exception:", error)
+    return NextResponse.json({ error: "Failed to send payment link email" }, { status: 502 })
+  }
+}
