@@ -8,7 +8,7 @@ const PLAN_CONFIG = {
   },
   Studio: {
     monthlyPriceId: "price_1Twju9DTYPATv6KzmRA9PZXi",
-    setupPriceId: "price_1Twju9DTYPATv6Kzv5ulQbRS",
+    setupPriceId: "price_1TwjynDTYPATv6Kzv5ulQbRS",
   },
 } as const
 
