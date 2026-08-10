@@ -178,8 +178,8 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold">12. Contact Us</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               If you have questions about this Privacy Policy or wish to exercise your data rights, contact us at{" "}
-              <a href="mailto:hello@operion.ai" className="text-primary hover:underline">
-                hello@operion.ai
+              <a href="mailto:Hello@Operion.Online" className="text-primary hover:underline">
+                Hello@Operion.Online
               </a>
               .
             </p>
