@@ -5,7 +5,8 @@ import { applyRateLimit } from "@/lib/rate-limit"
 /**
  * GET /api/support/access?token=xxx
  * Validates a support access token and returns the target organization info.
- * The client-side page at /support/access then injects support claims into the session.
+ * The client-side page at /support/access passes only the opaque token to the
+ * server-side JWT callback, which derives all support claims from the record.
  * Rate-limited to 5 requests per minute per IP to prevent brute-force.
  */
 export async function GET(request: Request) {
@@ -49,14 +50,11 @@ export async function GET(request: Request) {
     }, { status: 403 })
   }
 
-  // Token is valid — return org info for client-side session injection
+  // Token is valid — return display information only. Authorization claims are
+  // intentionally not returned for client-side session injection; the JWT callback
+  // validates the opaque token and derives those claims server-side.
   return NextResponse.json({
     valid: true,
-    supportOrgId: supportToken.organizationId,
-    supportPermissions: supportToken.permissions,
-    supportTokenId: supportToken.id,
-    supportExpiresAt: supportToken.expiresAt.toISOString(),
     orgName: supportToken.organization.name,
-    token,
   })
 }

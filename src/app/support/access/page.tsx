@@ -61,14 +61,9 @@ function SupportAccessInner() {
           // Activate support mode via session update
           setStatus("activating")
           try {
-            await update({
-              isSupportMode: true,
-              supportOrgId: data.supportOrgId,
-              supportPermissions: data.supportPermissions,
-              supportTokenId: data.supportTokenId,
-              supportExpiresAt: data.supportExpiresAt,
-              supportActorId: (session.user as any).id,
-            })
+            // Pass only the opaque token. The JWT callback validates it and derives
+            // organization, permissions, expiry, and actor identity server-side.
+            await update({ supportToken: token })
 
             // Redirect to the target org's dashboard
             router.push("/home")

@@ -168,18 +168,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, account, trigger, session }) {
       // console.log("[AUTH jwt] ENTER — trigger:", trigger, "hasUser:", !!user, "hasAccount:", !!account, "provider:", account?.provider)
 
-      // Handle support mode activation via client-side update()
+      // Session updates are client-controlled. Never copy authorization claims from
+      // them. Support activation accepts only the opaque raw token; all context is
+      // derived from the database record below. Impersonation is deliberately not
+      // activatable through session.update() (only its server-created JWT state may
+      // be exited).
       if (trigger === "update" && session) {
-        if (session.isSupportMode) {
-          token.isSupportMode = true
-          token.supportOrgId = session.supportOrgId
-          token.supportPermissions = session.supportPermissions
-          token.supportTokenId = session.supportTokenId
-          token.supportExpiresAt = session.supportExpiresAt
-          token.supportActorId = session.supportActorId
-        } else if (session.isSupportMode === false) {
-          // Exiting support mode — clear claims
+        const updateData = session as Record<string, unknown>
+
+        if (updateData.supportToken && typeof updateData.supportToken === "string") {
+          const supportRecord = await prisma.supportAccessToken.findUnique({
+            where: { token: updateData.supportToken },
+          })
+          const now = new Date()
+          if (
+            supportRecord &&
+            !supportRecord.revokedAt &&
+            supportRecord.expiresAt > now
+          ) {
+            token.isSupportMode = true
+            token.supportToken = updateData.supportToken
+            token.supportOrgId = supportRecord.organizationId
+            token.supportPermissions = supportRecord.permissions
+            token.supportTokenId = supportRecord.id
+            token.supportExpiresAt = supportRecord.expiresAt.toISOString()
+            // The authenticated identity is the only valid support actor.
+            token.supportActorId = token.id
+          }
+        }
+
+        if (updateData.isSupportMode === false) {
           delete token.isSupportMode
+          delete token.supportToken
           delete token.supportOrgId
           delete token.supportPermissions
           delete token.supportTokenId
@@ -187,31 +207,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           delete token.supportActorId
         }
 
-        // Handle impersonation activation
-        if (session.isImpersonating) {
-          token.isImpersonating = true
-          token.impersonatingOriginalUserId = session.impersonatingOriginalUserId
-          token.impersonatingOriginalOrgId = session.impersonatingOriginalOrgId
-          token.impersonatingOriginalEmail = session.impersonatingOriginalEmail
-          token.impersonatingOriginalRole = session.impersonatingOriginalRole
-          token.impersonatingOriginalName = session.impersonatingOriginalName
-          token.impersonatingOriginalIsSuperAdmin = session.impersonatingOriginalIsSuperAdmin
-          // Override token with demo user data
-          token.id = session.impersonatingDemoUserId
-          token.email = session.impersonatingDemoEmail
-          token.name = session.impersonatingDemoName
-          token.role = session.impersonatingDemoRole
-          token.organizationId = session.impersonatingDemoOrgId
-          token.isSuperAdmin = false
-        } else if (session.isImpersonating === false) {
-          // Restore original admin session
+        // Client data can never activate or alter impersonation. A server-created
+        // impersonation state can only be ended, restoring claims from the token.
+        if (updateData.isImpersonating === false) {
           if (token.impersonatingOriginalUserId) {
-            token.id = token.impersonatingOriginalUserId
-            token.email = token.impersonatingOriginalEmail
-            token.name = token.impersonatingOriginalName
-            token.role = token.impersonatingOriginalRole
-            token.organizationId = token.impersonatingOriginalOrgId
-            token.isSuperAdmin = token.impersonatingOriginalIsSuperAdmin
+            const jwt = token as any
+            jwt.id = jwt.impersonatingOriginalUserId
+            jwt.email = jwt.impersonatingOriginalEmail
+            jwt.name = jwt.impersonatingOriginalName
+            jwt.role = jwt.impersonatingOriginalRole
+            jwt.organizationId = jwt.impersonatingOriginalOrgId
+            jwt.isSuperAdmin = jwt.impersonatingOriginalIsSuperAdmin
           }
           delete token.isImpersonating
           delete token.impersonatingOriginalUserId
@@ -226,8 +232,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           delete token.impersonatingDemoRole
           delete token.impersonatingDemoOrgId
         }
+      }
 
-        return token
+      // Re-verify support access on every JWT/session request. This makes revocation
+      // effective immediately instead of trusting a previously issued JWT until it
+      // expires. The raw token is never copied into the public session object.
+      if (token.isSupportMode && token.supportToken) {
+        const supportRecord = await prisma.supportAccessToken.findUnique({
+          where: { token: token.supportToken },
+        })
+        if (!supportRecord || supportRecord.revokedAt || supportRecord.expiresAt <= new Date()) {
+          delete token.isSupportMode
+          delete token.supportToken
+          delete token.supportOrgId
+          delete token.supportPermissions
+          delete token.supportTokenId
+          delete token.supportExpiresAt
+          delete token.supportActorId
+        } else {
+          token.supportOrgId = supportRecord.organizationId
+          token.supportPermissions = supportRecord.permissions
+          token.supportTokenId = supportRecord.id
+          token.supportExpiresAt = supportRecord.expiresAt.toISOString()
+        }
       }
 
       if (trigger === "signIn" && user) {

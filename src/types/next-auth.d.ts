@@ -19,6 +19,7 @@ declare module "next-auth" {
       supportTokenId?: string
       supportExpiresAt?: string
       supportActorId?: string
+      isImpersonating?: boolean
     } & DefaultSession["user"]
   }
 
@@ -58,5 +59,7 @@ declare module "next-auth/jwt" {
     supportTokenId?: string
     supportExpiresAt?: string
     supportActorId?: string
+    /** Opaque raw support access token retained privately for revocation checks. */
+    supportToken?: string
   }
 }
