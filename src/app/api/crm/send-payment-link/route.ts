@@ -11,7 +11,40 @@ const PLAN_DETAILS = {
   Studio: "$499/mo + $5,000 one-time setup",
 } as const
 
+const RESEND_FROM = "Operion <Hello@Operion.Online>"
+const IS_DEVELOPMENT = process.env.NODE_ENV !== "production"
+
 type Plan = keyof typeof PAYMENT_LINKS
+
+type ResendError = {
+  name?: string
+  message?: string
+  [key: string]: unknown
+}
+
+function errorDetails(error: unknown): string {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`
+  }
+  if (error && typeof error === "object") {
+    const resendError = error as ResendError
+    if (resendError.name || resendError.message) {
+      return `${resendError.name || "ResendError"}: ${resendError.message || "Unknown Resend error"}`
+    }
+    return JSON.stringify(error)
+  }
+  return String(error)
+}
+
+function failureResponse(error: unknown) {
+  const response: { error: string; details?: string } = {
+    error: "Failed to send payment link email",
+  }
+  if (IS_DEVELOPMENT) {
+    response.details = errorDetails(error)
+  }
+  return NextResponse.json(response, { status: 502 })
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -80,20 +113,22 @@ export async function POST(request: Request) {
 
   try {
     const { error } = await new Resend(resendApiKey).emails.send({
-      from: "Operion <operion-18a31dd3@ctomail.io>",
+      from: RESEND_FROM,
       to: customerEmail.trim(),
       subject: "Welcome to Operion — Complete Your Setup",
       html,
     })
 
     if (error) {
-      console.error("Failed to send payment link email:", error)
-      return NextResponse.json({ error: "Failed to send payment link email" }, { status: 502 })
+      // Keep the complete upstream error in server logs; Resend errors include
+      // useful domain verification and API-key diagnostics.
+      console.error("Resend payment link email error (full):", error)
+      return failureResponse(error)
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Payment link email exception:", error)
-    return NextResponse.json({ error: "Failed to send payment link email" }, { status: 502 })
+    console.error("Resend payment link email exception (full):", error)
+    return failureResponse(error)
   }
 }
