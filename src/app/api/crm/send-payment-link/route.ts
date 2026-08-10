@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server"
 import { Resend } from "resend"
 
-const PAYMENT_LINKS = {
-  Founder: "https://buy.stripe.com/cNi5kDg8teC77Rmf3e1w0l",
-  Studio: "https://buy.stripe.com/6oUfZhe0leC7gnSf3e1w0m",
-} as const
-
 const PLAN_DETAILS = {
   Founder: "$249/mo + $2,500 one-time setup",
   Studio: "$499/mo + $5,000 one-time setup",
@@ -91,7 +86,23 @@ export async function POST(request: Request) {
 
   const selectedPlan = plan as Plan
   const name = escapeHtml(customerName.trim())
-  const paymentLink = PAYMENT_LINKS[selectedPlan]
+  let paymentLink: string
+  try {
+    const checkoutResponse = await fetch(new URL("/api/checkout", request.url), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ plan: selectedPlan, customerEmail: customerEmail.trim() }),
+    })
+    const checkoutResult = (await checkoutResponse.json()) as { url?: string; error?: string }
+    if (!checkoutResponse.ok || !checkoutResult.url) {
+      console.error("Checkout session creation failed:", checkoutResult)
+      return failureResponse(new Error(checkoutResult.error || "Unable to create checkout session"))
+    }
+    paymentLink = checkoutResult.url
+  } catch (error) {
+    console.error("Checkout endpoint request failed:", error)
+    return failureResponse(error)
+  }
   const details = PLAN_DETAILS[selectedPlan]
   const html = `<!DOCTYPE html>
 <html>
@@ -105,7 +116,7 @@ export async function POST(request: Request) {
     <div style="text-align:center;margin:32px 0;">
       <a href="${paymentLink}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;padding:14px 28px;border-radius:7px;font-weight:600;">Complete your payment</a>
     </div>
-    <p style="font-size:14px;line-height:1.6;color:#525252;margin:0 0 12px;">This link covers your monthly subscription. The one-time setup fee invoice will follow separately.</p>
+    <p style="font-size:14px;line-height:1.6;color:#525252;margin:0 0 12px;">Your one-time setup fee is charged today. Monthly billing begins on day 31.</p>
     <p style="font-size:16px;line-height:1.6;margin:24px 0 0;">Best,<br><strong>The Operion Team</strong></p>
   </div>
 </body>
