@@ -36,6 +36,71 @@ const DEFAULT_OPTIONS: RateLimitOptions = {
 
 const store = new Map<string, RateLimitEntry>()
 
+/**
+ * Dedicated credentials-login protection. Keys combine normalized email and
+ * trusted client IP so an attacker cannot bypass account throttling by
+ * changing only one identifier.
+ */
+interface LoginFailureEntry {
+  failures: number
+  lastFailureAt: number
+  lockedUntil: number
+}
+
+export interface LoginRateLimitResult {
+  allowed: boolean
+  retryAfter: number
+}
+
+const loginFailures = new Map<string, LoginFailureEntry>()
+const LOGIN_SHORT_LOCKOUT_MS = 60_000
+const LOGIN_LONG_LOCKOUT_MS = 15 * 60_000
+const LOGIN_ENTRY_TTL_MS = 24 * 60 * 60_000
+
+function loginKey(email: string, ip: string): string {
+  return `login:${email.trim().toLowerCase()}:${ip}`
+}
+
+/** Check whether a credentials login is currently locked out. */
+export function checkLoginRateLimit(
+  email: string,
+  req?: LoginRequest
+): LoginRateLimitResult {
+  const key = loginKey(email, req ? getClientIp(req) : "unknown")
+  const entry = loginFailures.get(key)
+  if (!entry) return { allowed: true, retryAfter: 0 }
+
+  const now = Date.now()
+  if (entry.lockedUntil > now) {
+    return {
+      allowed: false,
+      retryAfter: Math.max(1, Math.ceil((entry.lockedUntil - now) / 1000)),
+    }
+  }
+  return { allowed: true, retryAfter: 0 }
+}
+
+/** Record any failed credentials attempt (including unknown accounts). */
+export function recordLoginFailure(email: string, req?: LoginRequest): void {
+  const key = loginKey(email, req ? getClientIp(req) : "unknown")
+  const now = Date.now()
+  const previous = loginFailures.get(key)
+  const failures = previous && now - previous.lastFailureAt < LOGIN_ENTRY_TTL_MS
+    ? previous.failures + 1
+    : 1
+  const lockedUntil = failures >= 10
+    ? now + LOGIN_LONG_LOCKOUT_MS
+    : failures >= 5
+      ? now + LOGIN_SHORT_LOCKOUT_MS
+      : 0
+  loginFailures.set(key, { failures, lastFailureAt: now, lockedUntil })
+}
+
+/** Clear failed-login history after a successful credentials login. */
+export function resetLoginRateLimit(email: string, req?: LoginRequest): void {
+  loginFailures.delete(loginKey(email, req ? getClientIp(req) : "unknown"))
+}
+
 /** Periodic cleanup — runs every 60 seconds */
 const CLEANUP_INTERVAL = 60_000
 let cleanupTimer: ReturnType<typeof setInterval> | null = null
@@ -63,18 +128,31 @@ function startCleanup() {
  * Prefer platform-provided connection identity; do not trust the first
  * x-forwarded-for value because clients can forge it.
  */
-function getClientIp(req: Request): string {
+export type LoginRequest = Request | {
+  headers?: Headers | Record<string, unknown>
+  ip?: string
+}
+
+function header(req: LoginRequest, name: string): string | null {
+  const headers = req.headers
+  if (!headers) return null
+  if (headers instanceof Headers) return headers.get(name)
+  const value = headers[name] ?? headers[name.toLowerCase()]
+  return typeof value === "string" ? value : null
+}
+
+export function getClientIp(req: LoginRequest): string {
   // Vercel and most managed runtimes expose the connection IP here.
-  const connectionIp = (req as Request & { ip?: string }).ip
+  const connectionIp = (req as LoginRequest & { ip?: string }).ip
   if (connectionIp) return connectionIp
 
   // x-real-ip is set by the trusted reverse proxy in supported deployments.
-  const realIp = req.headers.get("x-real-ip")
+  const realIp = header(req, "x-real-ip")
   if (realIp) return realIp.trim()
 
   // Never use the client-controlled x-forwarded-for value as an identity.
   // Use a stable fallback for local development instead.
-  const ua = req.headers.get("user-agent") || "unknown"
+  const ua = header(req, "user-agent") || "unknown"
   return `local-${ua.slice(0, 50)}`
 }
 

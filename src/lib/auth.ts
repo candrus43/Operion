@@ -4,6 +4,13 @@ import GoogleProvider from "next-auth/providers/google"
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 import { compare } from "bcryptjs"
 import { prisma } from "./db"
+import {
+  checkLoginRateLimit,
+  recordLoginFailure,
+  resetLoginRateLimit,
+} from "./rate-limit"
+
+const GENERIC_LOGIN_ERROR = "Invalid email or password"
 
 const isSecure = process.env.NODE_ENV === "production" || (process.env.NEXTAUTH_URL || "").startsWith("https://")
 
@@ -67,29 +74,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
+      async authorize(credentials, request) {
+        const email = typeof credentials?.email === "string"
+          ? credentials.email.trim().toLowerCase()
+          : ""
+        const password = typeof credentials?.password === "string"
+          ? credentials.password
+          : ""
+
+        // Check before touching the database so locked accounts cannot be
+        // probed, and use the same error for every credentials failure.
+        const limit = checkLoginRateLimit(email, request)
+        if (!limit.allowed) {
+          throw new Error(GENERIC_LOGIN_ERROR)
         }
 
-        const user = await prisma.user.findFirst({
-          where: {
-            email: { equals: credentials.email as string, mode: "insensitive" },
-          },
-        })
+        const user = email && password
+          ? await prisma.user.findFirst({
+              where: { email: { equals: email, mode: "insensitive" } },
+            })
+          : null
 
-        if (!user || !user.passwordHash) {
-          return null
+        if (!user?.passwordHash) {
+          recordLoginFailure(email, request)
+          throw new Error(GENERIC_LOGIN_ERROR)
         }
 
-        const isValid = await compare(
-          credentials.password as string,
-          user.passwordHash
-        )
-
+        const isValid = await compare(password, user.passwordHash)
         if (!isValid) {
-          return null
+          recordLoginFailure(email, request)
+          throw new Error(GENERIC_LOGIN_ERROR)
         }
+
+        resetLoginRateLimit(email, request)
 
         return {
           id: user.id,
