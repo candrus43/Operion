@@ -14,6 +14,7 @@ const ALLOWED_TYPES = [
   "image/png",
   "image/jpeg",
   "image/jpg",
+  "image/webp",
   "text/plain",
 ]
 
@@ -26,10 +27,17 @@ const EXTENSION_MAP: Record<string, string> = {
   "image/png": ".png",
   "image/jpeg": ".jpg",
   "image/jpg": ".jpg",
+  "image/webp": ".webp",
   "text/plain": ".txt",
 }
 
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
+
+/** Reject SVG payloads even when a client lies about the MIME type or filename. */
+async function containsSvgMarkup(file: File): Promise<boolean> {
+  const contents = Buffer.from(await file.arrayBuffer()).toString("utf8")
+  return /<svg(?:[\s>]|$)/i.test(contents) || /<script(?:[\s>]|$)/i.test(contents)
+}
 
 export async function POST(req: NextRequest) {
   const limit = await applyRateLimit(req, { maxRequests: 30, windowMs: 60_000 })
@@ -54,9 +62,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "File exceeds 10MB limit" }, { status: 400 })
     }
 
+    // SVG is intentionally not supported: serving user-controlled SVG from the
+    // application origin can execute embedded JavaScript as a stored XSS.
+    const lowerName = file.name.toLowerCase()
+    if (file.type === "image/svg+xml" || lowerName.endsWith(".svg") || await containsSvgMarkup(file)) {
+      return NextResponse.json(
+        { error: "SVG uploads are not supported. Please upload a PNG, JPEG, or WebP image instead." },
+        { status: 400 }
+      )
+    }
+
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: `File type ${file.type} not allowed. Accepted: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, TXT` },
+        { error: `File type ${file.type} not allowed. Accepted: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, WebP, TXT` },
         { status: 400 }
       )
     }
