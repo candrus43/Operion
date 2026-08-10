@@ -143,7 +143,7 @@ const features = [
             Simple, transparent pricing
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Start with a 14-day free trial — no credit card required. Prefer to skip the trial? Buy your setup below.
+            Setup fee charged today. Monthly billing begins on day 31.
           </p>
           <div className="pt-4">
             <Link
