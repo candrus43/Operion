@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 
-function ownerGuard(session: any) {
+function superAdminGuard(session: any) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  if ((session.user as any).role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  if (!(session.user as any).isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   return null
 }
 
 // POST — create a new post
 export async function POST(req: NextRequest) {
   const session = await auth()
-  const guard = ownerGuard(session)
+  const guard = superAdminGuard(session)
   if (guard) return guard
 
   let body: {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 // PATCH — update post status
 export async function PATCH(req: NextRequest) {
   const session = await auth()
-  const guard = ownerGuard(session)
+  const guard = superAdminGuard(session)
   if (guard) return guard
 
   let body: {
@@ -86,7 +86,7 @@ export async function PATCH(req: NextRequest) {
 // DELETE — delete a post
 export async function DELETE(req: NextRequest) {
   const session = await auth()
-  const guard = ownerGuard(session)
+  const guard = superAdminGuard(session)
   if (guard) return guard
 
   const id = req.nextUrl.searchParams.get("id")
@@ -101,7 +101,7 @@ export async function DELETE(req: NextRequest) {
 // GET — list posts (optional, for direct API consumers)
 export async function GET() {
   const session = await auth()
-  const guard = ownerGuard(session)
+  const guard = superAdminGuard(session)
   if (guard) return guard
 
   const posts = await prisma.contentPost.findMany({

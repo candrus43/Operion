@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
-  if ((session.user as any).role !== "OWNER") {
+  if (!(session.user as any).isSuperAdmin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
