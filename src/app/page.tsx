@@ -797,7 +797,7 @@ export default function LandingPage() {
           <div className="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
             <Reveal direction="scale">
               <div className="animate-breathe pointer-events-none absolute left-1/2 top-1/3 -z-10 h-72 w-[40rem] max-w-[130vw] -translate-x-1/2 rounded-full bg-violet-600/25 blur-[130px]" />
-              <img src="/logo.png" alt="" className="mx-auto h-11 w-11 opacity-90" />
+              <img src="/logo.svg" alt="" className="mx-auto h-11 w-11 opacity-90" />
             </Reveal>
 
             <Reveal delay={120}>
@@ -845,7 +845,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-start justify-between gap-10 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2.5">
-                <img src="/logo.png" alt="Operion" className="h-6 w-6" />
+                <img src="/logo.svg" alt="Operion" className="h-6 w-6" />
                 <span className="text-[15px] font-medium tracking-[-0.02em] text-white">
                   Operion
                 </span>
