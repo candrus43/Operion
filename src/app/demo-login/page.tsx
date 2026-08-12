@@ -65,7 +65,7 @@ export default function DemoLoginPage() {
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-2xl animate-pulse" />
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt="Operion"
             className="relative h-16 w-16 animate-in zoom-in duration-500"
           />
