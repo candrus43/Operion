@@ -88,7 +88,10 @@ export async function POST(request: Request) {
   const name = escapeHtml(customerName.trim())
   let paymentLink: string
   try {
-    const checkoutResponse = await fetch(new URL("/api/checkout", request.url), {
+    // Call the checkout endpoint server-to-server (same host, port 3000) rather
+    // than via request.url — self-fetching the public URL through the platform
+    // edge fails with an SSL error and masks the real response as 503.
+    const checkoutResponse = await fetch(`http://localhost:3000/api/checkout`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ plan: selectedPlan, customerEmail: customerEmail.trim() }),
