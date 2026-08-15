@@ -33,7 +33,7 @@ export default function TrialExpiredPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Your 14-day free trial has ended
+              Your trial has ended
             </h1>
             <p className="text-muted-foreground mt-2 text-lg leading-relaxed max-w-md mx-auto">
               Upgrade now to keep full access to your AI Chief of Staff, all your entities, and your team workspace.
@@ -43,12 +43,12 @@ export default function TrialExpiredPage() {
 
         {/* Plans */}
         <div className="grid gap-6 sm:grid-cols-3">
-          {/* Solo */}
+          {/* Founder */}
           <div className="relative rounded-2xl glass border border-white/[0.06] p-6 flex flex-col">
             <div className="mb-5">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1 text-xs font-medium text-muted-foreground mb-3">
                 <Zap className="h-3 w-3" />
-                Solo
+                Founder
               </div>
               <div className="space-y-2">
                 <div>
@@ -114,7 +114,7 @@ export default function TrialExpiredPage() {
             <div className="mb-5">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400 mb-3">
                 <Sparkles className="h-3 w-3" />
-                Team
+                Studio
               </div>
               <div className="space-y-2">
                 <div>

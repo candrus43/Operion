@@ -186,10 +186,10 @@ export function CancelFlow({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white">
-                      Downgrade to Solo
+                      Downgrade to Founder
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Switch to the Solo plan at $249/month. Keep all features for
+                      Switch to the Founder plan at $249/month. Keep all features for
                       a single user.
                     </p>
                   </div>

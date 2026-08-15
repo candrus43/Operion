@@ -134,7 +134,7 @@ export default function BlogIndexPage() {
               href="/pricing"
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#262626] glass text-sm font-medium h-10 px-6 transition-all hover:bg-white/[0.06]"
             >
-              Start free trial
+              Get Started
             </Link>
           </div>
         </div>

@@ -122,8 +122,9 @@ const trustPoints = [
   },
   {
     icon: Clock,
-    title: "14-day free trial",
-    description: "Try everything with no credit card required. Cancel anytime.",
+    title: "Setup today, billing day 31",
+    description:
+      "One-time setup fee charged today. Monthly billing begins on day 31 — cancel anytime before then.",
   },
 ]
 
@@ -213,7 +214,7 @@ const faqItems = [
   {
     question: "Can my assistant and accountant have their own access?",
     answer:
-      "Yes. Team plan includes up to 5 seats with role-based permissions. Your EA gets a full workspace; your accountant can be limited to document and entity access.",
+      "Yes. Studio plan includes up to 5 seats with role-based permissions. Your EA gets a full workspace; your accountant can be limited to document and entity access.",
   },
   {
     question: "Is my data secure?",
@@ -302,7 +303,7 @@ export default function LandingPage() {
                   href="/register?redirect=/home"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] px-9 text-[15px] font-medium tracking-[-0.01em] text-white backdrop-blur-md transition-all duration-500 hover:border-violet-400/40 hover:bg-white/[0.06] sm:w-auto"
                 >
-                  Start Free Trial
+                  Get Started
                   <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                 </Link>
               </div>
@@ -311,7 +312,7 @@ export default function LandingPage() {
                 className="rise-in mt-6 text-[12px] tracking-[0.02em] text-white/25"
                 style={{ animationDelay: "620ms" }}
               >
-                14-day free trial · No credit card required
+                Setup fee charged today · Monthly billing begins day 31
               </p>
             </div>
 
@@ -551,8 +552,7 @@ export default function LandingPage() {
             </Reveal>
             <Reveal delay={160}>
               <p className="mx-auto mt-6 max-w-xl text-center text-[15px] leading-[1.75] text-white/40">
-                Start with a 14-day free trial — no credit card required. Upgrade after your trial
-                when you’re ready for white-glove onboarding.
+                Start with guided onboarding. Setup fee charged today; monthly billing begins on day 31.
               </p>
             </Reveal>
 
@@ -644,7 +644,7 @@ export default function LandingPage() {
                             : "border border-white/[0.12] bg-white/[0.04] text-white hover:border-violet-400/40 hover:bg-white/[0.07]"
                         }`}
                       >
-                        Start Free Trial
+                        Get Started
                         <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                       </Link>
                     </div>
@@ -828,7 +828,7 @@ export default function LandingPage() {
                   href="/register?redirect=/home"
                   className="group inline-flex h-[54px] w-full items-center justify-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] px-9 text-[15px] font-medium tracking-[-0.01em] text-white backdrop-blur-md transition-all duration-500 hover:border-violet-400/40 hover:bg-white/[0.06] sm:w-auto"
                 >
-                  Start Free Trial
+                  Get Started
                   <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                 </Link>
               </div>
@@ -880,7 +880,7 @@ export default function LandingPage() {
               &copy; {new Date().getFullYear()} Operion. All rights reserved.
             </span>
             <span className="text-[12px] text-white/25">
-              14-day free trial · No credit card required
+              Setup fee charged today · Monthly billing begins day 31
             </span>
           </div>
         </div>

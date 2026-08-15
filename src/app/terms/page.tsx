@@ -75,11 +75,13 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">6. Free Trial</h2>
+            <h2 className="text-xl font-semibold">6. Trial Period and Setup Fee</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              New users may be eligible for a 14-day free trial. No credit card is required to start a trial.
+              Operion does not offer a separate free trial. A one-time setup fee is charged at signup,
+              and monthly subscription billing begins 30 days later. If you cancel before the first
+              monthly billing date, you will not be charged any recurring fees.
               At the end of the trial period, you must subscribe to a paid plan to continue using the Service.
-              Operion reserves the right to modify or discontinue the free trial offer at any time.
+              Operion reserves the right to modify or discontinue trial offers at any time.
             </p>
           </section>
 

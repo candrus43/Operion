@@ -120,8 +120,8 @@ const features = [
   },
   {
     icon: Sparkles,
-    title: "14-Day Trial",
-    description: "Try all features free. No credit card required.",
+    title: "Setup Today, Billing Day 31",
+    description: "One-time setup fee charged today. Monthly billing begins on day 31.",
   },
 ]
 
@@ -150,7 +150,7 @@ const features = [
               href="/register?redirect=/home"
               className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 transition-colors hover:bg-primary/90"
             >
-              Start Free Trial
+              Get Started
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -239,7 +239,7 @@ const features = [
                       href="/register?redirect=/home"
                       className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-10 px-4 w-full border border-[#262626] bg-white/[0.04] hover:bg-[#222]"
                     >
-                      Start Free Trial — no card required
+                      Get Started — no card required
                     </Link>
                   </>
                 ) : (
@@ -289,7 +289,7 @@ const features = [
                 href="/register?redirect=/home"
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-medium h-11 px-8 w-full sm:w-auto transition-colors hover:bg-primary/90"
               >
-                Start Free Trial
+                Get Started
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
