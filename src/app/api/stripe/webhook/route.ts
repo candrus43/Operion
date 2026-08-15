@@ -118,24 +118,107 @@ export async function POST(request: Request) {
 }
 
 /**
+ * slugify — mirrors the register route so org slugs stay consistent.
+ */
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/['']/g, "") // remove apostrophes
+    .replace(/[^a-z0-9]+/g, "-") // replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, "") // trim leading/trailing hyphens
+    .slice(0, 60) // keep it reasonable
+}
+
+/**
+ * Resolve the organization that owns a completed checkout.
+ *
+ * Order of resolution:
+ * 1. session.client_reference_id — an org id (app pricing path). If it resolves,
+ *    use that org exactly as before.
+ * 2. The Stripe customer email (CRM path, where the customer typically has no
+ *    org yet): match an existing user/org by email first, then create the
+ *    customer's org + owner user deterministically.
+ *
+ * Idempotent: a replayed webhook for the same email reuses the org/user created
+ * by the first pass (the stripeEvent table additionally dedupes identical event
+ * ids at the top of POST).
+ */
+async function resolveOrgForCheckout(
+  session: Stripe.Checkout.Session
+): Promise<{ org: { id: string; subscriptionTier: string; subscriptionStatus: string } } | null> {
+  const orgId = session.client_reference_id
+  if (orgId) {
+    const org = await prisma.organization.findUnique({ where: { id: orgId } })
+    if (org) return { org }
+  }
+
+  const email = (session.customer_email ?? session.customer_details?.email ?? "").trim().toLowerCase()
+  if (!email) {
+    console.warn(
+      `checkout.session.completed: unable to resolve org ` +
+        `(client_reference_id=${orgId ?? "none"}, no customer email on session)`
+    )
+    return null
+  }
+
+  // Match an existing user/org by email first — never duplicate.
+  const existingUser = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+    select: { organizationId: true },
+  })
+  if (existingUser) {
+    const org = await prisma.organization.findUnique({
+      where: { id: existingUser.organizationId },
+    })
+    if (org) return { org }
+  }
+
+  // No existing org — provision one deterministically from the customer email.
+  const customerName = (session.customer_details?.name ?? "").trim() || email.split("@")[0] || "Operion Customer"
+  const orgName = `${customerName}'s Organization`
+  const baseSlug = slugify(orgName) || "operion-customer"
+  let slug = baseSlug
+  let suffix = 1
+  while (await prisma.organization.findUnique({ where: { slug } })) {
+    suffix += 1
+    slug = `${baseSlug}-${suffix}`
+  }
+
+  const org = await prisma.organization.create({
+    data: {
+      name: orgName,
+      slug,
+      subscriptionStatus: "TRIAL", // flipped to ACTIVE by the shared activation block below
+    },
+  })
+  await prisma.user.create({
+    data: {
+      name: customerName,
+      email,
+      role: "OWNER",
+      organizationId: org.id,
+    },
+  })
+  console.log(`🏗️ Provisioned org ${org.id} + owner for checkout customer ${email}`)
+  return { org }
+}
+
+/**
  * checkout.session.completed
- * Find the org by client_reference_id and activate the subscription.
+ * Resolve the org (client_reference_id → existing org, else provision from the
+ * customer email) and activate the subscription.
  */
 async function handleCheckoutCompleted(
   stripe: Stripe,
   session: Stripe.Checkout.Session
 ) {
-  const orgId = session.client_reference_id
-  if (!orgId) {
-    console.warn("checkout.session.completed: missing client_reference_id")
+  const resolved = await resolveOrgForCheckout(session)
+  if (!resolved) {
+    console.warn("checkout.session.completed: no org resolved; nothing activated")
     return
   }
-
-  const org = await prisma.organization.findUnique({ where: { id: orgId } })
-  if (!org) {
-    console.warn(`checkout.session.completed: org not found: ${orgId}`)
-    return
-  }
+  const { org } = resolved
+  const orgId = org.id
 
   const stripeCustomerId =
     typeof session.customer === "string"

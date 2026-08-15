@@ -86,6 +86,9 @@ export async function POST(request: Request) {
 
   const selectedPlan = plan as Plan
   const name = escapeHtml(customerName.trim())
+  // Stable reference for the webhook: prefixed marker so it can never collide
+  // with a real org id; the webhook resolves the customer's org by email.
+  const clientReferenceId = `crm:${customerEmail.trim().toLowerCase()}`
   let paymentLink: string
   try {
     // Call the checkout endpoint server-to-server (same host, port 3000) rather
@@ -94,7 +97,11 @@ export async function POST(request: Request) {
     const checkoutResponse = await fetch(`http://localhost:3000/api/checkout`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ plan: selectedPlan, customerEmail: customerEmail.trim() }),
+      body: JSON.stringify({
+        plan: selectedPlan,
+        customerEmail: customerEmail.trim(),
+        client_reference_id: clientReferenceId,
+      }),
     })
     const checkoutResult = (await checkoutResponse.json()) as { url?: string; error?: string }
     if (!checkoutResponse.ok || !checkoutResult.url) {

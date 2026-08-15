@@ -1,5 +1,6 @@
 import Stripe from "stripe"
 import { NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 
 const PLAN_CONFIG = {
   Founder: {
@@ -36,18 +37,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Request body must be a JSON object" }, { status: 400 })
   }
 
-  const { plan, customerEmail } = body as Record<string, unknown>
+  const { plan, customerEmail, client_reference_id } = body as Record<string, unknown>
   if (plan !== "Founder" && plan !== "Studio") {
     return NextResponse.json({ error: "plan must be Founder or Studio" }, { status: 400 })
   }
   if (customerEmail !== undefined && (typeof customerEmail !== "string" || !customerEmail.trim())) {
     return NextResponse.json({ error: "customerEmail must be a non-empty string" }, { status: 400 })
   }
+  if (
+    client_reference_id !== undefined &&
+    (typeof client_reference_id !== "string" || !client_reference_id.trim())
+  ) {
+    return NextResponse.json({ error: "client_reference_id must be a non-empty string" }, { status: 400 })
+  }
 
   try {
     const stripe = new Stripe(secretKey)
     const selectedPlan = PLAN_CONFIG[plan as Plan]
     const baseUrl = appUrl(request)
+
+    // Resolve the org reference that the webhook uses to provision the purchase:
+    // 1. An explicit client_reference_id in the body (server-to-server callers
+    //    such as the CRM payment-link route) always wins.
+    // 2. Otherwise, the authenticated user's org (app pricing path).
+    let clientReferenceId: string | undefined
+    if (typeof client_reference_id === "string" && client_reference_id.trim()) {
+      clientReferenceId = client_reference_id.trim()
+    } else {
+      const session = await auth()
+      const sessionOrgId = (session?.user as { organizationId?: string } | undefined)?.organizationId
+      if (typeof sessionOrgId === "string" && sessionOrgId) {
+        clientReferenceId = sessionOrgId
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [
@@ -62,6 +85,7 @@ export async function POST(request: Request) {
       success_url: `${baseUrl}/home`,
       cancel_url: `${baseUrl}/pricing`,
       ...(typeof customerEmail === "string" ? { customer_email: customerEmail.trim() } : {}),
+      ...(clientReferenceId ? { client_reference_id: clientReferenceId } : {}),
     })
 
     if (!session.url) {
