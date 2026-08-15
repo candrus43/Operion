@@ -43,12 +43,12 @@ function getPriceIdMap(): Record<string, string> {
     }
   }
 
-  // Test mode — hardcoded development price IDs
+  // Test mode — price IDs from the app's own Stripe test account (acct_1Ty1eZADHNbdtKNS)
   return {
-    SOLO_SETUP: "price_1TwjynDTYPATv6KzoIOmjHg1", // $2,500
-    SOLO_MONTHLY: "price_1Twju9DTYPATv6KzMjIYaJkt", // $249/mo
-    TEAM_SETUP: "price_1TwjynDTYPATv6Kzv5ulQbRS",   // $5,000
-    TEAM_MONTHLY: "price_1Twju9DTYPATv6KzmRA9PZXi", // $499/mo
+    SOLO_SETUP: "price_1U4kdDADHNbdtKNSs16OxBB1", // Founder onboarding $2,500
+    SOLO_MONTHLY: "price_1U4kdDADHNbdtKNS5PAd2hXM", // Founder monthly $249/mo
+    TEAM_SETUP: "price_1U4kdEADHNbdtKNSes4wVyZr",   // Studio onboarding $5,000
+    TEAM_MONTHLY: "price_1U4kdDADHNbdtKNSARFrEiSP", // Studio monthly $499/mo
   }
 }
 
