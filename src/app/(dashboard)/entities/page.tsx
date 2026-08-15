@@ -62,7 +62,7 @@ export default async function EntitiesPage() {
             <span className="font-medium text-foreground">{entities.length}</span> of{" "}
             <span className="font-medium text-foreground">{maxEntities ?? "unlimited"}</span> entities used
             {atLimit && (
-              <span> · Your {tier === "SOLO" ? "Solo" : "Team"} plan has reached its entity limit.</span>
+              <span> · Your {tier === "SOLO" ? "Founder" : "Studio"} plan has reached its entity limit.</span>
             )}
           </p>
           {atLimit && (

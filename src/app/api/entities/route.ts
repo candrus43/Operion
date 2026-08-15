@@ -61,8 +61,8 @@ export async function POST(req: Request) {
     const currentCount = await prisma.entity.count({ where: { organizationId: perm.orgId } })
     if (currentCount >= maxEntities) {
       const message = tier === "SOLO"
-        ? "Solo plan entity limit reached. Upgrade to Team."
-        : "Team plan limited to 25 entities. Upgrade to Enterprise."
+        ? "Founder plan entity limit reached. Upgrade to Studio."
+        : "Studio plan limited to 25 entities. Upgrade to Enterprise."
       return NextResponse.json({ error: message }, { status: 403 })
     }
   }

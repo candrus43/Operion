@@ -85,4 +85,4 @@ Operion was.
 
 ---
 
-*Operion is an AI Chief of Staff for entrepreneurs managing multiple companies, properties, and investments. [Explore the product](/api/demo) or [start a 14-day free trial](/pricing) — no credit card required.*
+*Operion is an AI Chief of Staff for entrepreneurs managing multiple companies, properties, and investments. [Explore the product](/api/demo) or [get started](/pricing).*

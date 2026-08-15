@@ -47,7 +47,7 @@ export const LINKEDIN_CONTENT_TEMPLATES: ContentTemplate[] = [
     title: "A calmer operating system for your portfolio",
     category: "Pricing / promotion",
     description: "Position the launch offer without hype or artificial urgency.",
-    body: "If you're running multiple entities, Operion gives you one place to see what matters and what needs attention next.\n\nStart with a guided setup and a 14-day free trial. Choose Solo for a focused owner + EA workspace, or Team for shared visibility and role-based permissions.\n\nNo more stitching together a picture of the business every morning.\n\nExplore Operion and see your next actions clearly: [link]\n\n#SaaS #Entrepreneurship #BusinessOperations",
+    body: "If you're running multiple entities, Operion gives you one place to see what matters and what needs attention next.\n\nStart with guided setup with your setup fee charged today and monthly billing beginning on day 31. Choose Founder for a focused owner workspace, or Studio for shared visibility and role-based permissions.\n\nNo more stitching together a picture of the business every morning.\n\nExplore Operion and see your next actions clearly: [link]\n\n#SaaS #Entrepreneurship #BusinessOperations",
   },
   {
     title: "What will you focus on when the noise is gone?",

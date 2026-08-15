@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         name: orgName,
         slug,
         trialStartDate: new Date(),
-        trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        trialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         subscriptionStatus: "TRIAL",
       },
     })

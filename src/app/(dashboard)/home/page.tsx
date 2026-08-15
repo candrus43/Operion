@@ -124,7 +124,7 @@ export default async function DashboardPage({
 
   // ── Tier / Trial Info ─────────────────────────────────────────
   const tier = org?.subscriptionTier || "SOLO"
-  const tierLabel = tier === "ENTERPRISE" ? "Enterprise Plan" : tier === "TEAM" ? "Team Plan" : "Solo Plan"
+  const tierLabel = tier === "ENTERPRISE" ? "Enterprise Plan" : tier === "TEAM" ? "Studio Plan" : "Founder Plan"
   const tierBadgeColors: Record<string, string> = {
     SOLO: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
     TEAM: "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -133,7 +133,7 @@ export default async function DashboardPage({
 
   // ── Checkout success handling ──────────────────────────────────
   const showCheckoutSuccess = searchParamsValue.checkout === "success"
-  const planName = tier === "TEAM" ? "Team" : "Solo"
+  const planName = tier === "TEAM" ? "Studio" : "Founder"
 
   let trialDaysRemaining: number | null = null
   let isTrial = false

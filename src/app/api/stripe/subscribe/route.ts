@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 
     const subscriptionData: Record<string, any> = {}
     if (isTrial) {
-      subscriptionData.trial_period_days = 14
+      subscriptionData.trial_period_days = 30
     }
 
     const session = await stripe.checkout.sessions.create({

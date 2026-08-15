@@ -79,4 +79,4 @@ That's the difference between a tool and a Chief of Staff. One waits for you to 
 
 ---
 
-*Operion is an AI Chief of Staff for entrepreneurs managing multiple companies, properties, and investments. It scans every entity, surfaces risks, and tells you what to do next — before you even ask. [Explore the product](/api/demo) or [start a 14-day free trial](/pricing).*
+*Operion is an AI Chief of Staff for entrepreneurs managing multiple companies, properties, and investments. It scans every entity, surfaces risks, and tells you what to do next — before you even ask. [Explore the product](/api/demo) or [get started](/pricing).*

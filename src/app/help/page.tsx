@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     q: "How does billing work?",
-    a: "Operion offers Solo ($249/mo) and Team ($499/mo) plans, each with a one-time setup fee. Both include unlimited entities. You can start a free 14-day trial with no credit card required."
+    a: "Operion offers Founder ($249/mo) and Studio ($499/mo) plans, each with a one-time setup fee. Setup fee is charged today; monthly billing begins on day 31."
   },
   {
     q: "What integrations are available?",
