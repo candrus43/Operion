@@ -3,12 +3,12 @@ import { NextResponse } from "next/server"
 
 const PLAN_CONFIG = {
   Founder: {
-    monthlyPriceId: "price_1U4kdDADHNbdtKNS5PAd2hXM", // $249/mo — Operion Founder — Monthly
-    setupPriceId: "price_1U4kdDADHNbdtKNSs16OxBB1", // $2,500 one-time — Operion Founder — Onboarding
+    monthlyPriceId: "price_1TyY65ADHNbdtKNS9M83pmJc", // $249/mo — Operion Solo — Monthly (live)
+    setupPriceId: "price_1TyY95ADHNbdtKNSdZYrvGV7", // $2,500 one-time — Operion Solo — Setup (live)
   },
   Studio: {
-    monthlyPriceId: "price_1U4kdDADHNbdtKNSARFrEiSP", // $499/mo — Operion Studio — Monthly
-    setupPriceId: "price_1U4kdEADHNbdtKNSes4wVyZr", // $5,000 one-time — Operion Studio — Onboarding
+    monthlyPriceId: "price_1TyYB3ADHNbdtKNSacUZufAC", // $499/mo — Operion Team — Monthly (live)
+    setupPriceId: "price_1TyYD6ADHNbdtKNSgbvfZQ6A", // $5,000 one-time — Operion Team — Setup (live)
   },
 } as const
 
