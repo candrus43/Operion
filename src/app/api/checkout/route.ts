@@ -50,11 +50,14 @@ export async function POST(request: Request) {
     const baseUrl = appUrl(request)
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: selectedPlan.monthlyPriceId, quantity: 1 }],
+      line_items: [
+        { price: selectedPlan.monthlyPriceId, quantity: 1 },
+        // One-time setup fee — billed with the subscription's first invoice.
+        { price: selectedPlan.setupPriceId, quantity: 1 },
+      ],
       subscription_data: {
         // The subscription starts immediately; this only defers the recurring invoice.
         trial_period_days: 30,
-        add_invoice_items: [{ price: selectedPlan.setupPriceId, quantity: 1 }],
       },
       success_url: `${baseUrl}/home`,
       cancel_url: `${baseUrl}/pricing`,
