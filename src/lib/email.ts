@@ -179,6 +179,64 @@ export async function sendCompleteSetupEmail({
   })
 }
 
+export interface OwnerSetupEmailParams {
+  email: string
+  name: string
+  orgName: string
+  inviteToken: string
+}
+
+/**
+ * Sent by the Stripe checkout webhook when it provisions a brand-new org +
+ * owner for a CRM-sold customer (no password yet). Carries a one-time
+ * /accept-invite link so the customer can set their password and sign in.
+ * Copy is truthful about what the customer just paid for: the setup fee was
+ * received, the 30-day trial runs from today, and monthly billing begins on
+ * day 31.
+ */
+export async function sendOwnerSetupEmail({
+  email,
+  name,
+  orgName,
+  inviteToken,
+}: OwnerSetupEmailParams): Promise<boolean> {
+  const acceptUrl = `${BASE_URL}/accept-invite?token=${inviteToken}`
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #080808; color: #e4e4e4; padding: 40px 20px;">
+  <div style="max-width: 480px; margin: 0 auto; background: #111111; border-radius: 12px; padding: 40px; border: 1px solid #262626;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 8px;">Welcome to Operion</h1>
+      <p style="color: #a1a1a1; font-size: 16px; margin: 0;">Your workspace is ready — set your password to sign in</p>
+    </div>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      Hi ${escapeHtml(name)},
+    </p>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      Your <strong style="color: #ffffff;">${escapeHtml(orgName)}</strong> workspace on Operion is ready. Thank you for your setup payment — your 30-day trial runs from today, and monthly billing begins on day 31.
+    </p>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      Set your password to log in and start managing your portfolio with AI-powered insights.
+    </p>
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${acceptUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Set your password</a>
+    </div>
+    <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center;">
+      This link was sent to ${escapeHtml(email)}. If you weren't expecting this, you can safely ignore it.
+    </p>
+  </div>
+</body>
+</html>`.trim()
+
+  return sendEmail({
+    to: email,
+    subject: "Welcome to Operion — set your password",
+    html,
+  })
+}
+
 export async function sendPasswordResetEmail(
   user: { email: string; name: string },
   resetToken: string
