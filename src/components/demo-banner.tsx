@@ -34,7 +34,7 @@ export function DemoBanner() {
           href="/register"
           className="inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium h-7 px-3 bg-violet-600 hover:bg-violet-500 text-white transition-colors"
         >
-          Start your 30-day trial
+          Start setup
           <ArrowRight className="ml-1.5 h-3 w-3" />
         </Link>
       </div>

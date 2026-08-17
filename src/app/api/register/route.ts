@@ -49,13 +49,23 @@ export async function POST(req: Request) {
       slug = `${baseSlug}-${suffix}`
     }
 
+    // Owner decision (2026-08-17, Option B): NO free evaluation window for
+    // unpaid registrations. The account/org is created but the workspace is
+    // gated behind the paywall (/trial-expired) until the customer pays.
+    // `subscriptionStatus: "EXPIRED"` routes the user to the existing paywall
+    // immediately (middleware + dashboard layout + home page all redirect on
+    // EXPIRED). trialStartDate/trialEndDate are set to now — there is no
+    // future trial window. Paying customers still get the 30-day trial
+    // between the setup fee (day 0) and the first subscription charge
+    // (day 31) via the two-session checkout; the webhook flips the org to
+    // ACTIVE on payment.
     const org = await prisma.organization.create({
       data: {
         name: orgName,
         slug,
         trialStartDate: new Date(),
-        trialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        subscriptionStatus: "TRIAL",
+        trialEndDate: new Date(),
+        subscriptionStatus: "EXPIRED",
       },
     })
 

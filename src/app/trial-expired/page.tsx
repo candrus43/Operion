@@ -1,11 +1,31 @@
 "use client"
 
 import { AuthShell } from "@/components/auth/auth-shell"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail } from "lucide-react"
 
 export default function TrialExpiredPage() {
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
+  const { data: session, update } = useSession()
+
+  // Self-heal stale billing claims. A fresh registration signs in while the
+  // org is EXPIRED (paywall), so the JWT keeps saying EXPIRED even after the
+  // checkout webhook activates the org. On mount, refresh billing claims from
+  // the DB; if the user has actually paid, send them to the dashboard.
+  useEffect(() => {
+    if (session?.user) {
+      update({ refreshBilling: true }).catch(() => {})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const status = (session?.user as { subscriptionStatus?: string } | undefined)?.subscriptionStatus
+    if (status === "ACTIVE") {
+      window.location.href = "/home"
+    }
+  }, [session])
 
   async function redirectToCheckout(plan: "SOLO" | "TEAM") {
     setCheckingOut(plan)
@@ -35,10 +55,11 @@ export default function TrialExpiredPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Your trial has ended
+              Choose a plan to continue
             </h1>
             <p className="text-muted-foreground mt-2 text-lg leading-relaxed max-w-md mx-auto">
-              Upgrade now to keep full access to your AI Chief of Staff, all your entities, and your team workspace.
+              Your workspace is ready. The one-time setup fee is charged today, and
+              monthly billing begins on day 31.
             </p>
           </div>
         </div>

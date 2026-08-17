@@ -249,6 +249,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           delete token.impersonatingDemoRole
           delete token.impersonatingDemoOrgId
         }
+
+        // Billing claims refresh (no-trial registration flow). A registrant's
+        // JWT is signed while their org is EXPIRED (paywall), so after the
+        // checkout webhook flips the org to ACTIVE the middleware would keep
+        // redirecting them to /trial-expired until they re-login. The
+        // /trial-expired page calls update({ refreshBilling: true }) on mount;
+        // here we re-read the org from the DB and refresh the billing claims
+        // so the session (and middleware) see the true status immediately.
+        if (updateData.refreshBilling === true && token.organizationId) {
+          try {
+            const org = await prisma.organization.findUnique({
+              where: { id: token.organizationId as string },
+              select: {
+                stripeCustomerId: true,
+                subscriptionStatus: true,
+                subscriptionTier: true,
+              },
+            })
+            if (org) {
+              token.subscriptionStatus = org.subscriptionStatus
+              token.subscriptionTier = org.subscriptionTier
+              token.stripeCustomerId = org.stripeCustomerId ?? undefined
+            }
+          } catch (e) {
+            console.error("[AUTH jwt] billing refresh failed:", e)
+          }
+        }
       }
 
       // Re-verify support access on every JWT/session request. This makes revocation
