@@ -9,7 +9,10 @@ function getResendClient(): Resend | null {
   return new Resend(apiKey)
 }
 
-const FROM_ADDRESS = "Operion <noreply@operion.app>"
+// Must be a domain verified in Resend — operion.online is verified (see the
+// CRM payment-link route, which already sends from Hello@Operion.Online);
+// operion.app is NOT verified and Resend rejects every send from it.
+const FROM_ADDRESS = "Operion <Hello@operion.online>"
 const BASE_URL = process.env.NEXTAUTH_URL || "https://operion.ctonew.app"
 
 export interface SendEmailParams {
