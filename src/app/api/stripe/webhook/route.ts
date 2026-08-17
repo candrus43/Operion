@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
+import { randomBytes } from "crypto"
 import { prisma } from "@/lib/db"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
 import { createCheckoutSession, getAppBaseUrl } from "@/lib/checkout"
-import { sendCompleteSetupEmail } from "@/lib/email"
+import { sendCompleteSetupEmail, sendOwnerSetupEmail } from "@/lib/email"
 import Stripe from "stripe"
 
 /**
@@ -296,6 +297,80 @@ async function handleCheckoutCompleted(
   // of POST — a replayed event never re-provisions or re-emails.
   if (session.mode === "payment") {
     await emailSessionBLink(session)
+  }
+
+  // ── CRM-sold owners: one-time set-password invite ──────────────────
+  // A customer provisioned by the checkout webhook has no password and no way
+  // to sign in. Email them a one-time /accept-invite link (invite token) so
+  // they can set a password and log in normally. Idempotent: skipped when the
+  // owner already has a password or an invite was already sent (both Session A
+  // and Session B complete for the same customer), and a failure never fails
+  // the webhook.
+  await sendOwnerInviteIfNeeded(orgId)
+}
+
+/**
+ * Email a one-time set-password invite to an org owner who was provisioned by
+ * the checkout webhook with no password (CRM path). Reuses the existing
+ * invite-token mechanics (/accept-invite page + User.inviteToken + PENDING
+ * status), so no new page or middleware change is needed.
+ *
+ * Idempotency: an owner who already has a password (registered normally,
+ * accepted an earlier invite, or completed setup between Session A and
+ * Session B) never receives a second invite; an owner who already has an
+ * invite token (invite sent when the first of the two checkout sessions
+ * completed) is skipped when the second session completes.
+ */
+async function sendOwnerInviteIfNeeded(orgId: string) {
+  try {
+    const owner = await prisma.user.findFirst({
+      where: { organizationId: orgId, role: "OWNER" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        passwordHash: true,
+        inviteToken: true,
+      },
+      orderBy: { createdAt: "asc" },
+    })
+    if (!owner) {
+      console.warn(`owner-invite: no OWNER user found for org ${orgId}`)
+      return
+    }
+    if (owner.passwordHash) {
+      console.log(`owner-invite: owner ${owner.email} already has a password — invite skipped`)
+      return
+    }
+    if (owner.inviteToken) {
+      console.log(`owner-invite: invite already sent to ${owner.email} — invite skipped`)
+      return
+    }
+
+    const inviteToken = randomBytes(32).toString("hex")
+    await prisma.user.update({
+      where: { id: owner.id },
+      data: { inviteToken, status: "PENDING" },
+    })
+
+    const org = await prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { name: true },
+    })
+    const sent = await sendOwnerSetupEmail({
+      email: owner.email,
+      name: owner.name,
+      orgName: org?.name ?? "your workspace",
+      inviteToken,
+    })
+    console.log(
+      `📧 Owner set-password invite emailed to ${owner.email} (org ${orgId}): ` +
+        `${sent ? "sent" : "send failed"}`
+    )
+  } catch (err) {
+    // Never fail the webhook for an email problem — the owner can also use the
+    // standard forgot-password flow to set a password.
+    console.error(`owner-invite: failed to send invite for org ${orgId}:`, err)
   }
 }
 
