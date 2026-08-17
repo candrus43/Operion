@@ -269,8 +269,11 @@ async function handleCheckoutCompleted(
     },
   })
 
-  // ── Clean up sample data if transitioning from TRIAL ──────────
-  if (org.subscriptionStatus === "TRIAL") {
+  // ── Clean up sample data if transitioning from a pre-payment state ──
+  // TRIAL: legacy 30-day-trial registrants. EXPIRED: no-trial registrations
+  // (owner decision 2026-08-17) and expired trials — both seeded sample data
+  // at signup and should have it removed once they pay.
+  if (org.subscriptionStatus === "TRIAL" || org.subscriptionStatus === "EXPIRED") {
     try {
       await prisma.task.deleteMany({ where: { organizationId: orgId, isSample: true } })
       await prisma.meeting.deleteMany({ where: { organizationId: orgId, isSample: true } })

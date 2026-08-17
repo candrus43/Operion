@@ -65,7 +65,7 @@ export async function sendWelcomeEmail(user: { email: string; name: string }): P
       Hi ${user.name},
     </p>
     <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
-      Your Operion workspace has been created. You can now log in and start managing your portfolio with AI-powered insights.
+      Your Operion workspace has been created. To start using your AI Chief of Staff, complete your setup — the one-time setup fee is charged today, and monthly billing begins on day 31.
     </p>
     <div style="text-align: center; margin: 32px 0;">
       <a href="${loginUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Log in to Operion</a>
