@@ -7,13 +7,15 @@ import { Sparkles, ShieldAlert, Zap, Users, Building2, Check, ArrowRight, Mail }
 export default function TrialExpiredPage() {
   const [checkingOut, setCheckingOut] = useState<string | null>(null)
 
-  async function redirectToCheckout(plan: "SOLO" | "TEAM", mode: "setup" | "monthly") {
-    setCheckingOut(`${plan}_${mode}`)
+  async function redirectToCheckout(plan: "SOLO" | "TEAM") {
+    setCheckingOut(plan)
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      // Two-session flow: Session A (setup fee, billed today) then Session B
+      // (30-day-trial subscription, first monthly charge on day 31).
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, mode }),
+        body: JSON.stringify({ plan: plan === "SOLO" ? "Founder" : "Studio" }),
       })
       const { url } = await res.json()
       if (url) {
@@ -88,19 +90,19 @@ export default function TrialExpiredPage() {
 
             <div className="space-y-2">
               <button
-                onClick={() => redirectToCheckout("SOLO", "setup")}
-                disabled={checkingOut === "SOLO_setup"}
+                onClick={() => redirectToCheckout("SOLO")}
+                disabled={checkingOut === "SOLO"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full"
               >
-                {checkingOut === "SOLO_setup" ? "Redirecting..." : "Start Setup"}
+                {checkingOut === "SOLO" ? "Redirecting..." : "Start Setup"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </button>
               <button
-                onClick={() => redirectToCheckout("SOLO", "monthly")}
-                disabled={checkingOut === "SOLO_monthly"}
+                onClick={() => redirectToCheckout("SOLO")}
+                disabled={checkingOut === "SOLO"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-11 px-8 w-full"
               >
-                {checkingOut === "SOLO_monthly" ? "Redirecting..." : "Monthly Billing"}
+                {checkingOut === "SOLO" ? "Redirecting..." : "Setup + Monthly Billing"}
               </button>
             </div>
           </div>
@@ -155,19 +157,19 @@ export default function TrialExpiredPage() {
 
             <div className="space-y-2">
               <button
-                onClick={() => redirectToCheckout("TEAM", "setup")}
-                disabled={checkingOut === "TEAM_setup"}
+                onClick={() => redirectToCheckout("TEAM")}
+                disabled={checkingOut === "TEAM"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-500 hover:bg-amber-400 text-black h-11 px-8 w-full"
               >
-                {checkingOut === "TEAM_setup" ? "Redirecting..." : "Start Setup"}
+                {checkingOut === "TEAM" ? "Redirecting..." : "Start Setup"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </button>
               <button
-                onClick={() => redirectToCheckout("TEAM", "monthly")}
-                disabled={checkingOut === "TEAM_monthly"}
+                onClick={() => redirectToCheckout("TEAM")}
+                disabled={checkingOut === "TEAM"}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-11 px-8 w-full"
               >
-                {checkingOut === "TEAM_monthly" ? "Redirecting..." : "Monthly Billing"}
+                {checkingOut === "TEAM" ? "Redirecting..." : "Setup + Monthly Billing"}
               </button>
             </div>
           </div>
