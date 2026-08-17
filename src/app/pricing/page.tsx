@@ -24,10 +24,13 @@ export default function PricingPage() {
     }
     setCheckingOut(plan)
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      // Two-session flow: /api/checkout creates Session A (setup fee, billed
+      // today); its success page immediately creates Session B (30-day-trial
+      // subscription, first monthly charge on day 31).
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, mode: "monthly" }),
+        body: JSON.stringify({ plan: plan === "SOLO" ? "Founder" : "Studio" }),
       })
       const data = await res.json()
       if (!res.ok) {

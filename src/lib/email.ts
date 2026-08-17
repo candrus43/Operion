@@ -133,6 +133,52 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#039;")
 }
 
+export interface CompleteSetupEmailParams {
+  email: string
+  plan: string
+  checkoutUrl: string
+}
+
+/**
+ * Sent after the one-time setup fee (Session A) is paid, when the customer
+ * abandoned the flow before completing the subscription (Session B). Carries
+ * the Session B checkout link so the purchase still completes.
+ */
+export async function sendCompleteSetupEmail({
+  email,
+  plan,
+  checkoutUrl,
+}: CompleteSetupEmailParams): Promise<boolean> {
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #080808; color: #e4e4e4; padding: 40px 20px;">
+  <div style="max-width: 480px; margin: 0 auto; background: #111111; border-radius: 12px; padding: 40px; border: 1px solid #262626;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 8px;">You're one step away</h1>
+      <p style="color: #a1a1a1; font-size: 16px; margin: 0;">Finish your ${escapeHtml(plan)} setup</p>
+    </div>
+    <p style="color: #d4d4d4; font-size: 15px; line-height: 1.6;">
+      Your one-time setup fee was received. Complete your subscription to activate your workspace — your 30-day trial starts today and monthly billing begins on day 31.
+    </p>
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${checkoutUrl}" style="display: inline-block; background: #ffffff; color: #111111; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">Complete your subscription</a>
+    </div>
+    <p style="color: #737373; font-size: 13px; line-height: 1.5; text-align: center;">
+      If you have any questions, just reply to this email.
+    </p>
+  </div>
+</body>
+</html>`.trim()
+
+  return sendEmail({
+    to: email,
+    subject: "Operion — Complete your subscription",
+    html,
+  })
+}
+
 export async function sendPasswordResetEmail(
   user: { email: string; name: string },
   resetToken: string

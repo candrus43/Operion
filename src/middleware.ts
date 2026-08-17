@@ -18,6 +18,7 @@ export default auth((req) => {
                        req.nextUrl.pathname.startsWith("/reset-password") ||
                        req.nextUrl.pathname.startsWith("/accept-invite") ||
                        req.nextUrl.pathname.startsWith("/support/access") ||
+                       req.nextUrl.pathname === "/complete-subscription" ||
                        req.nextUrl.pathname === "/admin/login"
 
   const isDemoRoute = req.nextUrl.pathname === "/demo-login"
@@ -27,7 +28,7 @@ export default auth((req) => {
   const isSupportAccessApi = req.nextUrl.pathname === "/api/support/access"
   const isAdminSetupApi = req.nextUrl.pathname === "/api/admin/setup"
   const isCrmApi = req.nextUrl.pathname.startsWith("/api/crm")
-  const isCheckoutApi = req.nextUrl.pathname === "/api/checkout"
+  const isCheckoutApi = req.nextUrl.pathname.startsWith("/api/checkout")
 
   // Skip enforcement for public routes, auth, etc.
   const isExemptRoute = isApiAuth || isRegisterApi || isStripeWebhook || isStripeApi || isSupportAccessApi || isAdminSetupApi || isCrmApi || isCheckoutApi ||

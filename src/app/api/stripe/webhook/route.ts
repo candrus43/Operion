@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getStripe, PRICE_ID_MAP } from "@/lib/stripe"
+import { createCheckoutSession, getAppBaseUrl } from "@/lib/checkout"
+import { sendCompleteSetupEmail } from "@/lib/email"
 import Stripe from "stripe"
 
 /**
@@ -145,7 +147,14 @@ function slugify(name: string): string {
  */
 async function resolveOrgForCheckout(
   session: Stripe.Checkout.Session
-): Promise<{ org: { id: string; subscriptionTier: string; subscriptionStatus: string } } | null> {
+): Promise<{
+  org: {
+    id: string
+    subscriptionTier: string
+    subscriptionStatus: string
+    stripeCustomerId: string | null
+  }
+} | null> {
   const orgId = session.client_reference_id
   if (orgId) {
     const org = await prisma.organization.findUnique({ where: { id: orgId } })
@@ -278,6 +287,61 @@ async function handleCheckoutCompleted(
     `✅ Org ${orgId} activated: tier=${tier}, status=${status}, ` +
       `customer=${stripeCustomerId}, sub=${stripeSubscriptionId}`
   )
+
+  // ── Session A (setup fee) → email the Session B link ─────────────
+  // The customer paid the one-time setup fee (billed immediately) but may have
+  // abandoned the flow before completing the subscription. Create Session B
+  // (30-day-trial subscription, first charge day 31) and email the link so the
+  // purchase still completes. Idempotent via the stripeEvent dedup at the top
+  // of POST — a replayed event never re-provisions or re-emails.
+  if (session.mode === "payment") {
+    await emailSessionBLink(session)
+  }
+}
+
+/**
+ * Build a Session B (subscription) link for a customer who completed Session A
+ * (setup fee) and email it to them. Reuses the same session-creation helper as
+ * the /api/checkout/subscribe route so both paths produce identical sessions.
+ */
+async function emailSessionBLink(session: Stripe.Checkout.Session) {
+  const email = (session.customer_email ?? session.customer_details?.email ?? "").trim()
+  if (!email) {
+    console.warn(
+      "checkout.session.completed (setup): no customer email on session — skipping Session B email"
+    )
+    return
+  }
+
+  // metadata.plan carries the DB tier (SOLO/TEAM); default to Founder for any
+  // legacy session without metadata.
+  const tier = session.metadata?.plan
+  const plan = tier === "TEAM" ? "Studio" : "Founder"
+
+  try {
+    const subSession = await createCheckoutSession({
+      plan,
+      step: "subscription",
+      customerEmail: email,
+      clientReferenceId:
+        typeof session.client_reference_id === "string"
+          ? session.client_reference_id
+          : undefined,
+      baseUrl: getAppBaseUrl(),
+    })
+    if (!subSession.url) {
+      console.error("Session B created without a URL for setup customer", subSession.id)
+      return
+    }
+    const sent = await sendCompleteSetupEmail({ email, plan, checkoutUrl: subSession.url })
+    console.log(
+      `📧 Session B link emailed to ${email} (session ${subSession.id}): ${sent ? "sent" : "send failed"}`
+    )
+  } catch (err) {
+    // Never fail the webhook for an email problem — the customer can also
+    // reach Session B from the /complete-subscription success page.
+    console.error("Failed to create/email Session B link:", err)
+  }
 }
 
 /**

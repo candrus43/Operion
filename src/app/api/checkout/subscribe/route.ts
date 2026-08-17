@@ -1,35 +1,22 @@
 import { NextResponse } from "next/server"
 import { applyRateLimit } from "@/lib/rate-limit"
-import {
-  createCheckoutSession,
-  getAppBaseUrl,
-  isPlan,
-  resolveClientReferenceId,
-} from "@/lib/checkout"
+import { createCheckoutSession, getAppBaseUrl, isPlan, resolveClientReferenceId } from "@/lib/checkout"
 
 /**
- * Session A of the two-session purchase flow (owner decision 2026-08-15).
+ * Session B of the two-session purchase flow (owner decision 2026-08-15).
  *
- * Creates a mode=payment Checkout Session with ONLY the one-time setup fee
- * (Founder $2,500 / Studio $5,000), billed immediately at checkout.
- * success_url is the /complete-subscription page, which immediately creates
- * Session B (the 30-day-trial subscription) and redirects to it.
+ * Creates a mode=subscription Checkout Session with ONLY the monthly price
+ * (Founder $249/mo / Studio $499/mo) and trial_period_days=30, so the first
+ * recurring charge lands on day 31.
  *
- * Used by both purchase paths:
- *  - App pricing page: POST { plan } with an authenticated session → the
- *    client_reference_id is the user's org id (resolved here).
- *  - CRM payment-link route: POST { plan, customerEmail, client_reference_id }
- *    server-to-server; the emailed link is this Session A URL.
+ * Called by the /complete-subscription page (Session A success landing) with
+ * the same plan / customerEmail / client_reference_id that Session A carried.
+ * Also used by the webhook to build the Session B link emailed to customers
+ * who complete Session A but abandon the flow.
  */
 export async function POST(request: Request) {
   const limit = await applyRateLimit(request, { maxRequests: 30, windowMs: 60_000 })
   if (limit) return limit
-
-  const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) {
-    console.error("STRIPE_SECRET_KEY is not configured")
-    return NextResponse.json({ error: "Payment service is not configured" }, { status: 500 })
-  }
 
   let body: unknown
   try {
@@ -55,7 +42,7 @@ export async function POST(request: Request) {
 
     const session = await createCheckoutSession({
       plan,
-      step: "setup",
+      step: "subscription",
       customerEmail: typeof customerEmail === "string" ? customerEmail.trim() : undefined,
       clientReferenceId,
       baseUrl: getAppBaseUrl(request),
@@ -63,17 +50,17 @@ export async function POST(request: Request) {
 
     if (!session.url) {
       console.error("Stripe Checkout returned a session without a URL", session.id)
-      return NextResponse.json({ error: "Unable to create checkout session" }, { status: 502 })
+      return NextResponse.json({ error: "Unable to create subscription session" }, { status: 502 })
     }
 
     console.log(
-      `💳 Session A (setup) created: ${session.id} plan=${plan} ` +
-        `mode=${session.mode} ref=${clientReferenceId ?? "none"}`
+      `💳 Session B (subscription) created: ${session.id} plan=${plan} ` +
+        `mode=${session.mode} trial=30d ref=${clientReferenceId ?? "none"}`
     )
     return NextResponse.json({ url: session.url, sessionId: session.id })
   } catch (error) {
-    console.error("Stripe Checkout session creation failed:", error)
-    return NextResponse.json({ error: "Unable to create checkout session" }, { status: 502 })
+    console.error("Stripe subscription session creation failed:", error)
+    return NextResponse.json({ error: "Unable to create subscription session" }, { status: 502 })
   }
 }
 
