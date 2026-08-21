@@ -16,6 +16,7 @@ import {
   StickyNote,
 } from "lucide-react"
 import { ContactDeleteButton } from "./delete-button"
+import { AskAiButton } from "@/components/ai/ask-ai-button"
 
 export default async function ContactDetailPage({
   params,
@@ -72,6 +73,7 @@ export default async function ContactDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <AskAiButton type="contact" id={contact.id} title={contact.name} />
           <Link href={`/contacts/${contact.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />

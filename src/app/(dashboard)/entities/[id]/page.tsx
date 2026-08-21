@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { EntityTabs } from "./tabs"
+import { AskAiButton } from "@/components/ai/ask-ai-button"
 
 const entityTypeConfig: Record<string, { icon: typeof Building2; color: string; label: string }> = {
   BUSINESS: { icon: Store, color: "bg-violet-500/10 text-violet-400 border-violet-500/20", label: "Business" },
@@ -110,6 +111,7 @@ export default async function EntityDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <AskAiButton type="entity" id={entity.id} title={entity.name} />
           <Link href={`/entities/${entity.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />
