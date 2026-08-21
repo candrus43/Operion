@@ -192,7 +192,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
                       </div>
                       <Progress value={project.progress} className="h-1.5" />
                       {(project.startDate || project.targetDate) && (
-                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground/50">
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
                           {project.startDate && (
                             <span>Start: {new Date(project.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                           )}
@@ -289,7 +289,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
                         <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", dc)}>
                           {doc.type.replace("_", " ")}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground/50">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         </span>
                       </div>

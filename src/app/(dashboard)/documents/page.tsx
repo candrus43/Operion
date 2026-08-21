@@ -145,7 +145,7 @@ export default async function DocumentsPage({
                           {doc.project.name}
                         </Link>
                       ) : (
-                        <span className="text-xs text-muted-foreground/40">—</span>
+                        <span className="text-xs text-muted-foreground/70">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -158,7 +158,7 @@ export default async function DocumentsPage({
                           {doc.entity.name}
                         </Link>
                       ) : (
-                        <span className="text-xs text-muted-foreground/40">—</span>
+                        <span className="text-xs text-muted-foreground/70">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -168,7 +168,7 @@ export default async function DocumentsPage({
                           <span className="text-xs text-muted-foreground">{doc.uploadedBy.name}</span>
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foreground/40">—</span>
+                        <span className="text-xs text-muted-foreground/70">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">

@@ -154,7 +154,7 @@ export default async function DocumentDetailPage({
                     {document.project.name}
                   </Link>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 
@@ -167,7 +167,7 @@ export default async function DocumentDetailPage({
                     {document.entity.name}
                   </Link>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 
@@ -180,7 +180,7 @@ export default async function DocumentDetailPage({
                     <span className="text-xs">{document.uploadedBy.name}</span>
                   </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 

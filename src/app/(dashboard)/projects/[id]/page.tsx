@@ -123,7 +123,7 @@ export default async function ProjectDetailPage({
               {phaseLabels[project.phase] || project.phase}
             </Badge>
           </div>
-          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground/60">
+          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
             {project.entity && (
               <Link
                 href={`/entities/${project.entity.id}`}
@@ -248,7 +248,7 @@ export default async function ProjectDetailPage({
             >
               {tab.label}
               {tab.count !== null && (
-                <span className="ml-1.5 text-[10px] text-muted-foreground/50">
+                <span className="ml-1.5 text-[10px] text-muted-foreground">
                   {tab.count}
                 </span>
               )}
@@ -317,7 +317,7 @@ export default async function ProjectDetailPage({
                               ? "text-emerald-400 font-medium"
                               : isPast
                               ? "text-muted-foreground/60"
-                              : "text-muted-foreground/30"
+                              : "text-muted-foreground/70"
                           )}
                         >
                           {phaseLabels[phase]}
@@ -420,7 +420,7 @@ export default async function ProjectDetailPage({
                     </div>
                     <div className="flex items-center gap-2 mt-1.5">
                       {task.dueDate && (
-                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground/60">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <Calendar className="h-2.5 w-2.5" />
                           {new Date(task.dueDate).toLocaleDateString("en-US", {
                             month: "short",
@@ -429,7 +429,7 @@ export default async function ProjectDetailPage({
                         </span>
                       )}
                       {task.assignee && (
-                        <span className="text-[11px] text-muted-foreground/60">
+                        <span className="text-[11px] text-muted-foreground">
                           {task.assignee.name}
                         </span>
                       )}
@@ -480,7 +480,7 @@ export default async function ProjectDetailPage({
                         >
                           {doc.type.replace("_", " ")}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground/50">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(doc.createdAt).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
@@ -520,7 +520,7 @@ export default async function ProjectDetailPage({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{meeting.title}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] text-muted-foreground/60">
+                      <span className="text-[11px] text-muted-foreground">
                         {new Date(meeting.date).toLocaleDateString("en-US", {
                           weekday: "short",
                           month: "short",
@@ -529,13 +529,13 @@ export default async function ProjectDetailPage({
                         })}
                       </span>
                       {meeting.location && (
-                        <span className="text-[11px] text-muted-foreground/40">
+                        <span className="text-[11px] text-muted-foreground">
                           {meeting.location}
                         </span>
                       )}
                     </div>
                     {meeting.notes && (
-                      <p className="text-xs text-muted-foreground/50 mt-1 line-clamp-1">
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                         {meeting.notes}
                       </p>
                     )}

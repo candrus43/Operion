@@ -194,13 +194,13 @@ export default async function ProjectsPage(props: {
 
                 {/* Bottom row: task count + date */}
                 <div className="flex items-center justify-between pt-1 border-t border-white/[0.03]">
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground/50">
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     <span>{project._count.tasks} tasks</span>
                     {project._count.documents > 0 && (
                       <span>{project._count.documents} docs</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-0.5 text-[11px] text-muted-foreground/30">
+                  <div className="flex items-center gap-0.5 text-[11px] text-muted-foreground/70">
                     {project.targetDate && (
                       <>
                         <Calendar className="h-2.5 w-2.5" />
@@ -212,7 +212,7 @@ export default async function ProjectsPage(props: {
                         </span>
                       </>
                     )}
-                    <ChevronRight className="h-3 w-3 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRight className="h-3 w-3 ml-0.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity" />
                   </div>
                 </div>
               </CardContent>
