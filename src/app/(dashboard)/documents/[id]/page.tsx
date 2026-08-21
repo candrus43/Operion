@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { docTypeColor, docTypeLabel } from "@/lib/colors"
+import { AskAiButton } from "@/components/ai/ask-ai-button"
 import {
   ArrowLeft,
   Pencil,
@@ -62,6 +63,7 @@ export default async function DocumentDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <AskAiButton type="document" id={document.id} title={document.name} />
           <Link href={`/documents/${document.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />

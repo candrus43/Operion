@@ -36,7 +36,7 @@ const mainNavItems = [
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/import", label: "Import Data", icon: Upload },
   { href: "/ea", label: "EA Workspace", icon: Briefcase },
-  { href: "/ai", label: "AI Assistant", icon: Sparkles },
+  { href: "/ai", label: "AI Workspace", icon: Sparkles },
 ]
 
 const bottomNavItems = [

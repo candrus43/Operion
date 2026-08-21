@@ -26,6 +26,7 @@ import { AISuggestion } from "./ai-suggestion"
 import { TaskDiscussion } from "./task-discussion"
 import { StatusActions } from "@/components/tasks/status-actions"
 import { TaskActivity } from "@/components/tasks/task-activity"
+import { AskAiButton } from "@/components/ai/ask-ai-button"
 
 
 
@@ -95,6 +96,7 @@ export default async function TaskDetailPage({
           )}
         </div>
         <div className="flex items-center gap-2">
+          <AskAiButton type="task" id={task.id} title={task.title} />
           <Link href={`/tasks/${task.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />
