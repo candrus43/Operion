@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Search, Calendar, ArrowUpDown, ArrowUp, ArrowDown, ChevronRight, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor } from "@/lib/colors"
 import { toast } from "sonner"
 
 type Task = {
@@ -47,35 +48,16 @@ interface TaskListClientProps {
   initialMineFilter?: boolean
 }
 
-const priorityColor = (p: string) => {
-  switch (p) {
-    case "CRITICAL": return "bg-rose-500/10 text-rose-300 border-rose-500/20"
-    case "HIGH": return "bg-amber-500/10 text-amber-300 border-amber-500/20"
-    case "MEDIUM": return "bg-sky-500/10 text-sky-300 border-sky-500/20"
-    default: return "bg-slate-500/10 text-slate-300 border-slate-500/20"
-  }
-}
 
 const priorityDot = (p: string) => {
   switch (p) {
-    case "CRITICAL": return "bg-rose-400 shadow-[0_0_9px_rgba(251,113,133,0.7)]"
-    case "HIGH": return "bg-amber-400 shadow-[0_0_9px_rgba(251,191,36,0.6)]"
-    case "MEDIUM": return "bg-sky-400 shadow-[0_0_9px_rgba(56,189,248,0.6)]"
+    case "CRITICAL": return "bg-red-400 shadow-[0_0_9px_rgba(239,68,68,0.7)]"
+    case "HIGH": return "bg-orange-400 shadow-[0_0_9px_rgba(249,115,22,0.6)]"
+    case "MEDIUM": return "bg-blue-400 shadow-[0_0_9px_rgba(59,130,246,0.6)]"
     default: return "bg-slate-400"
   }
 }
 
-const statusColor = (s: string) => {
-  switch (s) {
-    case "WAITING_ON": return "text-amber-400 bg-amber-500/10"
-    case "BLOCKED": return "text-red-400 bg-red-500/10"
-    case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10"
-    case "DONE": return "text-emerald-400 bg-emerald-500/10"
-    case "READY_FOR_REVIEW": return "text-purple-400 bg-purple-500/10"
-    case "TODO": return "text-zinc-400 bg-zinc-500/10"
-    default: return "text-zinc-400 bg-zinc-500/10"
-  }
-}
 
 type SortField = "title" | "status" | "priority" | "dueDate" | "createdAt"
 type SortDir = "asc" | "desc"
@@ -321,7 +303,7 @@ export function TaskListClient({ tasks: initialTasks, users, entities, projects,
                             🔗
                           </span>
                         )}
-                        <Link href={`/tasks/${task.id}`} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Link href={`/tasks/${task.id}`} className="shrink-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity">
                           <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
                         </Link>
                       </div>

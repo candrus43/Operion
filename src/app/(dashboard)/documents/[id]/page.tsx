@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { docTypeColor, docTypeLabel } from "@/lib/colors"
 import {
   ArrowLeft,
   Pencil,
@@ -20,31 +21,6 @@ import {
 } from "lucide-react"
 import { DocumentDeleteButton } from "./delete-button"
 
-const typeColors: Record<string, string> = {
-  CONTRACT: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  PURCHASE_AGREEMENT: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  LEASE: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  INSURANCE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  LICENSE: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  TAX: "bg-red-500/10 text-red-400 border-red-500/20",
-  FINANCIAL_STATEMENT: "bg-green-500/10 text-green-400 border-green-500/20",
-  PHOTO: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-  PDF: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-  OTHER: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-}
-
-const typeLabels: Record<string, string> = {
-  CONTRACT: "Contract",
-  PURCHASE_AGREEMENT: "Purchase Agreement",
-  LEASE: "Lease",
-  INSURANCE: "Insurance",
-  LICENSE: "License",
-  TAX: "Tax",
-  FINANCIAL_STATEMENT: "Financial Statement",
-  PHOTO: "Photo",
-  PDF: "PDF",
-  OTHER: "Other",
-}
 
 export default async function DocumentDetailPage({
   params,
@@ -80,8 +56,8 @@ export default async function DocumentDetailPage({
         <div className="flex-1">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight">{document.name}</h1>
-            <Badge variant="outline" className={cn("text-[11px] px-2 py-0.5 border", typeColors[document.type])}>
-              {typeLabels[document.type]}
+            <Badge variant="outline" className={cn("text-[11px] px-2 py-0.5 border", docTypeColor(document.type))}>
+              {docTypeLabel[document.type]}
             </Badge>
           </div>
         </div>
@@ -164,8 +140,8 @@ export default async function DocumentDetailPage({
               {/* Type */}
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Type</span>
-                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", typeColors[document.type])}>
-                  {typeLabels[document.type]}
+                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", docTypeColor(document.type))}>
+                  {docTypeLabel[document.type]}
                 </Badge>
               </div>
 

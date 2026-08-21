@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor, projectStatusColor, phaseColor, docTypeColor, docTypeLabel } from "@/lib/colors"
 import {
   FolderKanban,
   CheckSquare,
@@ -33,48 +34,6 @@ const tabDefs: { key: Tabs; label: string; icon: typeof Info }[] = [
   { key: "contacts", label: "Contacts", icon: Users },
 ]
 
-const priorityColor = (p: string) => {
-  switch (p) {
-    case "CRITICAL": return "bg-red-500/10 text-red-400 border-red-500/20"
-    case "HIGH": return "bg-orange-500/10 text-orange-400 border-orange-500/20"
-    case "MEDIUM": return "bg-blue-500/10 text-blue-400 border-blue-500/20"
-    default: return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-  }
-}
-
-const statusColor = (s: string) => {
-  switch (s) {
-    case "WAITING_ON": return "text-amber-400 bg-amber-500/10"
-    case "BLOCKED": return "text-red-400 bg-red-500/10"
-    case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10"
-    case "DONE": return "text-emerald-400 bg-emerald-500/10"
-    case "TODO": return "text-zinc-400 bg-zinc-500/10"
-    default: return "text-zinc-400 bg-zinc-500/10"
-  }
-}
-
-const projectStatusColor = (s: string) => {
-  switch (s) {
-    case "ACTIVE": return "bg-emerald-500/10 text-emerald-400"
-    case "ON_HOLD": return "bg-amber-500/10 text-amber-400"
-    case "COMPLETED": return "bg-blue-500/10 text-blue-400"
-    case "CANCELLED": return "bg-red-500/10 text-red-400"
-    default: return "bg-zinc-500/10 text-zinc-400"
-  }
-}
-
-const docTypeConfig: Record<string, { color: string }> = {
-  CONTRACT: { color: "text-amber-400 bg-amber-500/10" },
-  PURCHASE_AGREEMENT: { color: "text-violet-400 bg-violet-500/10" },
-  LEASE: { color: "text-sky-400 bg-sky-500/10" },
-  INSURANCE: { color: "text-emerald-400 bg-emerald-500/10" },
-  LICENSE: { color: "text-blue-400 bg-blue-500/10" },
-  TAX: { color: "text-red-400 bg-red-500/10" },
-  FINANCIAL_STATEMENT: { color: "text-amber-400 bg-amber-500/10" },
-  PHOTO: { color: "text-rose-400 bg-rose-500/10" },
-  PDF: { color: "text-zinc-400 bg-zinc-500/10" },
-  OTHER: { color: "text-zinc-400 bg-zinc-500/10" },
-}
 
 export function EntityTabs({ entity }: EntityTabsProps) {
   const [activeTab, setActiveTab] = useState<Tabs>("overview")
@@ -315,19 +274,19 @@ export function EntityTabs({ entity }: EntityTabsProps) {
               </div>
             ) : (
               entity.documents.map((doc: any) => {
-                const dc = docTypeConfig[doc.type] || docTypeConfig.OTHER
+                const dc = docTypeColor(doc.type)
                 return (
                   <div
                     key={doc.id}
                     className="flex items-center gap-3 rounded-lg glass hover:bg-white/[0.07] transition-colors p-3 cursor-pointer"
                   >
-                    <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg shrink-0", dc.color)}>
+                    <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg shrink-0", dc)}>
                       <FileText className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{doc.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", dc.color)}>
+                        <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", dc)}>
                           {doc.type.replace("_", " ")}
                         </Badge>
                         <span className="text-[10px] text-muted-foreground/50">

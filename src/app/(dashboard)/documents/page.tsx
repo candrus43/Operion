@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, Plus, ExternalLink, Building2, FolderKanban, User } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { docTypeColor, docTypeLabel } from "@/lib/colors"
 import DocumentTypeFilter from "@/components/documents/document-type-filter"
 
 const DOC_TYPES = [
@@ -16,31 +17,6 @@ const DOC_TYPES = [
   "LICENSE", "TAX", "FINANCIAL_STATEMENT", "PHOTO", "PDF", "OTHER"
 ] as const
 
-const typeColors: Record<string, string> = {
-  CONTRACT: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  PURCHASE_AGREEMENT: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  LEASE: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  INSURANCE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  LICENSE: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  TAX: "bg-red-500/10 text-red-400 border-red-500/20",
-  FINANCIAL_STATEMENT: "bg-green-500/10 text-green-400 border-green-500/20",
-  PHOTO: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-  PDF: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-  OTHER: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-}
-
-const typeLabels: Record<string, string> = {
-  CONTRACT: "Contract",
-  PURCHASE_AGREEMENT: "Purchase Agreement",
-  LEASE: "Lease",
-  INSURANCE: "Insurance",
-  LICENSE: "License",
-  TAX: "Tax",
-  FINANCIAL_STATEMENT: "Financial Statement",
-  PHOTO: "Photo",
-  PDF: "PDF",
-  OTHER: "Other",
-}
 
 export default async function DocumentsPage({
   searchParams,
@@ -103,7 +79,7 @@ export default async function DocumentsPage({
               size="sm"
               className={cn("text-xs", typeFilter === t && "bg-white/[0.04]")}
             >
-              {typeLabels[t]}
+              {docTypeLabel[t]}
             </Button>
           </Link>
         ))}
@@ -155,8 +131,8 @@ export default async function DocumentsPage({
                       </Link>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", typeColors[doc.type])}>
-                        {typeLabels[doc.type]}
+                      <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", docTypeColor(doc.type))}>
+                        {docTypeLabel[doc.type]}
                       </Badge>
                     </td>
                     <td className="px-4 py-3">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { priorityColor } from "@/lib/colors"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -25,16 +26,10 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 
-const priorityColors: Record<string, string> = {
-  CRITICAL: "bg-red-500/10 text-red-400 border-red-500/20",
-  HIGH: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  MEDIUM: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  LOW: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-}
 
 function PriorityBadge({ priority }: { priority: string }) {
   return (
-    <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium uppercase ${priorityColors[priority] || priorityColors.MEDIUM}`}>
+    <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium uppercase ${priorityColor(priority)}`}>
       {priority}
     </span>
   )
