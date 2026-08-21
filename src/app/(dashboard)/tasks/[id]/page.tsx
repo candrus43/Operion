@@ -23,30 +23,12 @@ import {
   ArrowRight,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor } from "@/lib/colors"
 import { TaskActions } from "./task-actions"
 import { AISuggestion } from "./ai-suggestion"
 import { TaskDiscussion } from "./task-discussion"
 
-const priorityColor = (p: string) => {
-  switch (p) {
-    case "CRITICAL": return "bg-red-500/10 text-red-400 border-red-500/20"
-    case "HIGH": return "bg-orange-500/10 text-orange-400 border-orange-500/20"
-    case "MEDIUM": return "bg-blue-500/10 text-blue-400 border-blue-500/20"
-    default: return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-  }
-}
 
-const statusColor = (s: string) => {
-  switch (s) {
-    case "WAITING_ON": return "text-amber-400 bg-amber-500/10 border-amber-500/20"
-    case "BLOCKED": return "text-red-400 bg-red-500/10 border-red-500/20"
-    case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10 border-blue-500/20"
-    case "DONE": return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-    case "READY_FOR_REVIEW": return "text-purple-400 bg-purple-500/10 border-purple-500/20"
-    case "TODO": return "text-zinc-400 bg-zinc-500/10 border-zinc-500/20"
-    default: return "text-zinc-400 bg-zinc-500/10"
-  }
-}
 
 export default async function TaskDetailPage({
   params,
@@ -298,7 +280,7 @@ export default async function TaskDetailPage({
                     <span className="text-xs">{task.assignee.name}</span>
                   </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">Unassigned</span>
+                  <span className="text-xs text-muted-foreground">Unassigned</span>
                 )}
               </div>
 
@@ -308,7 +290,7 @@ export default async function TaskDetailPage({
                 {task.createdBy ? (
                   <span className="text-xs">{task.createdBy.name}</span>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 
@@ -321,7 +303,7 @@ export default async function TaskDetailPage({
                     {task.project.name}
                   </Link>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 
@@ -334,7 +316,7 @@ export default async function TaskDetailPage({
                     {task.entity.name}
                   </Link>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 
@@ -351,7 +333,7 @@ export default async function TaskDetailPage({
                     {isOverdue && <span className="text-[10px] ml-1">OVERDUE</span>}
                   </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">—</span>
+                  <span className="text-xs text-muted-foreground">—</span>
                 )}
               </div>
 

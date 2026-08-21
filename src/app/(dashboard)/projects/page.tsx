@@ -25,6 +25,7 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor, projectStatusColor, phaseColor, docTypeColor, docTypeLabel } from "@/lib/colors"
 
 const phaseLabels: Record<string, string> = {
   ACQUISITION: "Acquisition",
@@ -36,22 +37,6 @@ const phaseLabels: Record<string, string> = {
   OPERATIONS: "Operations",
 }
 
-const phaseColors: Record<string, string> = {
-  ACQUISITION: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  DUE_DILIGENCE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  DESIGN: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-  PERMITTING: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  CONSTRUCTION: "bg-red-500/10 text-red-400 border-red-500/20",
-  CLOSEOUT: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  OPERATIONS: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-}
-
-const statusColors: Record<string, string> = {
-  ACTIVE: "bg-emerald-500/10 text-emerald-400",
-  ON_HOLD: "bg-amber-500/10 text-amber-400",
-  COMPLETED: "bg-blue-500/10 text-blue-400",
-  CANCELLED: "bg-red-500/10 text-red-400",
-}
 
 export default async function ProjectsPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>
@@ -166,7 +151,7 @@ export default async function ProjectsPage(props: {
                     variant="outline"
                     className={cn(
                       "text-[10px] px-1.5 py-0 shrink-0",
-                      statusColors[project.status] || "bg-zinc-500/10 text-zinc-400"
+                      projectStatusColor(project.status)
                     )}
                   >
                     {project.status.replace("_", " ")}
@@ -179,7 +164,7 @@ export default async function ProjectsPage(props: {
                     variant="outline"
                     className={cn(
                       "text-[10px] px-1.5 py-0 border",
-                      phaseColors[project.phase] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                      phaseColor(project.phase)
                     )}
                   >
                     {phaseLabels[project.phase] || project.phase}
@@ -209,13 +194,13 @@ export default async function ProjectsPage(props: {
 
                 {/* Bottom row: task count + date */}
                 <div className="flex items-center justify-between pt-1 border-t border-white/[0.03]">
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground/50">
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     <span>{project._count.tasks} tasks</span>
                     {project._count.documents > 0 && (
                       <span>{project._count.documents} docs</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-0.5 text-[11px] text-muted-foreground/30">
+                  <div className="flex items-center gap-0.5 text-[11px] text-muted-foreground/70">
                     {project.targetDate && (
                       <>
                         <Calendar className="h-2.5 w-2.5" />
@@ -227,7 +212,7 @@ export default async function ProjectsPage(props: {
                         </span>
                       </>
                     )}
-                    <ChevronRight className="h-3 w-3 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ChevronRight className="h-3 w-3 ml-0.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity" />
                   </div>
                 </div>
               </CardContent>

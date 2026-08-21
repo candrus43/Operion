@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor, projectStatusColor } from "@/lib/colors"
 
 // ── Stat Cards ──────────────────────────────────────────────────
 
@@ -74,26 +75,6 @@ export async function CriticalTasks({ orgId }: CriticalTasksProps) {
     take: 6,
   })
 
-  const priorityColor = (p: string) => {
-    switch (p) {
-      case "CRITICAL": return "bg-red-500/10 text-red-400 border-red-500/20"
-      case "HIGH": return "bg-orange-500/10 text-orange-400 border-orange-500/20"
-      case "MEDIUM": return "bg-blue-500/10 text-blue-400 border-blue-500/20"
-      default: return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-    }
-  }
-
-  const statusColor = (s: string) => {
-    switch (s) {
-      case "WAITING_ON": return "text-amber-400 bg-amber-500/10"
-      case "BLOCKED": return "text-red-400 bg-red-500/10"
-      case "IN_PROGRESS": return "text-blue-400 bg-blue-500/10"
-      case "READY_FOR_REVIEW": return "text-purple-400 bg-purple-500/10"
-      case "TODO": return "text-zinc-400 bg-zinc-500/10"
-      default: return "text-zinc-400 bg-zinc-500/10"
-    }
-  }
-
   return (
     <Card className="glass">
       <CardHeader className="pb-3">
@@ -132,11 +113,11 @@ export async function CriticalTasks({ orgId }: CriticalTasksProps) {
                     {task.status.replace("_", " ")}
                   </Badge>
                   {task.project && (
-                    <span className="text-[11px] text-muted-foreground/60 truncate">{task.project.name}</span>
+                    <span className="text-[11px] text-muted-foreground truncate">{task.project.name}</span>
                   )}
                 </div>
                 {task.dueDate && (
-                  <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground/60">
+                  <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground">
                     <Calendar className="h-2.5 w-2.5" />
                     {task.dueDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                     {task.dueDate < new Date() && (
@@ -235,10 +216,10 @@ export async function UpcomingDeadlines({ orgId }: UpcomingDeadlinesProps) {
                   </p>
                   <div className="flex items-center gap-1.5 mt-1">
                     {task.project && (
-                      <span className="text-[11px] text-muted-foreground/60 truncate">{task.project.name}</span>
+                      <span className="text-[11px] text-muted-foreground truncate">{task.project.name}</span>
                     )}
                     {task.assignee && (
-                      <span className="text-[10px] text-muted-foreground/40">
+                      <span className="text-[10px] text-muted-foreground">
                         · {task.assignee.name?.split(" ")[0]}
                       </span>
                     )}
@@ -270,14 +251,6 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
     orderBy: { progress: "asc" },
     take: 6,
   })
-
-  const statusColor = (s: string) => {
-    switch (s) {
-      case "ACTIVE": return "bg-emerald-500/10 text-emerald-400"
-      case "ON_HOLD": return "bg-amber-500/10 text-amber-400"
-      default: return "bg-zinc-500/10 text-zinc-400"
-    }
-  }
 
   return (
     <Card className="glass">
@@ -311,12 +284,12 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
                     {project.name}
                   </p>
                   {project.entity && (
-                    <p className="text-[11px] text-muted-foreground/50 truncate mt-0.5">
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                       {project.entity.name}
                     </p>
                   )}
                 </div>
-                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 ml-2 shrink-0", statusColor(project.status))}>
+                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 ml-2 shrink-0", projectStatusColor(project.status))}>
                   {project.status.replace("_", " ")}
                 </Badge>
               </div>
@@ -325,14 +298,14 @@ export async function ActiveProjects({ orgId }: ActiveProjectsProps) {
                   <span className="text-muted-foreground">
                     {project.progress}% complete
                   </span>
-                  <span className="text-muted-foreground/50">
+                  <span className="text-muted-foreground">
                     {project._count.tasks} tasks
                   </span>
                 </div>
                 <Progress value={project.progress} className="h-1.5" />
               </div>
               {project.targetDate && (
-                <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground/50">
+                <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground">
                   <Calendar className="h-2.5 w-2.5" />
                   Target: {project.targetDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                 </div>
@@ -491,7 +464,7 @@ export async function ActivityFeed({ orgId }: ActivityFeedProps) {
                     </span>
                   </p>
                 </div>
-                <span className="text-[10px] text-muted-foreground/40 shrink-0 mt-0.5">
+                <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
                   {timeAgo(item.timestamp)}
                 </span>
               </>
@@ -597,19 +570,19 @@ export async function WaitingOn({ orgId }: WaitingOnProps) {
                           {task.assignee.name?.split(" ").map(n => n[0]).join("")}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-[10px] text-muted-foreground/70">
+                      <span className="text-[10px] text-muted-foreground">
                         {task.assignee.name?.split(" ")[0]}
                       </span>
                     </div>
                   )}
                 </div>
                 {task.notes && (
-                  <p className="text-[10px] text-muted-foreground/50 mt-1.5 line-clamp-1 italic">
+                  <p className="text-[10px] text-muted-foreground mt-1.5 line-clamp-1 italic">
                     {task.notes}
                   </p>
                 )}
                 {task.dueDate && (
-                  <p className="text-[10px] text-muted-foreground/40 mt-1">
+                  <p className="text-[10px] text-muted-foreground mt-1">
                     Due {task.dueDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </p>
                 )}

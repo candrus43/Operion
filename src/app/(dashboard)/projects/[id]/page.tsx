@@ -23,6 +23,7 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { priorityColor, statusColor, projectStatusColor, phaseColor, docTypeColor, docTypeLabel } from "@/lib/colors"
 
 const phaseLabels: Record<string, string> = {
   ACQUISITION: "Acquisition",
@@ -34,75 +35,6 @@ const phaseLabels: Record<string, string> = {
   OPERATIONS: "Operations",
 }
 
-const phaseColors: Record<string, string> = {
-  ACQUISITION: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  DUE_DILIGENCE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  DESIGN: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-  PERMITTING: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  CONSTRUCTION: "bg-red-500/10 text-red-400 border-red-500/20",
-  CLOSEOUT: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  OPERATIONS: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-}
-
-const statusColors: Record<string, string> = {
-  ACTIVE: "bg-emerald-500/10 text-emerald-400",
-  ON_HOLD: "bg-amber-500/10 text-amber-400",
-  COMPLETED: "bg-blue-500/10 text-blue-400",
-  CANCELLED: "bg-red-500/10 text-red-400",
-}
-
-const allPhases = [
-  "ACQUISITION",
-  "DUE_DILIGENCE",
-  "DESIGN",
-  "PERMITTING",
-  "CONSTRUCTION",
-  "CLOSEOUT",
-  "OPERATIONS",
-]
-
-const priorityColor = (p: string) => {
-  switch (p) {
-    case "CRITICAL":
-      return "bg-red-500/10 text-red-400 border-red-500/20"
-    case "HIGH":
-      return "bg-orange-500/10 text-orange-400 border-orange-500/20"
-    case "MEDIUM":
-      return "bg-blue-500/10 text-blue-400 border-blue-500/20"
-    default:
-      return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-  }
-}
-
-const statusColor = (s: string) => {
-  switch (s) {
-    case "WAITING_ON":
-      return "text-amber-400 bg-amber-500/10"
-    case "BLOCKED":
-      return "text-red-400 bg-red-500/10"
-    case "IN_PROGRESS":
-      return "text-blue-400 bg-blue-500/10"
-    case "DONE":
-      return "text-emerald-400 bg-emerald-500/10"
-    case "TODO":
-      return "text-zinc-400 bg-zinc-500/10"
-    default:
-      return "text-zinc-400 bg-zinc-500/10"
-  }
-}
-
-const docTypeConfig: Record<string, { color: string }> = {
-  CONTRACT: { color: "text-amber-400 bg-amber-500/10" },
-  PURCHASE_AGREEMENT: { color: "text-violet-400 bg-violet-500/10" },
-  LEASE: { color: "text-sky-400 bg-sky-500/10" },
-  INSURANCE: { color: "text-emerald-400 bg-emerald-500/10" },
-  LICENSE: { color: "text-blue-400 bg-blue-500/10" },
-  TAX: { color: "text-red-400 bg-red-500/10" },
-  FINANCIAL_STATEMENT: { color: "text-amber-400 bg-amber-500/10" },
-  PHOTO: { color: "text-rose-400 bg-rose-500/10" },
-  PDF: { color: "text-zinc-400 bg-zinc-500/10" },
-  OTHER: { color: "text-zinc-400 bg-zinc-500/10" },
-}
 
 const progressColor = (pct: number) => {
   if (pct >= 75) return "bg-emerald-500"
@@ -176,7 +108,7 @@ export default async function ProjectDetailPage({
               variant="outline"
               className={cn(
                 "text-[11px] px-2 py-0.5",
-                statusColors[project.status] || "bg-zinc-500/10 text-zinc-400"
+                projectStatusColor(project.status)
               )}
             >
               {project.status.replace("_", " ")}
@@ -185,13 +117,13 @@ export default async function ProjectDetailPage({
               variant="outline"
               className={cn(
                 "text-[11px] px-2 py-0.5 border",
-                phaseColors[project.phase] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                phaseColor(project.phase)
               )}
             >
               {phaseLabels[project.phase] || project.phase}
             </Badge>
           </div>
-          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground/60">
+          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
             {project.entity && (
               <Link
                 href={`/entities/${project.entity.id}`}
@@ -316,7 +248,7 @@ export default async function ProjectDetailPage({
             >
               {tab.label}
               {tab.count !== null && (
-                <span className="ml-1.5 text-[10px] text-muted-foreground/50">
+                <span className="ml-1.5 text-[10px] text-muted-foreground">
                   {tab.count}
                 </span>
               )}
@@ -385,7 +317,7 @@ export default async function ProjectDetailPage({
                               ? "text-emerald-400 font-medium"
                               : isPast
                               ? "text-muted-foreground/60"
-                              : "text-muted-foreground/30"
+                              : "text-muted-foreground/70"
                           )}
                         >
                           {phaseLabels[phase]}
@@ -488,7 +420,7 @@ export default async function ProjectDetailPage({
                     </div>
                     <div className="flex items-center gap-2 mt-1.5">
                       {task.dueDate && (
-                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground/60">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <Calendar className="h-2.5 w-2.5" />
                           {new Date(task.dueDate).toLocaleDateString("en-US", {
                             month: "short",
@@ -497,7 +429,7 @@ export default async function ProjectDetailPage({
                         </span>
                       )}
                       {task.assignee && (
-                        <span className="text-[11px] text-muted-foreground/60">
+                        <span className="text-[11px] text-muted-foreground">
                           {task.assignee.name}
                         </span>
                       )}
@@ -525,7 +457,7 @@ export default async function ProjectDetailPage({
               </div>
             ) : (
               project.documents.map((doc) => {
-                const dc = docTypeConfig[doc.type] || docTypeConfig.OTHER
+                const dc = docTypeColor(doc.type)
                 return (
                   <div
                     key={doc.id}
@@ -534,7 +466,7 @@ export default async function ProjectDetailPage({
                     <div
                       className={cn(
                         "flex h-9 w-9 items-center justify-center rounded-lg shrink-0",
-                        dc.color
+                        dc
                       )}
                     >
                       <FileText className="h-4 w-4" />
@@ -544,11 +476,11 @@ export default async function ProjectDetailPage({
                       <div className="flex items-center gap-2 mt-0.5">
                         <Badge
                           variant="outline"
-                          className={cn("text-[10px] px-1.5 py-0", dc.color)}
+                          className={cn("text-[10px] px-1.5 py-0", dc)}
                         >
                           {doc.type.replace("_", " ")}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground/50">
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(doc.createdAt).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
@@ -588,7 +520,7 @@ export default async function ProjectDetailPage({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{meeting.title}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] text-muted-foreground/60">
+                      <span className="text-[11px] text-muted-foreground">
                         {new Date(meeting.date).toLocaleDateString("en-US", {
                           weekday: "short",
                           month: "short",
@@ -597,13 +529,13 @@ export default async function ProjectDetailPage({
                         })}
                       </span>
                       {meeting.location && (
-                        <span className="text-[11px] text-muted-foreground/40">
+                        <span className="text-[11px] text-muted-foreground">
                           {meeting.location}
                         </span>
                       )}
                     </div>
                     {meeting.notes && (
-                      <p className="text-xs text-muted-foreground/50 mt-1 line-clamp-1">
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                         {meeting.notes}
                       </p>
                     )}
