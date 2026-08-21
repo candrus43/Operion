@@ -6,7 +6,35 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import {
+  TASK_VIEWS,
+  DEFAULT_VIEW,
+  isValidViewId,
+  buildViewWhere,
+  type TaskViewId,
+} from "@/lib/task-views"
+import type { Prisma } from "@prisma/client"
 import { TaskListClient } from "./task-list-client"
+
+export const dynamic = "force-dynamic"
+
+const HOUR = 60 * 60 * 1000
+
+function buildDueWhere(due: string): Prisma.TaskWhereInput {
+  const now = new Date()
+  switch (due) {
+    case "overdue":
+      return { dueDate: { lt: now } }
+    case "next7":
+      return { dueDate: { gte: now, lte: new Date(now.getTime() + 7 * 24 * HOUR) } }
+    case "next30":
+      return { dueDate: { gte: now, lte: new Date(now.getTime() + 30 * 24 * HOUR) } }
+    case "none":
+      return { dueDate: null }
+    default:
+      return {}
+  }
+}
 
 export default async function TasksPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>
@@ -15,6 +43,7 @@ export default async function TasksPage(props: {
   if (!session?.user) redirect("/login")
 
   const orgId = (session.user as any).organizationId
+  const currentUserId = (session.user as any).id
   if (!orgId) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -24,56 +53,100 @@ export default async function TasksPage(props: {
   }
 
   const params = await props.searchParams
-  const statusFilter = params.status || ""
-  const priorityFilter = params.priority || ""
-  const searchQuery = params.search || ""
-  const sortBy = params.sort || "dueDate"
-  const mineFilter = params.mine === "true"
-  const currentUserId = (session.user as any).id
 
-  // Build where clause
-  const where: any = { organizationId: orgId }
-  if (statusFilter && statusFilter !== "all") where.status = statusFilter
-  if (priorityFilter && priorityFilter !== "all") where.priority = priorityFilter
-  if (mineFilter) where.assigneeId = currentUserId
-  if (searchQuery) {
-    where.OR = [
-      { title: { contains: searchQuery } },
-      { description: { contains: searchQuery } },
-    ]
+  // ── Resolve the effective saved view ────────────────────────────────────
+  // Explicit ?view= wins. Otherwise keep legacy deep-links working:
+  //   ?status=X (chips/sidebar)         → All Tasks, filtered by that status
+  //   ?mine=true (dashboard "my tasks") → My Tasks
+  // With nothing → default to Needs My Attention (owner direction).
+  let view: TaskViewId
+  if (isValidViewId(params.view)) {
+    view = params.view
+  } else if (params.status && params.status !== "all") {
+    view = "all"
+  } else if (params.mine === "true") {
+    view = "my-tasks"
+  } else {
+    view = DEFAULT_VIEW
   }
 
-  // Sort
-  let orderBy: any = [{ dueDate: { sort: "asc", nulls: "last" } }]
-  if (sortBy === "priority") {
-    orderBy = [{ priority: "asc" }, { dueDate: { sort: "asc", nulls: "last" } }]
-  } else if (sortBy === "title") {
-    orderBy = [{ title: "asc" }]
-  } else if (sortBy === "status") {
-    orderBy = [{ status: "asc" }]
-  } else if (sortBy === "createdAt") {
-    orderBy = [{ createdAt: "desc" }]
+  // ── Parse the combinable filters ────────────────────────────────────────
+  const status = params.status && params.status !== "all" ? params.status : undefined
+  const priority = params.priority && params.priority !== "all" ? params.priority : undefined
+  const assignee = params.assignee && params.assignee !== "all" ? params.assignee : undefined
+  const entity = params.entity && params.entity !== "all" ? params.entity : undefined
+  const project = params.project && params.project !== "all" ? params.project : undefined
+  const due = params.due && params.due !== "all" ? params.due : undefined
+  const search = params.search?.trim() || undefined
+
+  const sortField = params.sort || "dueDate"
+  const sortDir = params.sortDir === "desc" ? "desc" : "asc"
+
+  // ── Compose the single query: view preset AND'ed with each active filter ──
+  const viewWhere = buildViewWhere(view, { organizationId: orgId, userId: currentUserId })
+
+  const filterFragments: Prisma.TaskWhereInput[] = []
+  if (status) filterFragments.push({ status })
+  if (priority) filterFragments.push({ priority })
+  if (assignee) filterFragments.push({ assigneeId: assignee })
+  if (entity) filterFragments.push({ entityId: entity })
+  if (project) filterFragments.push({ projectId: project })
+  if (due) filterFragments.push(buildDueWhere(due))
+  if (search) {
+    filterFragments.push({
+      OR: [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { category: { contains: search, mode: "insensitive" } },
+      ],
+    })
   }
 
-  const tasks = await prisma.task.findMany({
-    where,
-    include: {
-      assignee: true,
-      project: true,
-      entity: true,
-      dependsOn: { select: { id: true, title: true, status: true } },
-    },
-    orderBy,
-  })
+  const where: Prisma.TaskWhereInput = { AND: [viewWhere, ...filterFragments] }
 
-  // Fetch users + entities + projects for filters
-  const [users, entities, projects] = await Promise.all([
+  // ── Sort (default: due date ascending — which naturally surfaces overdue first) ──
+  const dueDateOrder: Prisma.SortOrder = sortDir === "desc" ? "desc" : "asc"
+  let orderBy: Prisma.TaskOrderByWithRelationInput[] = [
+    { dueDate: { sort: dueDateOrder, nulls: "last" } },
+  ]
+  if (sortField === "priority") {
+    orderBy = [{ priority: "asc" }, { dueDate: { sort: dueDateOrder, nulls: "last" } }]
+  } else if (sortField === "title") {
+    orderBy = [{ title: sortDir }]
+  } else if (sortField === "status") {
+    orderBy = [{ status: sortDir }, { dueDate: { sort: dueDateOrder, nulls: "last" } }]
+  } else if (sortField === "createdAt") {
+    orderBy = [{ createdAt: sortDir }]
+  }
+
+  const [tasks, users, entities, projects, counts, taskCount] = await Promise.all([
+    prisma.task.findMany({
+      where,
+      include: {
+        assignee: true,
+        project: true,
+        entity: true,
+        dependsOn: { select: { id: true, title: true, status: true } },
+      },
+      orderBy,
+    }),
     prisma.user.findMany({ where: { organizationId: orgId }, select: { id: true, name: true } }),
     prisma.entity.findMany({ where: { organizationId: orgId }, select: { id: true, name: true } }),
     prisma.project.findMany({ where: { organizationId: orgId }, select: { id: true, name: true } }),
+    // One count per saved view using the same where builder (org-scoped).
+    Promise.all(
+      TASK_VIEWS.map((v) =>
+        prisma.task.count({ where: buildViewWhere(v.id, { organizationId: orgId, userId: currentUserId }) }),
+      ),
+    ),
+    prisma.task.count({ where: { organizationId: orgId } }),
   ])
 
-  const taskCount = await prisma.task.count({ where: { organizationId: orgId } })
+  const countsMap = Object.fromEntries(
+    TASK_VIEWS.map((v, i) => [v.id, counts[i]]),
+  ) as Record<TaskViewId, number>
+
+  const viewMeta = TASK_VIEWS.find((v) => v.id === view)
 
   return (
     <div className="space-y-6">
@@ -98,7 +171,10 @@ export default async function TasksPage(props: {
           entities={entities}
           projects={projects}
           currentUserId={currentUserId}
-          initialMineFilter={mineFilter}
+          view={view}
+          viewLabel={viewMeta?.label ?? "Tasks"}
+          counts={countsMap}
+          activeFilterCount={filterFragments.length}
         />
       </Suspense>
     </div>
