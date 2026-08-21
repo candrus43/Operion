@@ -1,23 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles, Loader2, Key } from "lucide-react"
+import { notifyTaskChanged } from "@/lib/task-events-client"
 
 interface AISuggestionProps {
   taskId: string
   existingSuggestion: string | null
+  /** ISO timestamp of when the cached suggestion was generated (Phase 1d). */
+  generatedAt?: string | null
 }
 
-export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) {
+function generatedLabel(iso?: string | null): string | null {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return null
+  const now = new Date()
+  const mins = Math.floor((now.getTime() - d.getTime()) / 60000)
+  if (mins < 1) return "Generated just now"
+  if (mins < 60) return `Generated ${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `Generated ${hrs}h ago`
+  if (hrs < 24 * 7) return `Generated ${Math.floor(hrs / 24)}d ago`
+  return `Generated ${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+}
+
+export function AISuggestion({ taskId, existingSuggestion, generatedAt }: AISuggestionProps) {
   const [suggestion, setSuggestion] = useState<string | null>(existingSuggestion)
+  const [genTime, setGenTime] = useState<string | null>(generatedAt || null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [auto, setAuto] = useState(false)
+  const autoStarted = useRef(false)
 
-  async function generateSuggestion() {
+  async function generateSuggestion({ automatic = false }: { automatic?: boolean } = {}) {
     setLoading(true)
     setError(null)
+    if (automatic) setAuto(true)
     try {
       const response = await fetch("/api/ai/suggest-task", {
         method: "POST",
@@ -37,19 +58,35 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
       }
 
       setSuggestion(data.suggestion)
+      if (data.generatedAt) setGenTime(data.generatedAt)
+      notifyTaskChanged() // surface AI_REFRESH in the activity feed
     } catch {
       setError("Unable to connect. Please try again.")
     } finally {
       setLoading(false)
+      setAuto(false)
     }
   }
 
+  // Phase 1d: auto-generate ONCE when there's no cached suggestion (cheap;
+  // cached afterwards, so it won't regenerate on every visit).
+  useEffect(() => {
+    if (autoStarted.current) return
+    if (existingSuggestion === null && typeof window !== "undefined") {
+      autoStarted.current = true
+      generateSuggestion({ automatic: true })
+    }
+  }, [existingSuggestion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const label = generatedLabel(genTime)
+
   return (
     <Card className="glass">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-violet-400" />
           AI Suggestions
+          {label && <span className="text-[10px] text-muted-foreground/70 font-normal">{label}</span>}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -59,14 +96,15 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 mt-0.5">
                 <Sparkles className="h-3.5 w-3.5 text-violet-400" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground/90 leading-relaxed">{suggestion}</p>
+                <p className="text-[10px] text-muted-foreground/50 mt-1">AI-generated — verify before acting.</p>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={generateSuggestion}
+                  onClick={() => generateSuggestion()}
                   disabled={loading}
-                  className="mt-3 h-7 text-xs text-muted-foreground hover:text-violet-400 gap-1.5"
+                  className="mt-1.5 h-7 text-xs text-muted-foreground hover:text-violet-400 gap-1.5"
                 >
                   {loading ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -77,6 +115,11 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
                 </Button>
               </div>
             </div>
+          </div>
+        ) : auto ? (
+          <div className="flex items-center gap-3 py-4">
+            <Loader2 className="h-4 w-4 animate-spin text-violet-400" />
+            <p className="text-sm text-muted-foreground">Generating your AI suggestion…</p>
           </div>
         ) : error ? (
           <div className="rounded-xl bg-amber-500/5 border border-amber-500/10 p-4">
@@ -89,7 +132,7 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={generateSuggestion}
+                  onClick={() => generateSuggestion()}
                   disabled={loading}
                   className="h-7 text-xs text-muted-foreground hover:text-amber-400"
                 >
@@ -108,7 +151,7 @@ export function AISuggestion({ taskId, existingSuggestion }: AISuggestionProps) 
               Get smart suggestions on next steps, deadlines, and blockers.
             </p>
             <Button
-              onClick={generateSuggestion}
+              onClick={() => generateSuggestion()}
               disabled={loading}
               variant="outline"
               size="sm"

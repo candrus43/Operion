@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MessageSquare, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { notifyTaskChanged } from "@/lib/task-events-client"
 
 interface Author {
   id: string
@@ -197,6 +198,7 @@ export function TaskDiscussion({ taskId }: { taskId: string }) {
         const newComment = await res.json()
         setComments((prev) => [...prev, newComment])
         setContent("")
+        notifyTaskChanged() // surface the comment in the activity feed
       }
     } catch {
       // ignore

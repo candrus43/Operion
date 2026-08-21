@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db"
 import { requireRole } from "@/lib/permissions"
 import { generateNotifications } from "@/lib/notifications"
 import { applyRateLimit } from "@/lib/rate-limit"
+import { createTaskEvent } from "@/lib/task-events"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -184,7 +185,25 @@ export async function PATCH(
   }
 
   const body = await req.json()
-  const { title, description, status, priority, dueDate, category, projectId, entityId, assigneeId, notes, dependsOnId, waitingOnUserId } = body
+  const {
+    title, description, status, priority, dueDate, category, projectId, entityId, assigneeId, notes, dependsOnId, waitingOnUserId,
+    // Phase 1d status-workflow fields
+    blockedReason, blockedSince, waitingOn, waitingOnSince, expectedResolutionDate, escalationOwner,
+    reviewRequestedAt, reviewRequiredBy, reviewedById, reviewedAt, approvalStatus,
+    whatRequired, relatedContact,
+  } = body
+
+  // Capture structured status-workflow details for the activity feed
+  const workflow: Record<string, unknown> = {}
+  if (blockedReason !== undefined) workflow.blockedReason = blockedReason
+  if (waitingOn !== undefined) workflow.waitingOn = waitingOn
+  if (expectedResolutionDate !== undefined) workflow.expectedResolutionDate = expectedResolutionDate ? new Date(expectedResolutionDate).toISOString() : null
+  if (escalationOwner !== undefined) workflow.escalationOwner = escalationOwner
+  if (reviewRequiredBy !== undefined) workflow.reviewRequiredBy = reviewRequiredBy ? new Date(reviewRequiredBy).toISOString() : null
+  if (reviewedById !== undefined) workflow.reviewedById = reviewedById
+  if (approvalStatus !== undefined) workflow.approvalStatus = approvalStatus
+  if (whatRequired !== undefined) workflow.whatRequired = whatRequired
+  if (relatedContact !== undefined) workflow.relatedContact = relatedContact
 
   const task = await prisma.task.update({
     where: { id },
@@ -201,6 +220,18 @@ export async function PATCH(
       ...(notes !== undefined && { notes }),
       ...(dependsOnId !== undefined && { dependsOnId: dependsOnId || null }),
       ...(waitingOnUserId !== undefined && { waitingOnUserId: waitingOnUserId || null }),
+      // Phase 1d status-workflow fields
+      ...(blockedReason !== undefined && { blockedReason }),
+      ...(blockedSince !== undefined && { blockedSince: blockedSince ? new Date(blockedSince) : null }),
+      ...(waitingOn !== undefined && { waitingOn }),
+      ...(waitingOnSince !== undefined && { waitingOnSince: waitingOnSince ? new Date(waitingOnSince) : null }),
+      ...(expectedResolutionDate !== undefined && { expectedResolutionDate: expectedResolutionDate ? new Date(expectedResolutionDate) : null }),
+      ...(escalationOwner !== undefined && { escalationOwner }),
+      ...(reviewRequestedAt !== undefined && { reviewRequestedAt: reviewRequestedAt ? new Date(reviewRequestedAt) : null }),
+      ...(reviewRequiredBy !== undefined && { reviewRequiredBy: reviewRequiredBy ? new Date(reviewRequiredBy) : null }),
+      ...(reviewedById !== undefined && { reviewedById: reviewedById || null }),
+      ...(reviewedAt !== undefined && { reviewedAt: reviewedAt ? new Date(reviewedAt) : null }),
+      ...(approvalStatus !== undefined && { approvalStatus }),
     },
     include: {
       assignee: true,
@@ -228,6 +259,38 @@ export async function PATCH(
     entityId: task.id,
     details: JSON.stringify({ title: task.title, status: task.status }),
   })
+
+  // ── Phase 1d: activity-feed events (status / workflow / assignee / due) ──
+  const statusChanged = status !== undefined && status !== oldSnapshot.status
+  const newAssigneeId = assigneeId !== undefined ? (assigneeId || null) : null
+  const assigneeChanged = assigneeId !== undefined && newAssigneeId !== oldSnapshot.assigneeId
+  const newDue = dueDate !== undefined ? (dueDate ? new Date(dueDate) : null) : undefined
+  const oldDueTime = existing.dueDate ? new Date(existing.dueDate).getTime() : null
+  const dueChanged = newDue !== undefined && (newDue ? newDue.getTime() : null) !== oldDueTime
+
+  if (approvalStatus === "APPROVED") {
+    void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "REVIEW_APPROVED", details: { workflow } })
+  } else if (approvalStatus === "REJECTED") {
+    void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "REVIEW_REJECTED", details: { workflow } })
+  } else if (approvalStatus === "CHANGES_REQUESTED") {
+    void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "REVIEW_REQUESTED_CHANGES", details: { workflow } })
+  } else if (statusChanged) {
+    if (status === "BLOCKED") {
+      void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "BLOCKED", details: { from: oldSnapshot.status, ...workflow } })
+    } else if (status === "WAITING_ON") {
+      void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "WAITING_ON", details: { from: oldSnapshot.status, ...workflow } })
+    } else if (status === "READY_FOR_REVIEW") {
+      void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "REVIEW_SUBMITTED", details: { from: oldSnapshot.status, ...workflow } })
+    } else {
+      void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "STATUS_CHANGE", details: { from: oldSnapshot.status, to: status } })
+    }
+  }
+  if (assigneeChanged) {
+    void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "ASSIGNEE_CHANGE", details: { assigneeId: newAssigneeId } })
+  }
+  if (dueChanged) {
+    void createTaskEvent({ taskId: task.id, organizationId: orgId, actorId: userId, actorName: userName, action: "DUE_CHANGE", details: { dueDate: newDue ? newDue.toISOString() : null } })
+  }
 
   // Fire-and-forget: trigger system notification generation on key changes
   const statusChangedToDone = status === "DONE" && oldSnapshot.status !== "DONE"

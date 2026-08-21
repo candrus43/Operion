@@ -10,12 +10,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   ArrowLeft,
   Pencil,
-  Trash2,
   Calendar,
   Clock,
   CheckCircle2,
-  PlayCircle,
-  AlertTriangle,
   Ban,
   Link2,
   Building2,
@@ -27,6 +24,8 @@ import { priorityColor, statusColor } from "@/lib/colors"
 import { TaskActions } from "./task-actions"
 import { AISuggestion } from "./ai-suggestion"
 import { TaskDiscussion } from "./task-discussion"
+import { StatusActions } from "@/components/tasks/status-actions"
+import { TaskActivity } from "@/components/tasks/task-activity"
 
 
 
@@ -48,6 +47,7 @@ export default async function TaskDetailPage({
       createdBy: true,
       project: true,
       entity: true,
+      reviewer: { select: { id: true, name: true } },
       dependsOn: { select: { id: true, title: true, status: true } },
       dependedBy: {
         select: { id: true, title: true, status: true, priority: true, dueDate: true },
@@ -152,6 +152,23 @@ export default async function TaskDetailPage({
                   }
                 </p>
               )}
+              {(task.status === "BLOCKED" && (task.blockedReason || task.waitingOn)) && (
+                <p className="text-sm text-red-200/70 mt-1">
+                  {task.blockedReason}
+                  {task.waitingOn ? (task.blockedReason ? ` • On: ${task.waitingOn}` : `Waiting on: ${task.waitingOn}`) : ""}
+                </p>
+              )}
+              {(task.status === "WAITING_ON" && task.waitingOn) && (
+                <p className="text-sm text-amber-200/70 mt-1">Waiting on: {task.waitingOn}</p>
+              )}
+              {(task.status === "READY_FOR_REVIEW" && task.reviewer) && (
+                <p className="text-sm text-purple-200/70 mt-1">Reviewer: {task.reviewer.name}</p>
+              )}
+              {task.expectedResolutionDate && (task.status === "BLOCKED" || task.status === "WAITING_ON") && (
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Expected resolution: {task.expectedResolutionDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -253,10 +270,17 @@ export default async function TaskDetailPage({
           )}
 
           {/* AI Suggestion */}
-          <AISuggestion taskId={task.id} existingSuggestion={task.aiSuggestion} />
+          <AISuggestion
+            taskId={task.id}
+            existingSuggestion={task.aiSuggestion}
+            generatedAt={task.aiSuggestionGeneratedAt ? task.aiSuggestionGeneratedAt.toISOString() : null}
+          />
 
           {/* Discussion */}
           <TaskDiscussion taskId={task.id} />
+
+          {/* Activity feed */}
+          <TaskActivity taskId={task.id} />
         </div>
 
         {/* Sidebar */}
@@ -366,143 +390,12 @@ export default async function TaskDetailPage({
             <CardHeader>
               <CardTitle className="text-sm font-medium">Actions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {/* READY_FOR_REVIEW: Approve / Request Changes (prominent for owner) */}
-              {task.status === "READY_FOR_REVIEW" && (
-                <>
-                  <form action={async () => {
-                    "use server"
-                    const { auth } = await import("@/lib/auth")
-                    const { prisma } = await import("@/lib/db")
-                    const { revalidatePath: rp } = await import("next/cache")
-                    const s = await auth()
-                    if (!s?.user) return
-                    await prisma.task.update({ where: { id: task.id }, data: { status: "DONE" } })
-                    rp("/tasks")
-                    rp(`/tasks/${task.id}`)
-                    rp("/home")
-                    rp("/ea")
-                  }}>
-                    <Button variant="default" size="sm" className="w-full justify-start gap-2 bg-emerald-600 hover:bg-emerald-700" type="submit">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-200" />
-                      Approve — Mark Done
-                    </Button>
-                  </form>
-                  <form action={async () => {
-                    "use server"
-                    const { auth } = await import("@/lib/auth")
-                    const { prisma } = await import("@/lib/db")
-                    const { revalidatePath: rp } = await import("next/cache")
-                    const s = await auth()
-                    if (!s?.user) return
-                    await prisma.task.update({
-                      where: { id: task.id },
-                      data: { status: "IN_PROGRESS", waitingOnUserId: task.assigneeId },
-                    })
-                    rp("/tasks")
-                    rp(`/tasks/${task.id}`)
-                    rp("/home")
-                    rp("/ea")
-                  }}>
-                    <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-amber-500/30 hover:bg-amber-500/10" type="submit">
-                      <ArrowLeft className="h-4 w-4 text-amber-400" />
-                      Request Changes
-                    </Button>
-                  </form>
-                </>
-              )}
-              {task.status !== "IN_PROGRESS" && task.status !== "READY_FOR_REVIEW" && (
-                <form action={async () => {
-                  "use server"
-                  const { auth } = await import("@/lib/auth")
-                  const { prisma } = await import("@/lib/db")
-                  const { revalidatePath: rp } = await import("next/cache")
-                  const s = await auth()
-                  if (!s?.user) return
-                  await prisma.task.update({ where: { id: task.id }, data: { status: "IN_PROGRESS" } })
-                  rp("/tasks")
-                  rp(`/tasks/${task.id}`)
-                }}>
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
-                    <PlayCircle className="h-4 w-4 text-blue-400" />
-                    Mark In Progress
-                  </Button>
-                </form>
-              )}
-              {task.status !== "DONE" && task.status !== "READY_FOR_REVIEW" && (
-                <form action={async () => {
-                  "use server"
-                  const { auth } = await import("@/lib/auth")
-                  const { prisma } = await import("@/lib/db")
-                  const { revalidatePath: rp } = await import("next/cache")
-                  const s = await auth()
-                  if (!s?.user) return
-                  await prisma.task.update({ where: { id: task.id }, data: { status: "DONE" } })
-                  rp("/tasks")
-                  rp(`/tasks/${task.id}`)
-                }}>
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                    Mark Done
-                  </Button>
-                </form>
-              )}
-              {task.status === "IN_PROGRESS" && (
-                <form action={async () => {
-                  "use server"
-                  const { auth } = await import("@/lib/auth")
-                  const { prisma } = await import("@/lib/db")
-                  const { revalidatePath: rp } = await import("next/cache")
-                  const s = await auth()
-                  if (!s?.user) return
-                  await prisma.task.update({ where: { id: task.id }, data: { status: "READY_FOR_REVIEW" } })
-                  rp("/tasks")
-                  rp(`/tasks/${task.id}`)
-                  rp("/home")
-                  rp("/ea")
-                }}>
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10" type="submit">
-                    <CheckCircle2 className="h-4 w-4 text-purple-400" />
-                    Submit for Review
-                  </Button>
-                </form>
-              )}
-              {task.status !== "BLOCKED" && (
-                <form action={async () => {
-                  "use server"
-                  const { auth } = await import("@/lib/auth")
-                  const { prisma } = await import("@/lib/db")
-                  const { revalidatePath: rp } = await import("next/cache")
-                  const s = await auth()
-                  if (!s?.user) return
-                  await prisma.task.update({ where: { id: task.id }, data: { status: "BLOCKED" } })
-                  rp("/tasks")
-                  rp(`/tasks/${task.id}`)
-                }}>
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
-                    <Ban className="h-4 w-4 text-red-400" />
-                    Mark Blocked
-                  </Button>
-                </form>
-              )}
-              {task.status !== "WAITING_ON" && (
-                <form action={async () => {
-                  "use server"
-                  const { auth } = await import("@/lib/auth")
-                  const { prisma } = await import("@/lib/db")
-                  const { revalidatePath: rp } = await import("next/cache")
-                  const s = await auth()
-                  if (!s?.user) return
-                  await prisma.task.update({ where: { id: task.id }, data: { status: "WAITING_ON" } })
-                  rp("/tasks")
-                  rp(`/tasks/${task.id}`)
-                }}>
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2" type="submit">
-                    <Clock className="h-4 w-4 text-amber-400" />
-                    Mark Waiting
-                  </Button>
-                </form>
-              )}
+            <CardContent>
+              <StatusActions
+                taskId={task.id}
+                currentStatus={task.status}
+                assigneeId={task.assigneeId}
+              />
             </CardContent>
           </Card>
         </div>

@@ -47,6 +47,7 @@ model Organization {
   auditLogs     AuditLog[]
   executiveNotes ExecutiveNote[]
   supportTokens SupportAccessToken[]
+  taskEvents    TaskEvent[]
 }
 
 model User {
@@ -76,6 +77,7 @@ model User {
   comments        Comment[]
   auditLogs       AuditLog[]
   executiveNotes  ExecutiveNote[]
+  reviewedTasks   Task[]         @relation("TaskReviewer")
 }
 
 model Account {
@@ -170,7 +172,22 @@ model Task {
   waitingOnUserId String?
   notes           String?
   aiSuggestion    String?
+  aiSuggestionGeneratedAt DateTime?
   isSample        Boolean      @default(false)
+
+  // ── Status-workflow capture (Phase 1d) ──
+  blockedReason       String?
+  blockedSince        DateTime?
+  waitingOn           String?
+  waitingOnSince      DateTime?
+  expectedResolutionDate DateTime?
+  escalationOwner     String?
+  reviewRequestedAt   DateTime?
+  reviewRequiredBy    DateTime?
+  reviewedById        String?
+  reviewedAt          DateTime?
+  approvalStatus      String?   // PENDING, APPROVED, CHANGES_REQUESTED, REJECTED
+
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -182,8 +199,28 @@ model Task {
   dependsOn       Task?        @relation("TaskDependency", fields: [dependsOnId], references: [id])
   dependedBy      Task[]       @relation("TaskDependency")
   waitingOnUser   User?        @relation("TaskWaitingOn", fields: [waitingOnUserId], references: [id])
+  reviewer        User?        @relation("TaskReviewer", fields: [reviewedById], references: [id])
   comments        Comment[]
+  events          TaskEvent[]
 
+  @@index([organizationId])
+  @@index([reviewedById])
+}
+
+model TaskEvent {
+  id             String   @id @default(cuid())
+  taskId         String
+  actorId        String?
+  actorName      String?
+  action         String   // STATUS_CHANGE, ASSIGNEE_CHANGE, DUE_CHANGE, BLOCKED, WAITING_ON, REVIEW_SUBMITTED, REVIEW_APPROVED, REVIEW_REQUESTED_CHANGES, REVIEW_REJECTED, COMMENT, AI_REFRESH, NOTE
+  details        Json?
+  at             DateTime @default(now())
+  organizationId String
+
+  task           Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([taskId, at])
   @@index([organizationId])
 }
 
