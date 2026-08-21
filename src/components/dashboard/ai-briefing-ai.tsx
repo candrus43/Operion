@@ -1,17 +1,26 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { Sparkles, AlertTriangle, Calendar, ShieldAlert, Lightbulb, RefreshCw } from "lucide-react"
+import Link from "next/link"
+import { Sparkles, AlertTriangle, Calendar, ShieldAlert, Lightbulb, RefreshCw, ArrowUpRight } from "lucide-react"
 import { Greeting } from "./greeting"
 
-type Item = { title: string; detail: string; sourceEntity: string; sourceItem: string; urgency: string }
-type Deadline = { title: string; detail: string; date: string; sourceEntity: string; sourceItem: string }
-type Risk = { title: string; detail: string; sourceEntity: string; sourceItem: string }
-type Action = { action: string; reason: string; sourceItem: string }
+type RecordRef = { kind: "task" | "project" | "entity" | "meeting"; id: string; href: string }
+type Item = { title: string; detail: string; sourceEntity: string; sourceItem: string; urgency: string; record?: RecordRef; owner?: string; priority?: string; dueDate?: string }
+type Deadline = { title: string; detail: string; date: string; sourceEntity: string; sourceItem: string; record?: RecordRef; owner?: string }
+type Risk = { title: string; detail: string; sourceEntity: string; sourceItem: string; record?: RecordRef }
+type Action = { action: string; reason: string; sourceItem: string; record?: RecordRef }
 type Briefing = { criticalItems: Item[]; upcomingDeadlines: Deadline[]; risks: Risk[]; recommendedActions: Action[] }
 type ApiData = { briefing: Briefing; cached?: boolean; fallback?: boolean; generatedAt?: string }
 
 const EMPTY: Briefing = { criticalItems: [], upcomingDeadlines: [], risks: [], recommendedActions: [] }
+const EMPTY_COPY = {
+  critical: "No critical items right now.",
+  deadlines: "No deadlines in the next 7 days.",
+  risks: "No risks currently flagged.",
+  actions: "You're clear. No immediate action required.",
+} as const
+
 const config = {
   critical: { label: "Critical Items", icon: AlertTriangle, accent: "text-rose-400", bg: "bg-rose-500/[0.04]", border: "border-rose-500/10", ring: "ring-rose-500/20" },
   deadlines: { label: "Upcoming Deadlines", icon: Calendar, accent: "text-sky-400", bg: "bg-sky-500/[0.04]", border: "border-sky-500/10", ring: "ring-sky-500/20" },
@@ -28,9 +37,71 @@ function SkeletonLoader() {
   return <div className="rounded-2xl glass border border-white/[0.06] p-6 md:p-8 space-y-4 animate-pulse"><div className="flex items-center gap-3"><div className="h-9 w-9 rounded-xl bg-white/[0.04]" /><div className="space-y-2"><div className="h-5 w-36 bg-white/[0.04] rounded" /><div className="h-3 w-40 bg-white/[0.04] rounded" /></div></div><div className="flex items-center gap-2 text-xs text-white/40"><span className="h-2 w-2 rounded-full bg-violet-400 animate-pulse" />Analyzing your portfolio…</div><div className="grid gap-3 sm:grid-cols-2">{[1, 2, 3, 4].map(i => <div key={i} className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4 space-y-2"><div className="h-3 w-20 bg-white/[0.04] rounded" /><div className="h-4 w-full bg-white/[0.04] rounded" /><div className="h-4 w-2/3 bg-white/[0.04] rounded" /></div>)}</div></div>
 }
 
-function SectionCard({ kind, items }: { kind: keyof typeof config; items: (Item | Deadline | Risk | Action)[] }) {
+function SectionCard({ kind, items, wide }: { kind: keyof typeof config; items: (Item | Deadline | Risk | Action)[]; wide?: boolean }) {
   const style = config[kind]; const Icon = style.icon
-  return <div className={`rounded-xl ${style.bg} border ${style.border} p-5`}><div className="flex items-center gap-2.5 mb-3"><div className={`flex h-7 w-7 items-center justify-center rounded-lg ${style.bg} ring-1 ${style.ring}`}><Icon className={`h-3.5 w-3.5 ${style.accent}`} /></div><h4 className={`text-xs font-semibold uppercase tracking-wider ${style.accent}`}>{style.label}</h4></div>{items.length ? <div className="space-y-3">{items.slice(0, 3).map((item, i) => { const isAction = kind === "actions"; const value = isAction ? item as Action : item as Item | Deadline | Risk; return <div key={i} className="rounded-lg border border-white/[0.06] bg-black/10 p-3"><div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-white/85">{isAction ? (value as Action).action : (value as Item).title}</p>{kind === "critical" && <span className="shrink-0 rounded-full bg-rose-400/10 px-2 py-0.5 text-[10px] text-rose-300">{(value as Item).urgency}</span>}{kind === "deadlines" && <span className="shrink-0 rounded-full bg-sky-400/10 px-2 py-0.5 text-[10px] text-sky-300">{(value as Deadline).date}</span>}</div><p className="mt-1 text-xs leading-relaxed text-white/55">{isAction ? (value as Action).reason : (value as Item | Deadline | Risk).detail}</p><p className="mt-2 text-[10px] text-white/30">{isAction ? `Source: ${(value as Action).sourceItem}` : `Source: ${(value as Item | Deadline | Risk).sourceEntity} · ${(value as Item | Deadline | Risk).sourceItem}`}</p></div> })}</div> : <p className="py-3 pl-[2.25rem] text-sm italic text-white/30">Nothing to report</p>}</div>
+  const span = wide ? " sm:col-span-2" : ""
+  const isAction = kind === "actions"
+
+  // EMPTY: compact single-line positive strip — never a tall empty card.
+  if (!items.length) {
+    return (
+      <div className={`flex items-center gap-2.5 rounded-xl ${style.bg} border ${style.border} px-4 py-2.5 ${span}`}>
+        <Icon className={`h-3.5 w-3.5 shrink-0 ${style.accent}`} />
+        <h4 className={`text-xs font-semibold uppercase tracking-wider ${style.accent}`}>{style.label}</h4>
+        <span className="ml-1 min-w-0 truncate text-xs text-white/45">{EMPTY_COPY[kind]}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`rounded-xl ${style.bg} border ${style.border} p-5 ${span}`}>
+      <div className="flex items-center gap-2.5 mb-3">
+        <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${style.bg} ring-1 ${style.ring}`}><Icon className={`h-3.5 w-3.5 ${style.accent}`} /></div>
+        <h4 className={`text-xs font-semibold uppercase tracking-wider ${style.accent}`}>{style.label}</h4>
+      </div>
+      <div className="space-y-3">
+        {items.slice(0, 3).map((raw, i) => {
+          const item = raw as Item & Deadline & Risk & Action
+          const title = isAction ? item.action : item.title
+          const detail = isAction ? item.reason : item.detail
+          const source = isAction ? item.sourceItem : `${item.sourceEntity} · ${item.sourceItem}`
+          const record = item.record
+          const linkable = !!record?.href
+          const body = (
+            <>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-medium text-white/85">{title}</p>
+                {kind === "critical" && item.urgency && <span className="shrink-0 rounded-full bg-rose-400/10 px-2 py-0.5 text-[10px] text-rose-300">{item.urgency}</span>}
+                {kind === "deadlines" && item.date && <span className="shrink-0 rounded-full bg-sky-400/10 px-2 py-0.5 text-[10px] text-sky-300">{item.date}</span>}
+                {linkable && <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-white/30" />}
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-white/55">{detail}</p>
+              {(kind === "critical" && (item.owner || item.priority || item.dueDate)) && (
+                <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  {item.priority && <span className="rounded-full bg-rose-400/10 px-2 py-0.5 text-[10px] text-rose-300">{item.priority}</span>}
+                  {item.owner && <span className="text-[10px] text-white/45">Owner: {item.owner}</span>}
+                  {item.dueDate && <span className="text-[10px] text-white/45">Due {item.dueDate}</span>}
+                </div>
+              )}
+              {(kind === "deadlines" && item.owner) && <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-[10px] text-white/45">Owner: {item.owner}</span></div>}
+              <p className="mt-2 text-[10px] text-white/30">Source: {source}</p>
+            </>
+          )
+          return linkable ? (
+            <Link
+              key={i}
+              href={record!.href}
+              className="block rounded-lg border border-white/[0.06] bg-black/10 p-3 transition-colors hover:border-white/20 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25"
+            >
+              {body}
+            </Link>
+          ) : (
+            <div key={i} className="rounded-lg border border-white/[0.06] bg-black/10 p-3">{body}</div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 export function AIBriefingAI({ userName }: { userName: string }) {
@@ -43,5 +114,12 @@ export function AIBriefingAI({ userName }: { userName: string }) {
   if (loading && !data) return <SkeletonLoader />
   if (networkError && !data) return <div className="rounded-2xl border border-rose-500/10 bg-rose-500/[0.04] p-6 text-sm text-white/60">Unable to load your briefing. <button onClick={() => void load()} className="ml-2 text-white/90 underline">Retry</button></div>
   const briefing = data?.briefing || EMPTY
-  return <div className="relative min-h-[32rem] overflow-hidden rounded-2xl border border-violet-400/[0.12] bg-gradient-to-br from-[#0d0d10] via-[#111118] to-[#0e0e18] p-7 shadow-[0_0_40px_rgba(139,92,246,0.06)] md:p-10"><div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-violet-500/[0.04] blur-3xl" /><div className="relative"><div className="mb-8 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-violet-500/20"><Sparkles className="h-5 w-5 text-violet-300" /></div><div><h2 className="text-xl font-semibold tracking-tight text-white"><Greeting firstName={userName?.split(" ")[0] || "there"} /></h2><p className="mt-0.5 text-xs text-white/40">Your AI briefing &bull; {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</p></div></div>{data?.fallback && <div className="mb-4 rounded-lg border border-amber-400/10 bg-amber-400/[0.04] px-3 py-2 text-xs text-amber-200/60">Limited briefing — AI unavailable</div>}<div className="grid gap-3 sm:grid-cols-2"><SectionCard kind="critical" items={briefing.criticalItems} /><SectionCard kind="deadlines" items={briefing.upcomingDeadlines} /><SectionCard kind="risks" items={briefing.risks} /><SectionCard kind="actions" items={briefing.recommendedActions} /></div><div className="mt-5 flex items-center justify-between border-t border-white/[0.05] pt-4"><p className="text-[11px] text-white/25">{data?.cached ? `Cached · updated ${ago(data.generatedAt)}` : data?.fallback ? "Limited briefing — AI unavailable" : `Updated ${ago(data?.generatedAt)}`} </p><button disabled={loading} onClick={() => void load()} className="flex items-center gap-1.5 text-[11px] text-white/40 transition-colors hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40"><RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />Refresh briefing</button></div><p className="mt-2 text-right text-[10px] text-white/20">Manually refresh for latest briefing</p></div></div>
+  return <div className="relative min-h-[32rem] overflow-hidden rounded-2xl border border-violet-400/[0.12] bg-gradient-to-br from-[#0d0d10] via-[#111118] to-[#0e0e18] p-7 shadow-[0_0_40px_rgba(139,92,246,0.06)] md:p-10"><div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-violet-500/[0.04] blur-3xl" /><div className="relative"><div className="mb-8 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-violet-500/20"><Sparkles className="h-5 w-5 text-violet-300" /></div><div><h2 className="text-xl font-semibold tracking-tight text-white"><Greeting firstName={userName?.split(" ")[0] || "there"} /></h2><p className="mt-0.5 text-xs text-white/40">Your AI briefing &bull; {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</p></div></div>{data?.fallback && <div className="mb-4 rounded-lg border border-amber-400/10 bg-amber-400/[0.04] px-3 py-2 text-xs text-amber-200/60">Limited briefing — AI unavailable</div>}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SectionCard kind="critical" items={briefing.criticalItems} wide />
+        <SectionCard kind="actions" items={briefing.recommendedActions} wide />
+        <SectionCard kind="deadlines" items={briefing.upcomingDeadlines} />
+        <SectionCard kind="risks" items={briefing.risks} />
+      </div>
+    <div className="mt-5 flex items-center justify-between border-t border-white/[0.05] pt-4"><p className="text-[11px] text-white/25">{data?.cached ? `Cached · updated ${ago(data.generatedAt)}` : data?.fallback ? "Limited briefing — AI unavailable" : `Updated ${ago(data?.generatedAt)}`} </p><button disabled={loading} onClick={() => void load()} className="flex items-center gap-1.5 text-[11px] text-white/40 transition-colors hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40"><RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />Refresh briefing</button></div><p className="mt-2 text-right text-[10px] text-white/20">Manually refresh for latest briefing</p></div></div>
 }
