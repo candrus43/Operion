@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { applyRateLimit } from "@/lib/rate-limit"
+import { createTaskEvent } from "@/lib/task-events"
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
       entity: { select: { name: true, type: true } },
       dependsOn: { select: { id: true, title: true, status: true } },
       assignee: { select: { name: true } },
+      comments: { orderBy: { createdAt: "desc" }, take: 3, select: { author: { select: { name: true } }, content: true } },
     },
   })
 
@@ -65,6 +67,7 @@ ${task.project ? `Project: ${task.project.name} (${task.project.phase}, ${task.p
 ${task.entity ? `Entity: ${task.entity.name} (${task.entity.type})` : "No entity"}
 ${task.dependsOn ? `Depends on: "${task.dependsOn.title}" (${task.dependsOn.status})` : "No dependencies"}
 ${task.assignee ? `Assignee: ${task.assignee.name}` : "Unassigned"}
+${task.comments.length > 0 ? `Recent discussion:\n${task.comments.map((c) => `- ${c.author.name}: ${c.content}`).join("\n")}` : ""}
 
 What's the single most impactful next action for this task? Return 2-3 sentences only.`
 
@@ -97,13 +100,22 @@ What's the single most impactful next action for this task? Return 2-3 sentences
     const data = await openaiResponse.json()
     const suggestion = data.choices?.[0]?.message?.content || "Unable to generate suggestion."
 
-    // Save suggestion to the task
+    // Save suggestion (cached with generatedAt) so we don't regenerate on every visit
     await prisma.task.update({
       where: { id: task.id },
-      data: { aiSuggestion: suggestion },
+      data: { aiSuggestion: suggestion, aiSuggestionGeneratedAt: new Date() },
     })
 
-    return NextResponse.json({ suggestion })
+    // Phase 1d: record an AI refresh in the activity feed
+    void createTaskEvent({
+      taskId: task.id,
+      organizationId: orgId,
+      actorId: (session.user as any).id ?? null,
+      actorName: (session.user as any).name ?? null,
+      action: "AI_REFRESH",
+    })
+
+    return NextResponse.json({ suggestion, generatedAt: new Date().toISOString() })
   } catch (error) {
     console.error("Suggest task error:", error)
     return NextResponse.json(

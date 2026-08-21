@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { applyRateLimit } from "@/lib/rate-limit"
+import { createTaskEvent } from "@/lib/task-events"
 
 // ── Audit log helper ────────────────────────────────────────────────
 
@@ -108,6 +109,16 @@ export async function POST(
     entity: "Comment",
     entityId: comment.id,
     details: JSON.stringify({ taskId, taskTitle: task.title }),
+  })
+
+  // Phase 1d: record a COMMENT entry in the task activity feed
+  void createTaskEvent({
+    taskId,
+    organizationId: orgId,
+    actorId: userId,
+    actorName: userName || "Someone",
+    action: "COMMENT",
+    details: { preview: comment.content.length > 120 ? comment.content.slice(0, 117) + "…" : comment.content },
   })
 
   // Check for @mentions and create notifications
