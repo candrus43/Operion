@@ -187,18 +187,6 @@ function LoginForm() {
               </svg>
               Google
             </a>
-            <a
-              href="/api/auth/signin/microsoft-entra-id?callbackUrl=/home"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-[#262626] bg-white/[0.04] hover:bg-[#222] h-10 px-4 py-2 w-full"
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none">
-                <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
-                <path d="M20 1H11V10H20V1Z" fill="#7FBA00"/>
-                <path d="M20 11H11V20H20V11Z" fill="#00A4EF"/>
-                <path d="M10 11H1V20H10V11Z" fill="#FFB900"/>
-              </svg>
-              Microsoft
-            </a>
           </CardContent>
 
           <CardFooter className="pt-0 pb-6">
