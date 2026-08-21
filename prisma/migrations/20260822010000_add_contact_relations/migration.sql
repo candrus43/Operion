@@ -12,12 +12,21 @@
 --   flat single-`entityId` model. The existing `Contact.entityId` stays
 --   (nullable) as the person's primary/home entity (back-compat).
 --
---   DATA migration (run once, idempotent, conservative — only merges when a
---   normalized email/phone AND confident name match):
+--   DATA migration (run once, idempotent, conservative — merges only when a
+--   confident name match is corroborated by a signal, see the script header):
 --     DATABASE_URL="<neon>" bun prisma/scripts/dedupe-contacts.ts [--dry-run]
---   Result on Neon: contacts 69 → 40 distinct people (29 confident duplicates
---   merged), 60 ContactRelation rows, all 40 contacts carry at least one
---   relation, 0 orphaned contacts, tasks preserved (255).
+--   Phase 3a (original): merged only on "normalized email OR phone AND confident
+--   name" — contacts 69 → 40 distinct people (29 merged). Missed same-firm /
+--   same-person duplicates that carried different work emails & phones.
+--   Phase 3a.1 (fix): added two corroborating paths — (a) same normalized
+--   company + confident name, and (b) eponymous firms (each company opens with
+--   the person's surname) + confident name. Re-run on Neon: 40 → 33 distinct
+--   people (7 more merged: Daniel Cho, Marcus Bell, Nina Kapoor, Elena Marquez,
+--   Olivia Park, Victor Lang, Grace Kim), 0 further merges on re-run (idempotent).
+--   Final state: 33 contacts org-wide (Blackstone demo 29 + Joshua Loveday 4,
+--   untouched), Blackstone relations 56 → 50 (same-entity role collisions
+--   collapsed to one relation per entity, lost roles folded into customer notes
+--   — no orphan relations, no duplicate-named contacts, tasks preserved).
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE "ContactRelation" (
     "id" TEXT NOT NULL,

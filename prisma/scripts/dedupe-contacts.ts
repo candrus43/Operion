@@ -13,12 +13,32 @@
  *   no ContactRelation to that entity yet, create one (role = position).
  *   Preserves every existing entity link exactly (no row is lost).
  *
- *   Phase B — Dedup. Merge two Contacts ONLY when BOTH a strong identifier
- *   (exact normalized email OR phone of length >= 8) matches AND the names
- *   match confidently (same first+last tokens, or identical single tokens).
- *   Never merges two distinct people. The most "complete" contact is kept as
- *   the survivor; the duplicate's relations are reparented to it, its missing
- *   primary fields are copied over, and the duplicate row is deleted.
+ *   Phase B — Dedup. Merge two Contacts ONLY when they are confidently the
+ *   SAME person. A merge requires a confident name match AND one of the
+ *   following corroborating signals (added in Phase 3a.1):
+ *
+ *     1. Strong identifier + name (Phase 3a, unchanged): same normalized
+ *        email, OR same normalized phone (length >= 8), PLUS confident name.
+ *     2. Same firm + name (Phase 3a.1 — fixes Daniel Cho et al.): same
+ *        normalized company AND confident name. This catches one real person
+ *        who appears twice within the same firm with different work emails /
+ *        phones / titles (e.g. "Managing Partner · Cho & Patel LLP" and
+ *        "Real Estate Counsel · Cho & Patel LLP").
+ *     3. Eponymous firms + name (Phase 3a.1 — fixes Marcus Bell): confident
+ *        name (>= 2 tokens) AND BOTH contacts' companies are the person's own
+ *        firms — each company's opening token equals the person's surname
+ *        (e.g. "Bell Tax Advisors" and "Bell Facilities Group" both open with
+ *        Marcus Bell's surname "Bell"). Only fires where the name match is
+ *        already strong and the firms are demonstrably named after the person.
+ *
+ *   Never merges two genuinely distinct people: every path requires a
+ *   confident name match, and the firm-based paths require the firms to be
+ *   the same or eponymous with the person — so two unrelated "John Smith"
+ *   cards at unrelated companies are never merged. The most "complete"
+ *   contact is kept as the survivor; the duplicate's relations are reparented
+ *   to it (same-entity role collisions are preserved by folding the lost role
+ *   into the keeper's notes), its missing primary fields are copied over, and
+ *   the duplicate row is deleted.
  *
  * Usage (bun, like seed.ts):
  *   DATABASE_URL="<neon-url>" bun prisma/scripts/dedupe-contacts.ts          # execute
@@ -39,6 +59,9 @@ function normPhone(p?: string | null): string {
 function normName(n?: string | null): string {
   return (n ?? "").trim().toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9 ]/g, "").trim()
 }
+function normCompany(c?: string | null): string {
+  return (c ?? "").trim().toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9 ]/g, "").trim()
+}
 
 /** Confident-name test: same first token + same last token, or identical single token. */
 function namesMatch(a?: string | null, b?: string | null): boolean {
@@ -52,6 +75,30 @@ function namesMatch(a?: string | null, b?: string | null): boolean {
   const firstOk = ta[0] === tb[0]
   const lastOk = ta.length >= 2 && tb.length >= 2 ? ta[ta.length - 1] === tb[tb.length - 1] : true
   return firstOk && lastOk
+}
+
+/** Last (surname) token of the normalized name, or "" for single-token names. */
+function surname(n?: string | null): string {
+  const t = normName(n).split(" ")
+  return t.length >= 2 ? t[t.length - 1] : ""
+}
+
+/**
+ * Eponymous-firm test (Phase 3a.1 — Marcus Bell case): both contacts' companies
+ * are the person's OWN firms, i.e. each company opens with the person's surname
+ * and each company has >= 2 tokens (a bare "Bell" is weaker evidence). Only
+ * evaluated alongside a confident name match.
+ */
+function eponymousFirms(a: { company?: string | null; name?: string | null }, b: { company?: string | null; name?: string | null }): boolean {
+  const ca = normCompany(a.company)
+  const cb = normCompany(b.company)
+  if (!ca || !cb) return false
+  const ta = ca.split(" ")
+  const tb = cb.split(" ")
+  if (ta.length < 2 || tb.length < 2) return false
+  const s = surname(a.name)
+  if (!s) return false
+  return ta[0] === s && tb[0] === s
 }
 
 async function main() {
@@ -87,11 +134,13 @@ async function main() {
       }
     }
 
-    // ── Phase B: dedup by (strongId AND confident name) ─────────────────────
-    // Build buckets keyed by normalized email and by normalized phone, then
-    // run union-find only on edges that ALSO satisfy the name match.
+    // ── Phase B: dedup by (corroborating signal AND confident name) ─────────
+    // Build buckets keyed by normalized email, phone, company, and full name,
+    // then run union-find only on pairs that clear a signal + name gate.
     const byEmail = new Map<string, typeof contacts>()
     const byPhone = new Map<string, typeof contacts>()
+    const byCompany = new Map<string, typeof contacts>()
+    const byName = new Map<string, typeof contacts>()
     const index = (m: Map<string, typeof contacts>, key: string, c: typeof contacts[number]) => {
       if (!key) return
       if (!m.has(key)) m.set(key, [])
@@ -100,6 +149,8 @@ async function main() {
     for (const c of contacts) {
       index(byEmail, normEmail(c.email), c)
       if (normPhone(c.phone).length >= 8) index(byPhone, normPhone(c.phone), c)
+      index(byCompany, normCompany(c.company), c)
+      index(byName, normName(c.name), c)
     }
 
     // union-find over indices
@@ -111,17 +162,31 @@ async function main() {
     }
     for (const c of contacts) parent.set(c.id, c.id)
 
+    // Signal + confident-name gate, applied within the shared-key bucket.
     const consider = (list: typeof contacts) => {
       for (let i = 0; i < list.length; i++) {
         for (let j = i + 1; j < list.length; j++) {
           const a = list[i], b = list[j]
-          // Guard: both a strong id and a confident name are REQUIRED.
+          // Guard: a corroborating signal (same bucket) AND a confident name
+          // are REQUIRED. Never merge on a shared key without a name match.
           if (namesMatch(a.name, b.name)) union(a.id, b.id)
         }
       }
     }
+    // 1) strong identifier + name (Phase 3a, unchanged)
     byEmail.forEach((l) => consider(l))
     byPhone.forEach((l) => consider(l))
+    // 2) same firm + name (Phase 3a.1 — Daniel Cho case + same-firm pairs)
+    byCompany.forEach((l) => consider(l))
+    // 3) eponymous firms + name (Phase 3a.1 — Marcus Bell case)
+    for (const list of byName.values()) {
+      for (let i = 0; i < list.length; i++) {
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i], b = list[j]
+          if (namesMatch(a.name, b.name) && eponymousFirms(a, b)) union(a.id, b.id)
+        }
+      }
+    }
 
     // group survivors
     const groups = new Map<string, typeof contacts>()
@@ -141,18 +206,31 @@ async function main() {
 
       for (const d of dups) {
         totalMerged++
-        console.log(`[merge] "${d.name}" -> keeper "${keeper.name}"`)
+        console.log(`[merge] "${d.name}" (${d.company ?? "—"}/${d.position ?? "—"}) -> keeper "${keeper.name}" (${keeper.company ?? "—"}/${keeper.position ?? "—"})`)
         if (!DRY) {
           // reparent all of the dup's relations to the keeper (skip collisions)
           const rels = await prisma.contactRelation.findMany({ where: { contactId: d.id } })
           for (const r of rels) {
-            const has = await prisma.contactRelation.findFirst({
+            const existing = await prisma.contactRelation.findFirst({
               where: { contactId: keeper.id, entityId: r.entityId },
             })
-            if (!has) {
+            if (!existing) {
               await prisma.contactRelation.create({
                 data: { contactId: keeper.id, entityId: r.entityId, role: r.role, notes: r.notes, enabled: r.enabled, organizationId: org.id },
               })
+            } else if (r.role && r.role !== existing.role) {
+              // same-entity role collision: unique(contactId,entityId) can hold
+              // only one role per entity — preserve the lost role on the keeper's
+              // notes so no role knowledge is silently dropped.
+              const entity = await prisma.entity.findUnique({ where: { id: r.entityId }, select: { name: true } })
+              const tag = entity?.name ?? r.entityId
+              const note = `${r.role} (${tag})`
+              const mergedNotes = keeper.notes
+                ? keeper.notes.includes(note)
+                  ? keeper.notes
+                  : `${keeper.notes}\n${note}`
+                : note
+              await prisma.contact.update({ where: { id: keeper.id }, data: { notes: mergedNotes || null } })
             }
             await prisma.contactRelation.delete({ where: { id: r.id } })
           }
@@ -165,6 +243,16 @@ async function main() {
               await prisma.contactRelation.create({
                 data: { contactId: keeper.id, entityId: d.entityId, role: d.position, organizationId: org.id },
               })
+            } else if (d.position && d.position !== (await prisma.contactRelation.findFirst({ where: { contactId: keeper.id, entityId: d.entityId } }))!.role) {
+              const entity = await prisma.entity.findUnique({ where: { id: d.entityId }, select: { name: true } })
+              const tag = entity?.name ?? d.entityId
+              const note = `${d.position} (${tag})`
+              const mergedNotes = keeper.notes
+                ? keeper.notes.includes(note)
+                  ? keeper.notes
+                  : `${keeper.notes}\n${note}`
+                : note
+              await prisma.contact.update({ where: { id: keeper.id }, data: { notes: mergedNotes || null } })
             }
           }
           // copy missing primary fields onto keeper
