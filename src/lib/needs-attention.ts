@@ -88,8 +88,8 @@ export async function collectNeedsAttention(
       status: t.status,
       priority: t.priority ?? undefined,
       dueDate: t.dueDate ? t.dueDate.toISOString() : undefined,
-      entityId: t.entityId,
-      entityName: t.entityId ? nameById.get(t.entityId) : undefined,
+      entityId: t.entityId ?? "",
+      entityName: t.entityId ? (nameById.get(t.entityId) ?? undefined) : undefined,
       url: `/tasks/${t.id}`,
     })
   }
@@ -115,8 +115,8 @@ export async function collectNeedsAttention(
         reason,
         status: p.status,
         dueDate: p.targetDate ? p.targetDate.toISOString() : undefined,
-        entityId: p.entityId,
-        entityName: p.entityId ? nameById.get(p.entityId) : undefined,
+        entityId: p.entityId ?? "",
+        entityName: p.entityId ? (nameById.get(p.entityId) ?? undefined) : undefined,
         url: `/projects/${p.id}`,
       })
     }
