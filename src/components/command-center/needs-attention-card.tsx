@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, ArrowUpRight, CheckSquare, FolderKanban } from "lucide-react"
+import { AlertTriangle, ArrowUpRight, CheckSquare, FolderKanban, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { NeedsAttentionItem, NeedsAttentionReason } from "@/lib/needs-attention"
 
@@ -11,6 +11,8 @@ import type { NeedsAttentionItem, NeedsAttentionReason } from "@/lib/needs-atten
 const REASON_META: Record<NeedsAttentionReason, { label: string; cls: string }> = {
   BLOCKED: { label: "Blocked", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
   OVERDUE: { label: "Overdue", cls: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+  EXPIRED: { label: "Expired", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
+  EXPIRING_SOON: { label: "Expiring Soon", cls: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
   CRITICAL: { label: "Critical", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
   WAITING_ON: { label: "Waiting", cls: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
   HIGH: { label: "High", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
@@ -18,7 +20,7 @@ const REASON_META: Record<NeedsAttentionReason, { label: string; cls: string }> 
 }
 
 export function needsAttentionSummary(items: NeedsAttentionItem[]): { label: string; count: number }[] {
-  const order: NeedsAttentionReason[] = ["BLOCKED", "OVERDUE", "CRITICAL", "WAITING_ON", "HIGH", "OPEN"]
+  const order: NeedsAttentionReason[] = ["BLOCKED", "OVERDUE", "EXPIRED", "EXPIRING_SOON", "CRITICAL", "WAITING_ON", "HIGH", "OPEN"]
   return order
     .map((r) => ({ label: REASON_META[r].label.toLowerCase(), count: items.filter((i) => i.reason === r).length }))
     .filter((s) => s.count > 0)
@@ -81,6 +83,8 @@ export function NeedsAttentionCard({ items, showEntity = false, className }: Nee
                     <div className="mt-0.5 shrink-0">
                       {item.kind === "task" ? (
                         <CheckSquare className="h-4 w-4 text-muted-foreground/60" />
+                      ) : item.kind === "document" ? (
+                        <FileText className="h-4 w-4 text-muted-foreground/60" />
                       ) : (
                         <FolderKanban className="h-4 w-4 text-muted-foreground/60" />
                       )}

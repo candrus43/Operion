@@ -64,7 +64,7 @@ export async function PATCH(
   const orgId = (session.user as any).organizationId
   const userId = (session.user as any).id
   const body = await req.json()
-  const { name, type, url, filePath, projectId, entityId } = body
+  const { name, type, url, filePath, projectId, entityId, expiryDate, expiryNote, attention } = body
 
   const existing = await prisma.document.findFirst({
     where: { id, organizationId: orgId },
@@ -82,6 +82,9 @@ export async function PATCH(
       ...(filePath !== undefined && { filePath: filePath || null }),
       ...(projectId !== undefined && { projectId: projectId || null }),
       ...(entityId !== undefined && { entityId: entityId || null }),
+      ...(expiryDate !== undefined && { expiryDate: expiryDate ? new Date(expiryDate) : null }),
+      ...(expiryNote !== undefined && { expiryNote: expiryNote || null }),
+      ...(attention !== undefined && { attention: attention || null }),
     },
     include: {
       project: { select: { id: true, name: true } },

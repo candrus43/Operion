@@ -7,7 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Plus, ExternalLink, Building2, FolderKanban, User } from "lucide-react"
+import { FileText, Plus, ExternalLink, Building2, FolderKanban, User, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { docTypeColor, docTypeLabel } from "@/lib/colors"
 import DocumentTypeFilter from "@/components/documents/document-type-filter"
@@ -129,6 +129,27 @@ export default async function DocumentsPage({
                       <Link href={`/documents/${doc.id}`} className="hover:text-white transition-colors">
                         <p className="text-sm font-medium truncate max-w-[280px]">{doc.name}</p>
                       </Link>
+                      {doc.expiryDate && (
+                        (() => {
+                          const diff = new Date(doc.expiryDate).getTime() - Date.now()
+                          const expired = diff < 0
+                          const soon = diff <= 30 * 24 * 60 * 60 * 1000
+                          return (
+                            <span className={cn(
+                              "inline-flex items-center gap-1 text-[10px] px-1.5 py-0 mt-0.5 rounded border",
+                              expired
+                                ? "bg-red-500/10 text-red-400 border-red-500/20"
+                                : soon
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "text-muted-foreground/60 border-transparent"
+                            )}>
+                              <AlertTriangle className="h-2.5 w-2.5" />
+                              {expired ? "Expired " : soon ? "Expiring " : "Expires "}
+                              {new Date(doc.expiryDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                            </span>
+                          )
+                        })()
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", docTypeColor(doc.type))}>

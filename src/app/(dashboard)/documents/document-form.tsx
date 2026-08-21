@@ -56,6 +56,13 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
   const [projectId, setProjectId] = useState(document?.projectId || "")
   const [entityId, setEntityId] = useState(document?.entityId || "")
 
+  // ── Document intelligence (Phase 3b) ──
+  const [expiryDate, setExpiryDate] = useState(
+    document?.expiryDate ? new Date(document.expiryDate).toISOString().slice(0, 10) : ""
+  )
+  const [expiryNote, setExpiryNote] = useState(document?.expiryNote || "")
+  const [attention, setAttention] = useState(document?.attention || "")
+
   // File upload state
   const [uploadedFile, setUploadedFile] = useState<{
     name: string
@@ -150,6 +157,9 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
         filePath: uploadedFile?.path || null,
         projectId: projectId || null,
         entityId: entityId || null,
+        expiryDate: expiryDate ? new Date(expiryDate + "T00:00:00").toISOString() : null,
+        expiryNote: expiryNote.trim() || null,
+        attention: !attention || attention === "none" ? null : attention,
       }
 
       const fetchUrl = isEdit ? `/api/documents/${document.id}` : "/api/documents"
@@ -348,6 +358,53 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* ── Document intelligence (Phase 3b) ── */}
+            <div className="pt-2 border-t border-white/[0.03]">
+              <p className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                <FileText className="h-4 w-4 text-amber-400" />
+                Expiry &amp; Attention
+              </p>
+              <p className="text-[11px] text-muted-foreground/60 mb-3">
+                Optional. Documents expiring within 30 days or flagged will surface in your briefings.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Input
+                    id="expiryDate"
+                    type="date"
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)}
+                    className="bg-white/[0.04] border-0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="attention">Attention</Label>
+                  <Select value={attention} onValueChange={setAttention}>
+                    <SelectTrigger id="attention" className="bg-white/[0.04] border-0">
+                      <SelectValue placeholder="None" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="RENEW">Renew needed</SelectItem>
+                      <SelectItem value="REVIEW">Review</SelectItem>
+                      <SelectItem value="FLAGGED">Flagged</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expiryNote">Expiry Note</Label>
+                <Input
+                  id="expiryNote"
+                  placeholder="e.g. Renewal due — negotiating with carrier"
+                  value={expiryNote}
+                  onChange={(e) => setExpiryNote(e.target.value)}
+                  className="bg-white/[0.04] border-0"
+                />
               </div>
             </div>
 

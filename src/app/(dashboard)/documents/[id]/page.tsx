@@ -4,23 +4,13 @@ import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { docTypeColor, docTypeLabel } from "@/lib/colors"
 import { AskAiButton } from "@/components/ai/ask-ai-button"
-import {
-  ArrowLeft,
-  Pencil,
-  Trash2,
-  ExternalLink,
-  FileText,
-  Building2,
-  FolderKanban,
-  User,
-  Calendar,
-  Download,
-} from "lucide-react"
+import { ArrowLeft, Pencil } from "lucide-react"
 import { DocumentDeleteButton } from "./delete-button"
+import { DocumentTabs } from "./tabs"
+import { collectDocumentNeedsAttention } from "@/lib/needs-attention"
 
 
 export default async function DocumentDetailPage({
@@ -44,6 +34,15 @@ export default async function DocumentDetailPage({
   })
 
   if (!document) notFound()
+
+  const [needsAttention, activity] = await Promise.all([
+    collectDocumentNeedsAttention(orgId, document.id),
+    prisma.auditLog.findMany({
+      where: { organizationId: orgId, entity: "Document", entityId: document.id },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+    }),
+  ])
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -74,138 +73,8 @@ export default async function DocumentDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* View Document */}
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Document</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {document.filePath ? (
-                <div className="space-y-3">
-                  <a
-                    href={document.filePath}
-                    download
-                    className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors"
-                  >
-                    <Download className="h-4 w-4 text-sky-400" />
-                    <span>Download File</span>
-                    <span className="text-xs text-muted-foreground truncate max-w-[200px]">{document.name}</span>
-                  </a>
-                  {document.url && (
-                    <a
-                      href={document.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors ml-3"
-                    >
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                      <span>External Link</span>
-                    </a>
-                  )}
-                </div>
-              ) : document.url ? (
-                <a
-                  href={document.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] px-4 py-3 text-sm transition-colors"
-                >
-                  <ExternalLink className="h-4 w-4 text-sky-400" />
-                  <span>View Document</span>
-                  <span className="text-xs text-muted-foreground truncate max-w-[200px]">{document.url}</span>
-                </a>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-500/10 mb-3">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm font-medium text-foreground/80">No file uploaded</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Edit this document to upload a file or add an external URL.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar — Metadata */}
-        <div className="space-y-4">
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Metadata</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Type */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Type</span>
-                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", docTypeColor(document.type))}>
-                  {docTypeLabel[document.type]}
-                </Badge>
-              </div>
-
-              {/* Project */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Project</span>
-                {document.project ? (
-                  <Link href={`/projects/${document.project.id}`} className="text-xs hover:text-white transition-colors flex items-center gap-1">
-                    <FolderKanban className="h-3 w-3" />
-                    {document.project.name}
-                  </Link>
-                ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
-                )}
-              </div>
-
-              {/* Entity */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Entity</span>
-                {document.entity ? (
-                  <Link href={`/entities/${document.entity.id}`} className="text-xs hover:text-white transition-colors flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
-                    {document.entity.name}
-                  </Link>
-                ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
-                )}
-              </div>
-
-              {/* Uploaded by */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Uploaded by</span>
-                {document.uploadedBy ? (
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3 text-muted-foreground/40" />
-                    <span className="text-xs">{document.uploadedBy.name}</span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
-                )}
-              </div>
-
-              {/* Created */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/[0.03]">
-                <span className="text-xs text-muted-foreground">Created</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {document.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </span>
-              </div>
-
-              {/* Updated */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Updated</span>
-                <span className="text-xs text-muted-foreground">
-                  {document.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Command center tabs */}
+      <DocumentTabs document={document} needsAttention={needsAttention} activity={activity} />
     </div>
   )
 }
