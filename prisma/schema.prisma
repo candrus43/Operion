@@ -239,6 +239,17 @@ model Document {
   entityId       String?
   uploadedById   String?
   isSample       Boolean      @default(false)
+
+  // ── Document intelligence (Phase 3b) ──
+  // Nullable / additive: expiry tracking + optional attention flag. When
+  // `expiryDate` is set, the shared needs-attention module computes
+  // EXPIRING_SOON (within 30 days) / EXPIRED automatically. `attention` is an
+  // optional operator-set reason string (e.g. "RENEW", "REVIEW", "FLAGGED") to
+  // force the document into the briefing regardless of expiry.
+  expiryDate   DateTime?
+  expiryNote   String?
+  attention    String?
+
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 

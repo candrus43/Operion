@@ -60,7 +60,7 @@ export async function POST(req: Request) {
   const userId = (session.user as any).id
   const body = await req.json()
 
-  const { name, type, url, filePath, content, projectId, entityId } = body
+  const { name, type, url, filePath, content, projectId, entityId, expiryDate, expiryNote, attention } = body
 
   if (!name || !type) {
     return NextResponse.json({ error: "Name and type are required" }, { status: 400 })
@@ -76,6 +76,9 @@ export async function POST(req: Request) {
       projectId: projectId || null,
       entityId: entityId || null,
       uploadedById: userId,
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      expiryNote: expiryNote || null,
+      attention: attention || null,
     },
     include: {
       project: { select: { id: true, name: true } },
