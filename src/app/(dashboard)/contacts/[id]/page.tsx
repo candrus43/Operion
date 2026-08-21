@@ -4,19 +4,12 @@ import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  ArrowLeft,
-  Pencil,
-  Phone,
-  Mail,
-  Building2,
-  Briefcase,
-  FolderKanban,
-  StickyNote,
-} from "lucide-react"
+import { ArrowLeft, Pencil } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { ContactDeleteButton } from "./delete-button"
 import { AskAiButton } from "@/components/ai/ask-ai-button"
+import { ContactTabs } from "./tabs"
+import { collectNeedsAttention } from "@/lib/needs-attention"
 
 export default async function ContactDetailPage({
   params,
@@ -32,44 +25,101 @@ export default async function ContactDetailPage({
   const contact = await prisma.contact.findFirst({
     where: { id, organizationId: orgId },
     include: {
-      entity: {
-        select: {
-          id: true,
-          name: true,
-          projects: {
-            select: { id: true, name: true, status: true },
-            take: 10,
-            orderBy: { updatedAt: "desc" },
-          },
-        },
+      entity: { select: { id: true, name: true } },
+      relations: {
+        include: { entity: { select: { id: true, name: true, type: true } } },
+        orderBy: { createdAt: "asc" },
       },
     },
   })
 
   if (!contact) notFound()
 
+  // Every distinct entity this person relates to (relations + fallback entityId
+  // for rows not yet migrated to relations).
+  const relations = contact.relations
+  const entityIds = [
+    ...new Set([
+      ...relations.map((r) => r.entityId),
+      ...(contact.entityId ? [contact.entityId] : []),
+    ]),
+  ]
+  const entityRefs = entityIds.map((eid) => {
+    const r = relations.find((x) => x.entityId === eid)
+    const named = r?.entity?.name
+    // Fallback name from the primary entity relation
+    const primName = contact.entity?.id === eid ? contact.entity.name : undefined
+    return { id: eid, name: named ?? primName }
+  })
+
+  const [needsAttention, tasks, projects, documents, activity, entitiesMap] = await Promise.all([
+    collectNeedsAttention(orgId, entityRefs, { includeProjects: true }),
+    entityIds.length
+      ? prisma.task.findMany({
+          where: { organizationId: orgId, entityId: { in: entityIds } },
+          include: { assignee: true, project: { select: { id: true, name: true } }, entity: { select: { id: true, name: true } } },
+          orderBy: [{ priority: "asc" }, { dueDate: "asc" }],
+        })
+      : [],
+    entityIds.length
+      ? prisma.project.findMany({
+          where: { organizationId: orgId, entityId: { in: entityIds } },
+          orderBy: { updatedAt: "desc" },
+        })
+      : [],
+    entityIds.length
+      ? prisma.document.findMany({
+          where: { organizationId: orgId, entityId: { in: entityIds } },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
+    prisma.auditLog.findMany({
+      where: { organizationId: orgId, entity: "Contact", entityId: contact.id },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+    }),
+    entityIds.length
+      ? prisma.entity.findMany({ where: { id: { in: entityIds } }, select: { id: true, name: true } })
+      : [],
+  ])
+  const entityNameById: Record<string, string> = Object.fromEntries(entitiesMap.map((e) => [e.id, e.name]))
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/contacts">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+    <div className="space-y-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Link href="/contacts" className="hover:text-foreground transition-colors">
+          Contacts
         </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
+        <span>/</span>
+        <span className="text-foreground">{contact.name}</span>
+      </div>
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-500/10">
+            <span className="text-base font-semibold text-sky-400">
+              {contact.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+            </span>
+          </div>
+          <div>
             <h1 className="text-2xl font-bold tracking-tight">{contact.name}</h1>
-            {contact.company && (
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 border bg-blue-500/10 text-blue-400 border-blue-500/20">
-                {contact.company}
-              </Badge>
-            )}
-            {contact.position && (
-              <Badge variant="outline" className="text-[11px] px-2 py-0.5 border bg-zinc-500/10 text-zinc-400 border-zinc-500/20">
-                {contact.position}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              {contact.company && (
+                <Badge variant="outline" className="text-[11px] px-2 py-0.5 border bg-blue-500/10 text-blue-400 border-blue-500/20">
+                  {contact.company}
+                </Badge>
+              )}
+              {contact.position && (
+                <Badge variant="outline" className="text-[11px] px-2 py-0.5 border bg-zinc-500/10 text-zinc-400 border-zinc-500/20">
+                  {contact.position}
+                </Badge>
+              )}
+              <span className="text-xs text-muted-foreground">
+                {relations.length} entit{relations.length === 1 ? "y" : "ies"}
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -84,160 +134,16 @@ export default async function ContactDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Contact Info */}
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {contact.email && (
-                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 shrink-0">
-                      <Mail className="h-4 w-4 text-sky-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-muted-foreground">Email</p>
-                      <a href={`mailto:${contact.email}`} className="text-sm hover:text-white transition-colors truncate block">
-                        {contact.email}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {contact.phone && (
-                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 shrink-0">
-                      <Phone className="h-4 w-4 text-emerald-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-muted-foreground">Phone</p>
-                      <a href={`tel:${contact.phone}`} className="text-sm hover:text-white transition-colors truncate block">
-                        {contact.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {contact.company && (
-                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 shrink-0">
-                      <Building2 className="h-4 w-4 text-violet-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-muted-foreground">Company</p>
-                      <p className="text-sm truncate">{contact.company}</p>
-                    </div>
-                  </div>
-                )}
-                {contact.position && (
-                  <div className="flex items-center gap-3 rounded-lg bg-white/[0.04] p-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 shrink-0">
-                      <Briefcase className="h-4 w-4 text-amber-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-muted-foreground">Position</p>
-                      <p className="text-sm truncate">{contact.position}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {!contact.email && !contact.phone && !contact.company && !contact.position && (
-                <p className="text-sm text-muted-foreground/50 italic text-center py-4">No contact information provided.</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Notes */}
-          {contact.notes && (
-            <Card className="glass">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <StickyNote className="h-4 w-4 text-amber-400" />
-                  Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{contact.notes}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Linked Projects (via entity) */}
-          {contact.entity && contact.entity.projects.length > 0 && (
-            <Card className="glass">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <FolderKanban className="h-4 w-4 text-violet-400" />
-                  Related Projects
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">Projects linked via {contact.entity.name}</p>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {contact.entity.projects.map((project) => (
-                  <Link
-                    key={project.id}
-                    href={`/projects/${project.id}`}
-                    className="flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm truncate group-hover:text-white transition-colors">{project.name}</p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                      {project.status.replace("_", " ")}
-                    </Badge>
-                  </Link>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Linked Entity */}
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Linked Entity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {contact.entity ? (
-                <Link
-                  href={`/entities/${contact.entity.id}`}
-                  className="flex items-center gap-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] p-3 transition-colors group"
-                >
-                  <Building2 className="h-4 w-4 text-muted-foreground group-hover:text-white transition-colors" />
-                  <span className="text-sm group-hover:text-white transition-colors">{contact.entity.name}</span>
-                </Link>
-              ) : (
-                <p className="text-xs text-muted-foreground/50">Not linked to an entity</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Dates */}
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Created</span>
-                <span className="text-xs text-muted-foreground">
-                  {contact.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Updated</span>
-                <span className="text-xs text-muted-foreground">
-                  {contact.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Command center tabs */}
+      <ContactTabs
+        contact={contact}
+        entityNameById={entityNameById}
+        needsAttention={needsAttention}
+        tasks={tasks}
+        projects={projects}
+        documents={documents}
+        activity={activity}
+      />
     </div>
   )
 }

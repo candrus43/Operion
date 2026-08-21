@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -19,11 +20,14 @@ import {
   Mail,
   Building2,
 } from "lucide-react"
+import { NeedsAttentionCard } from "@/components/command-center/needs-attention-card"
+import type { NeedsAttentionItem } from "@/lib/needs-attention"
 
 type Tabs = "overview" | "projects" | "tasks" | "documents" | "contacts"
 
 interface EntityTabsProps {
   entity: any
+  needsAttention: NeedsAttentionItem[]
 }
 
 const tabDefs: { key: Tabs; label: string; icon: typeof Info }[] = [
@@ -35,10 +39,29 @@ const tabDefs: { key: Tabs; label: string; icon: typeof Info }[] = [
 ]
 
 
-export function EntityTabs({ entity }: EntityTabsProps) {
+export function EntityTabs({ entity, needsAttention }: EntityTabsProps) {
   const [activeTab, setActiveTab] = useState<Tabs>("overview")
   let metadata: Record<string, any> = {}
   try { metadata = JSON.parse(entity.metadata) } catch {}
+
+  // Relation-aware contacts: prefer ContactRelation membership (role/notes),
+  // fall back to flat entity.contacts for pre-migration rows.
+  const relationContacts = (entity.contactRelations || []).map((r: any) => ({
+    id: r.contact.id,
+    name: r.contact.name,
+    company: r.contact.company,
+    email: r.contact.email,
+    phone: r.contact.phone,
+    position: r.contact.position,
+    role: r.role,
+    notes: r.notes,
+    enabled: r.enabled,
+  }))
+  const relationIds = new Set(relationContacts.map((rc: any) => rc.id))
+  const flatContacts = (entity.contacts || [])
+    .filter((c: any) => !relationIds.has(c.id))
+    .map((c: any) => ({ id: c.id, name: c.name, company: c.company, email: c.email, phone: c.phone, position: c.position, role: c.position, notes: null, enabled: true }))
+  const allContacts = [...relationContacts, ...flatContacts]
 
   return (
     <div>
@@ -127,6 +150,11 @@ export function EntityTabs({ entity }: EntityTabsProps) {
                 )}
               </CardContent>
             </Card>
+
+            {/* Needs Attention */}
+            <div className="md:col-span-2">
+              <NeedsAttentionCard items={needsAttention} />
+            </div>
 
             {/* Quick Summary */}
             <Card className="glass md:col-span-2">
@@ -304,7 +332,7 @@ export function EntityTabs({ entity }: EntityTabsProps) {
         {/* Contacts Tab */}
         {activeTab === "contacts" && (
           <div className="space-y-2">
-            {entity.contacts.length === 0 ? (
+            {allContacts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] mb-4">
                   <Users className="h-7 w-7 text-muted-foreground" />
@@ -314,41 +342,43 @@ export function EntityTabs({ entity }: EntityTabsProps) {
               </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {entity.contacts.map((contact: any) => (
-                  <Card key={contact.id} className="glass hover:bg-white/[0.07] transition-colors cursor-pointer">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 shrink-0">
-                          <AvatarFallback className="text-xs bg-[#222]">
-                            {contact.name?.split(" ").map((n: string) => n[0]).join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{contact.name}</p>
-                          {contact.position && (
-                            <p className="text-[11px] text-muted-foreground truncate">{contact.position}</p>
+                {allContacts.map((contact: any) => (
+                  <Link key={contact.id} href={`/contacts/${contact.id}`} className="block">
+                    <Card className="glass hover:bg-white/[0.07] transition-colors cursor-pointer">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10 shrink-0">
+                            <AvatarFallback className="text-xs bg-[#222]">
+                              {contact.name?.split(" ").map((n: string) => n[0]).join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{contact.name}</p>
+                            {contact.role && (
+                              <p className="text-[11px] text-muted-foreground truncate">{contact.role}</p>
+                            )}
+                            {contact.company && (
+                              <p className="text-[11px] text-muted-foreground/60 truncate">{contact.company}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 mt-3 pt-3 border-t border-white/[0.03]">
+                          {contact.email && (
+                            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                              <Mail className="h-3 w-3" />
+                              {contact.email}
+                            </div>
                           )}
-                          {contact.company && (
-                            <p className="text-[11px] text-muted-foreground/60 truncate">{contact.company}</p>
+                          {contact.phone && (
+                            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                              <Phone className="h-3 w-3" />
+                              {contact.phone}
+                            </div>
                           )}
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-1 mt-3 pt-3 border-t border-white/[0.03]">
-                        {contact.email && (
-                          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                            <Mail className="h-3 w-3" />
-                            {contact.email}
-                          </div>
-                        )}
-                        {contact.phone && (
-                          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                            <Phone className="h-3 w-3" />
-                            {contact.phone}
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             )}

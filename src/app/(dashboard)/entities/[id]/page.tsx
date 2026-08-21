@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { EntityTabs } from "./tabs"
 import { AskAiButton } from "@/components/ai/ask-ai-button"
+import { collectNeedsAttention } from "@/lib/needs-attention"
 
 const entityTypeConfig: Record<string, { icon: typeof Building2; color: string; label: string }> = {
   BUSINESS: { icon: Store, color: "bg-violet-500/10 text-violet-400 border-violet-500/20", label: "Business" },
@@ -58,11 +59,17 @@ export default async function EntityDetailPage({
         orderBy: [{ priority: "asc" }, { dueDate: "asc" }],
       },
       contacts: { orderBy: { createdAt: "desc" } },
+      contactRelations: {
+        include: { contact: true },
+        orderBy: { createdAt: "asc" },
+      },
       documents: { orderBy: { createdAt: "desc" } },
     },
   })
 
   if (!entity) notFound()
+
+  const needsAttention = await collectNeedsAttention(orgId, [{ id: entity.id, name: entity.name }])
 
   const config = entityTypeConfig[entity.type] || entityTypeConfig.OTHER
   const Icon = config.icon
@@ -149,7 +156,7 @@ export default async function EntityDetailPage({
       </div>
 
       {/* Tabbed Content */}
-      <EntityTabs entity={entity} />
+      <EntityTabs entity={entity} needsAttention={needsAttention} />
     </div>
   )
 }

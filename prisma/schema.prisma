@@ -41,6 +41,7 @@ model Organization {
   tasks         Task[]
   documents     Document[]
   contacts      Contact[]
+  contactRelations ContactRelation[]
   meetings      Meeting[]
   notifications Notification[]
   comments      Comment[]
@@ -126,6 +127,7 @@ model Entity {
   tasks          Task[]
   documents      Document[]
   contacts       Contact[]
+  contactRelations ContactRelation[]
 
   @@index([organizationId])
 }
@@ -256,6 +258,9 @@ model Contact {
   phone          String?
   email          String?
   organizationId String
+  // entityId is the contact's PRIMARY/home entity (back-compat for the flat
+  // model). Full multi-entity membership lives on ContactRelation — a person is
+  // ONE Contact with N relations. entityId stays nullable and additive.
   entityId       String?
   notes          String?
   isSample       Boolean      @default(false)
@@ -264,7 +269,34 @@ model Contact {
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   entity         Entity?      @relation(fields: [entityId], references: [id])
+  relations      ContactRelation[]
 
+  @@index([organizationId])
+}
+
+// ── Contact ↔ Entity relationship (Phase 3a: dedup structural fix) ──────────
+// One real person = ONE Contact row. Each entity they relate to is a row in
+// ContactRelation (role/title + enablement + per-entity notes). This removes
+// the structural duplicate-contact problem of the flat single-entityId model.
+model ContactRelation {
+  id             String   @id @default(cuid())
+  contactId      String
+  entityId       String
+  // role/title at that entity, e.g. "CEO", "Board", "Vendor rep", "Manager"
+  role           String?
+  enabled        Boolean  @default(true)
+  // Per-entity notes about this person's involvement at that entity
+  notes          String?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  contact      Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  entity       Entity       @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([contactId, entityId])
+  @@index([entityId])
   @@index([organizationId])
 }
 

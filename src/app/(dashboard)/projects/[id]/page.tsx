@@ -36,6 +36,12 @@ const phaseLabels: Record<string, string> = {
   OPERATIONS: "Operations",
 }
 
+// Ordered phase timeline driven by the phase selector's canonical order (the
+// insertion order of phaseLabels above). Fix: `allPhases` was previously
+// referenced (allPhases.indexOf / allPhases.map) but never declared, which
+// broke the phase timeline at runtime and caused tsc errors.
+const allPhases = Object.keys(phaseLabels)
+
 
 const progressColor = (pct: number) => {
   if (pct >= 75) return "bg-emerald-500"
