@@ -23,6 +23,8 @@ import {
 } from "lucide-react"
 import { NeedsAttentionCard } from "@/components/command-center/needs-attention-card"
 import type { NeedsAttentionItem } from "@/lib/needs-attention"
+import { AiConversation } from "@/components/ai/ai-conversation"
+import { Sparkles, FileCheck2 } from "lucide-react"
 
 type Tabs = "overview" | "intelligence" | "activity"
 
@@ -56,6 +58,10 @@ function intelligenceStatus(doc: any): { label: string; cls: string } | null {
 export function DocumentTabs({ document, needsAttention, activity }: DocumentTabsProps) {
   const [activeTab, setActiveTab] = useState<Tabs>("overview")
   const intelligence = intelligenceStatus(document)
+  const daysToExpiry = document.expiryDate
+    ? Math.ceil((new Date(document.expiryDate).getTime() - Date.now()) / 86_400_000)
+    : null
+  const hasFullText = Boolean(document.content && document.content.trim().length > 0)
 
   return (
     <div>
@@ -223,6 +229,7 @@ export function DocumentTabs({ document, needsAttention, activity }: DocumentTab
 
         {/* ── Intelligence ─────────────────────────────────────────────────── */}
         {activeTab === "intelligence" && (
+          <>
           <div className="grid gap-6 lg:grid-cols-2">
             <Card className="glass">
               <CardHeader>
@@ -250,6 +257,32 @@ export function DocumentTabs({ document, needsAttention, activity }: DocumentTab
                     {document.expiryDate
                       ? new Date(document.expiryDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
                       : "Not set"}
+                  </span>
+                </div>
+                {daysToExpiry !== null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Days to expiry</span>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full border",
+                      daysToExpiry < 0 ? "bg-red-500/10 text-red-400 border-red-500/20"
+                        : daysToExpiry <= 30 ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    )}>
+                      {daysToExpiry < 0 ? `${-daysToExpiry} days past` : `${daysToExpiry} day${daysToExpiry === 1 ? "" : "s"}`}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Full text on file</span>
+                  <span className={cn("text-xs flex items-center gap-1.5", hasFullText ? "text-emerald-400" : "text-muted-foreground/60")}>
+                    {hasFullText ? (
+                      <>
+                        <FileCheck2 className="h-3.5 w-3.5" />
+                        {document.content.trim().length.toLocaleString()} chars — Q&amp;A can read it
+                      </>
+                    ) : (
+                      <span>Metadata only — AI answers honestly without it</span>
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -289,6 +322,29 @@ export function DocumentTabs({ document, needsAttention, activity }: DocumentTab
               </CardContent>
             </Card>
           </div>
+
+          {/* ── Document Q&A (Phase 4c) ─────────────────────────────────── */}
+          <Card className="glass mt-6">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-violet-400" />
+                Ask about this document
+              </CardTitle>
+              <p className="text-xs text-muted-foreground/70 mt-0.5">
+                Answers are grounded in {hasFullText ? "this document's stored full text and its metadata" : "this document's metadata"}{" "}
+                with clickable sources. {hasFullText ? "" : "No full text is stored, so content questions are answered honestly from metadata only."}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <AiConversation
+                initialContext={{ type: "document", id: document.id, title: document.name }}
+                placeholder={`Ask about “${document.name}” — e.g. when does it expire? summarize it.`}
+                compact
+                hideContextChip
+              />
+            </CardContent>
+          </Card>
+          </>
         )}
 
         {/* ── Activity ─────────────────────────────────────────────────────── */}

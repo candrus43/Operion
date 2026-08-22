@@ -10,9 +10,15 @@
 import OpenAI from "openai"
 import { loadAiPool, resolveContextRef, resolveSources } from "./records"
 import type { AiAnswerCard, AiContextRef, AiMessage, AiSourceType } from "./types"
+import { tryDocumentMetadataAnswer } from "./document-answers"
 
 const MODEL = "gpt-4o-mini"
 const MAX_TOKENS = 1000
+const DAY = 86_400_000
+/** Whole days from now until `d` (positive = future, negative = past). */
+function daysUntil(d: Date | null): number | null {
+  return d ? Math.floor((d.getTime() - Date.now()) / DAY) : null
+}
 
 /** LLM-internal source declaration (raw, pre-resolution). */
 interface LlmSource { type: AiSourceType; title: string }
@@ -71,8 +77,13 @@ function orgSummary(orgId: string, pool: Awaited<ReturnType<typeof loadAiPool>>)
     pool.contacts.slice(0, 60).forEach(c => lines.push(`- ${c.name}${c.company ? ` (${c.company})` : ""}${c.position ? ` · ${c.position}` : ""}`))
   }
   if (pool.documents.length) {
-    lines.push("DOCUMENTS:")
-    pool.documents.slice(0, 60).forEach(d => lines.push(`- ${d.name} (${d.type.replace(/_/g, " ")})`))
+    lines.push("DOCUMENTS (expiry · attention · full-text-available):")
+    pool.documents.slice(0, 80).forEach(d => {
+      const exp = d.expiryDate ? `${fmt(d.expiryDate)} (${daysUntil(d.expiryDate)} days)` : "no expiry"
+      const att = d.attention ? ` · attention=${d.attention}` : ""
+      const ctn = d.content ? ` · full-text stored (${d.content.length} chars)` : ` · metadata only (no full text)`
+      lines.push(`- ${d.name} (${d.type.replace(/_/g, " ")}) [expiry=${exp}${att}${ctn}]${d.entity?.name ? ` · entity: ${d.entity.name}` : ""}${d.project?.name ? ` · project: ${d.project.name}` : ""}`)
+    })
   }
   if (pool.meetings.length) {
     lines.push("MEETINGS:")
@@ -113,7 +124,16 @@ function contextDetail(pool: Awaited<ReturnType<typeof loadAiPool>>, type: AiSou
     }
     case "document": {
       const d = pool.documents.find(x => x.name === title)
-      return d ? `DOCUMENT "${d.name}" (${d.type.replace(/_/g, " ")})${d.notes ? `\nNotes: ${d.notes}` : ""}` : null
+      if (!d) return null
+      const lines = [`DOCUMENT "${d.name}" (${d.type.replace(/_/g, " ")})`]
+      if (d.entity?.name) lines.push(`Entity: ${d.entity.name}`)
+      if (d.project?.name) lines.push(`Project: ${d.project.name}`)
+      if (d.expiryDate) lines.push(`Expires: ${fmt(d.expiryDate)} (${daysUntil(d.expiryDate)} days from now)`)
+      if (d.attention) lines.push(`Attention flag: ${d.attention}`)
+      if (d.notes) lines.push(`Notes: ${d.notes}`)
+      if (d.content) lines.push(`Full text stored (${d.content.length} chars):\n${d.content.slice(0, 4000)}`)
+      else lines.push("NO full text stored — only metadata (name, type, entity, project, dates) and any notes are available.")
+      return lines.join("\n")
     }
     case "meeting": {
       const m = pool.meetings.find(x => x.title === title)
@@ -138,6 +158,21 @@ export async function generateStructuredAnswer(params: EngineParams): Promise<{ 
     resolvedContext = resolveContextRef(params.context, pool)
     if (resolvedContext) {
       contextSnippet = contextDetail(pool, resolvedContext.type, resolvedContext.title)
+    }
+  }
+
+  // ── Deterministic document-metadata path (Phase 4c) ──
+  // Metadata-answerable prompts (expiry/renewals, type, entity, attention,
+  // missing-docs, single-document facts) are answered from REAL org-scoped rows
+  // here — fast, honest, and never fabricated — before any LLM call. Prompts
+  // that need full-text reasoning (e.g. "summarize the purchase agreement")
+  // return null and fall through to the LLM, which now has document content in
+  // its context pool when it exists.
+  const metaAnswer = tryDocumentMetadataAnswer(pool, params.question, params.context ?? null)
+  if (metaAnswer) {
+    return {
+      card: metaAnswer.card,
+      context: metaAnswer.context ?? resolvedContext,
     }
   }
 

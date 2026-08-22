@@ -20,7 +20,7 @@ export interface AiPool {
   projects: { id: string; name: string; status: string; phase: string; progress: number; targetDate: Date | null; description: string | null; entity: { name: string | null } | null }[]
   tasks: { id: string; title: string; status: string; priority: string; dueDate: Date | null; description: string | null; notes: string | null; assignee: { name: string | null } | null; entity: { name: string | null } | null; project: { name: string | null } | null }[]
   contacts: { id: string; name: string; company: string | null; position: string | null; entity: { name: string | null } | null }[]
-  documents: { id: string; name: string; type: string; notes: string | null; entity: { name: string | null } | null; project: { name: string | null } | null }[]
+  documents: { id: string; name: string; type: string; notes: string | null; content: string | null; expiryDate: Date | null; expiryNote: string | null; attention: string | null; entity: { id: string | null; name: string | null } | null; project: { id: string | null; name: string | null } | null }[]
   meetings: { id: string; title: string; date: Date; project: { name: string | null } | null }[]
 }
 
@@ -60,7 +60,12 @@ export async function loadAiPool(orgId: string): Promise<AiPool> {
     }),
     prisma.document.findMany({
       where: { organizationId: orgId },
-      select: { id: true, name: true, type: true, notes: true, entity: { select: { name: true } }, project: { select: { name: true } } },
+      select: {
+        id: true, name: true, type: true, notes: true, content: true,
+        expiryDate: true, expiryNote: true, attention: true,
+        entity: { select: { id: true, name: true } },
+        project: { select: { id: true, name: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.meeting.findMany({
