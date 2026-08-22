@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Building2, Plus, AlertTriangle, Info } from "lucide-react"
 import EntitySearch from "@/components/entities/entity-search"
+import { computeEntitySignals, type EntitySignals } from "@/lib/entity-signals"
 
 import { TIER_LIMITS } from "@/lib/tier-limits"
 
@@ -20,6 +21,7 @@ export default async function EntitiesPage() {
 
   let entities: any[] = []
   let org: { subscriptionTier: string } | null = null
+  let signals: EntitySignals = {}
 
   try {
     const result = await Promise.all([
@@ -36,6 +38,8 @@ export default async function EntitiesPage() {
       }),
     ]);
     [entities, org] = result
+    // Operational signals for the grid cards, scoped to this org's entities.
+    signals = await computeEntitySignals(orgId, entities.map((e: any) => e.id))
   } catch (err) {
     console.error("Entities page fetch failed:", err)
   }
@@ -97,7 +101,7 @@ export default async function EntitiesPage() {
         }
       />
 
-      <EntitySearch entities={entities} />
+      <EntitySearch entities={entities} signals={signals} />
 
       {entities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">

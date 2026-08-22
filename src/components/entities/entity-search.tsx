@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, type ReactNode } from "react"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import {
   Home,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { EntitySignals } from "@/lib/entity-signals"
 
 const entityTypeConfig: Record<string, { icon: typeof Building2; color: string; label: string }> = {
   BUSINESS: { icon: Store, color: "bg-violet-500/10 text-violet-400 border-violet-500/20", label: "Business" },
@@ -30,6 +31,27 @@ const entityTypeConfig: Record<string, { icon: typeof Building2; color: string; 
 
 const typeFilters = ["ALL", "BUSINESS", "HOTEL", "GAS_STATION", "COMMERCIAL_PROPERTY", "INVESTMENT", "OTHER"]
 
+// ── Signal formatting helpers (client-safe) ────────────────────────────────
+function shortDate(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+}
+
+function relativeTime(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  const diff = Date.now() - d.getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return "just now"
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days}d ago`
+  return shortDate(iso)
+}
+
 interface Entity {
   id: string
   name: string
@@ -37,7 +59,7 @@ interface Entity {
   _count: { projects: number; tasks: number; contacts: number; documents: number }
 }
 
-export default function EntitySearch({ entities }: { entities: Entity[] }) {
+export default function EntitySearch({ entities, signals = {} }: { entities: Entity[]; signals?: EntitySignals }) {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState("ALL")
 
@@ -76,6 +98,62 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
         {filtered.map((entity) => {
           const config = entityTypeConfig[entity.type] || entityTypeConfig.OTHER
           const Icon = config.icon
+          const sig = signals[entity.id]
+
+          // Only render signals that actually have data — nothing fabricated.
+          const signalPills: ReactNode[] = []
+          if (sig) {
+            if (sig.attentionCount > 0) {
+              signalPills.push(
+                <span key="attention" className="rounded-full border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-[10px] font-medium text-rose-300" title="Items needing attention">
+                  {sig.attentionCount} need attention
+                </span>
+              )
+            }
+            if (sig.blockedCount > 0) {
+              signalPills.push(
+                <span key="blocked" className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-medium text-orange-300" title="Blocked tasks">
+                  {sig.blockedCount} blocked
+                </span>
+              )
+            }
+            if (sig.awaitingReviewCount > 0) {
+              signalPills.push(
+                <span key="awaiting" className="rounded-full border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-[10px] font-medium text-purple-300" title="Tasks awaiting review/approval">
+                  {sig.awaitingReviewCount} to review
+                </span>
+              )
+            }
+            if (sig.nearestDeadline) {
+              const d = shortDate(sig.nearestDeadline.date)
+              signalPills.push(
+                <span key="deadline" className={cn("rounded-full border px-2.5 py-1 text-[10px] font-medium", sig.nearestDeadline.overdue ? "border-rose-500/20 bg-rose-500/10 text-rose-300" : "border-sky-400/15 bg-sky-400/[0.07] text-sky-200/70")} title={sig.nearestDeadline.kind === "document" ? "Document expires" : "Task due"}>
+                  {sig.nearestDeadline.kind === "document" ? "Doc " : "Due "}{d}{sig.nearestDeadline.overdue ? " (overdue)" : ""}
+                </span>
+              )
+            }
+            if (sig.activeProjectCount > 0) {
+              signalPills.push(
+                <span key="projects" className="rounded-full border border-emerald-500/15 bg-emerald-500/[0.07] px-2.5 py-1 text-[10px] text-emerald-200/80" title="Active projects">
+                  {sig.activeProjectCount} active
+                </span>
+              )
+            }
+            if (sig.lastActivity) {
+              signalPills.push(
+                <span key="activity" className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/50" title="Last activity">
+                  {relativeTime(sig.lastActivity)}
+                </span>
+              )
+            }
+            if (sig.leader) {
+              signalPills.push(
+                <span key="leader" className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/50" title="Responsible leader">
+                  {sig.leader}
+                </span>
+              )
+            }
+          }
 
           return (
             <Link key={entity.id} href={`/entities/${entity.id}`}>
@@ -109,6 +187,9 @@ export default function EntitySearch({ entities }: { entities: Entity[] }) {
                     <span className="rounded-full border border-amber-400/15 bg-amber-400/[0.07] px-2.5 py-1 text-[10px] text-amber-200/70">{entity._count.tasks} tasks</span>
                     <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.07] px-2.5 py-1 text-[10px] text-violet-200/70">{entity._count.documents} docs</span>
                   </div>
+                  {signalPills.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">{signalPills}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
