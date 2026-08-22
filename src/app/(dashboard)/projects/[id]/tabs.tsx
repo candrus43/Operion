@@ -15,12 +15,14 @@ import {
   Activity,
   Clock,
   DollarSign,
-  Sparkles,
   ChevronRight,
   AlertTriangle,
+  ShieldAlert,
+  User,
 } from "lucide-react"
 import { NeedsAttentionCard } from "@/components/command-center/needs-attention-card"
 import type { NeedsAttentionItem } from "@/lib/needs-attention"
+import type { RiskSignal, ReconcilationWarning } from "@/lib/project-risk"
 
 type Tabs = "overview" | "tasks" | "documents" | "meetings" | "activity"
 
@@ -28,6 +30,8 @@ interface ProjectTabsProps {
   project: any
   needsAttention: NeedsAttentionItem[]
   activity: any[]
+  risk: { signals: RiskSignal[]; level: "HIGH" | "MEDIUM" | "LOW"; hasRisk: boolean }
+  reconciliation: ReconcilationWarning | null
 }
 
 const phaseLabels: Record<string, string> = {
@@ -58,7 +62,7 @@ const tabDefs: { key: Tabs; label: string; icon: typeof Info }[] = [
   { key: "activity", label: "Activity", icon: Activity },
 ]
 
-export function ProjectTabs({ project, needsAttention, activity }: ProjectTabsProps) {
+export function ProjectTabs({ project, needsAttention, activity, risk, reconciliation }: ProjectTabsProps) {
   const [activeTab, setActiveTab] = useState<Tabs>("overview")
   const tasks = project.tasks || []
   const documents = project.documents || []
@@ -168,24 +172,103 @@ export function ProjectTabs({ project, needsAttention, activity }: ProjectTabsPr
                 </Card>
               )}
 
-              {/* AI Risk Assessment placeholder */}
-              <Card className="glass border border-dashed border-white/[0.05]">
+              {/* Phase / progress reconciliation warning */}
+              {reconciliation && (
+                <div className={cn(
+                  "rounded-xl p-4 border",
+                  reconciliation.level === "behind"
+                    ? "bg-amber-500/5 border-amber-500/30"
+                    : "bg-sky-500/5 border-sky-500/30"
+                )}>
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-lg shrink-0 mt-0.5",
+                      reconciliation.level === "behind" ? "bg-amber-500/10" : "bg-sky-500/10"
+                    )}>
+                      <AlertTriangle className={cn("h-4 w-4", reconciliation.level === "behind" ? "text-amber-400" : "text-sky-400")} />
+                    </div>
+                    <div>
+                      <p className={cn(
+                        "text-sm font-semibold",
+                        reconciliation.level === "behind" ? "text-amber-300" : "text-sky-300"
+                      )}>
+                        {reconciliation.level === "behind" ? "Progress is behind the phase plan" : "Progress is ahead of the phase plan"}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{reconciliation.message}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Real risk profile (Phase 4e — replaces placeholder) */}
+              <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-violet-400" />
-                    AI Risk Assessment
+                    <ShieldAlert className="h-4 w-4 text-violet-400" />
+                    Risk Profile
+                    {risk.hasRisk && (
+                      <span className={cn(
+                        "ml-auto text-[10px] px-2 py-0.5 rounded-full border",
+                        risk.level === "HIGH"
+                          ? "bg-red-500/10 text-red-400 border-red-500/20"
+                          : risk.level === "MEDIUM"
+                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      )}>
+                        {risk.level}
+                      </span>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col items-center justify-center py-6 text-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-500/10 mb-3">
-                      <Sparkles className="h-5 w-5 text-violet-400" />
+                  {!risk.hasRisk ? (
+                    <div className="flex items-center gap-3 py-4">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/10 shrink-0">
+                        <ShieldAlert className="h-4 w-4 text-emerald-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        No material risks detected from the current task/timeline data.
+                      </p>
                     </div>
-                    <p className="text-sm font-medium text-muted-foreground">AI-powered risk analysis</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Coming in Phase 4 — get automated risk detection and mitigation suggestions for your projects.
-                    </p>
-                  </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {risk.signals.map((s: RiskSignal) => (
+                        <div
+                          key={s.id}
+                          className={cn(
+                            "flex items-start gap-3 rounded-lg p-3 border",
+                            s.severity === "high"
+                              ? "bg-red-500/5 border-red-500/20"
+                              : s.severity === "medium"
+                              ? "bg-amber-500/5 border-amber-500/20"
+                              : "bg-white/[0.03] border-white/[0.06]"
+                          )}
+                        >
+                          <div className={cn(
+                            "flex h-6 w-6 items-center justify-center rounded-full shrink-0 mt-0.5",
+                            s.severity === "high"
+                              ? "bg-red-500/10"
+                              : s.severity === "medium"
+                              ? "bg-amber-500/10"
+                              : "bg-white/[0.06]"
+                          )}>
+                            <AlertTriangle className={cn(
+                              "h-3 w-3",
+                              s.severity === "high"
+                                ? "text-red-400"
+                                : s.severity === "medium"
+                                ? "text-amber-400"
+                                : "text-muted-foreground"
+                            )} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">{s.label}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{s.detail}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -198,6 +281,17 @@ export function ProjectTabs({ project, needsAttention, activity }: ProjectTabsPr
                   <CardTitle className="text-sm font-medium">Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Owner</span>
+                    {project.ownerUser ? (
+                      <div className="flex items-center gap-1.5">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs font-medium">{project.ownerUser.name}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Unassigned</span>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Start Date</span>
                     <span className="text-xs">

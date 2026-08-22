@@ -19,6 +19,7 @@ import {
   Phone,
   Mail,
   Building2,
+  AlertTriangle,
 } from "lucide-react"
 import { NeedsAttentionCard } from "@/components/command-center/needs-attention-card"
 import type { NeedsAttentionItem } from "@/lib/needs-attention"
@@ -62,6 +63,36 @@ export function EntityTabs({ entity, needsAttention }: EntityTabsProps) {
     .filter((c: any) => !relationIds.has(c.id))
     .map((c: any) => ({ id: c.id, name: c.name, company: c.company, email: c.email, phone: c.phone, position: c.position, role: c.position, notes: null, enabled: true }))
   const allContacts = [...relationContacts, ...flatContacts]
+
+  // ── Relationships (Phase 4e / GAP 14A) ────────────────────────────────────
+  // Owner/principal and vendor/partner contacts are derived from their role at
+  // this entity (ContactRelation.role). Alongside the explicit entity owner
+  // contact, parent entity, and child entities, this forms the relationships
+  // panel. Deterministic classification only — never fabricated.
+  const ev = (s?: string | null) => (s || "").toLowerCase()
+  const isOwnerRole = (r?: string | null) =>
+    /owner|ceo|principal|shareholder|founder|president|ubd|managing|director/.test(ev(r))
+  const isVendorRole = (r?: string | null) =>
+    /vendor|supplier|contractor|service|lender|bank|attorney|lawyer|accountant|cpa|agent|partner/.test(ev(r))
+  const ownerContacts = (entity.contactRelations || []).filter((r: any) => isOwnerRole(r.role))
+  const vendorContacts = (entity.contactRelations || []).filter((r: any) => isVendorRole(r.role))
+  const explicitOwner = entity.ownerContact
+
+  // ── Risk profile (Phase 4e / GAP 14A) ─────────────────────────────────────
+  // Reuses the shared needs-attention logic (needsAttentionItem[]) plus
+  // critical/open task counts to surface real attention signals — no made-up
+  // score.
+  const riskCounts = {
+    open: (entity.tasks || []).filter((t: any) => t.status !== "DONE").length,
+    critical: (entity.tasks || []).filter((t: any) => t.priority === "CRITICAL" && t.status !== "DONE").length,
+    total: needsAttention.length,
+  }
+  const riskLevel =
+    needsAttention.filter((n) => n.reason === "BLOCKED" || n.reason === "CRITICAL").length > 0
+      ? "HIGH"
+      : needsAttention.length > 0
+      ? "MEDIUM"
+      : "LOW"
 
   return (
     <div>
@@ -155,6 +186,149 @@ export function EntityTabs({ entity, needsAttention }: EntityTabsProps) {
             <div className="md:col-span-2">
               <NeedsAttentionCard items={needsAttention} />
             </div>
+
+            {/* Relationships (Phase 4e / GAP 14A) */}
+            <Card className="glass md:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  Relationships
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Parent / child entity hierarchy */}
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Parent Entity</p>
+                    {entity.parent ? (
+                      <Link href={`/entities/${entity.parent.id}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+                        <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                        {entity.parent.name}
+                      </Link>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/60">No parent entity</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Child Entities ({entity.childEntities?.length || 0})</p>
+                    {entity.childEntities && entity.childEntities.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {entity.childEntities.map((c: any) => (
+                          <Link key={c.id} href={`/entities/${c.id}`} className="text-sm hover:text-white transition-colors">
+                            <Badge variant="outline" className="text-[11px] px-2 py-0.5">{c.name}</Badge>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/60">No child entities</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Owner */}
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Owner &amp; Principals</p>
+                    {explicitOwner || ownerContacts.length > 0 ? (
+                      <div className="space-y-1.5">
+                        {explicitOwner && (
+                          <Link href={`/contacts/${explicitOwner.id}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+                            <Avatar className="h-5 w-5">
+                              <AvatarFallback className="text-[9px] bg-[#222]">
+                                {explicitOwner.name?.split(" ").map((n: string) => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            {explicitOwner.name}
+                          </Link>
+                        )}
+                        {ownerContacts.map((oc: any) => (
+                          <Link key={oc.contact.id} href={`/contacts/${oc.contact.id}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+                            <Avatar className="h-5 w-5">
+                              <AvatarFallback className="text-[9px] bg-[#222]">
+                                {oc.contact.name?.split(" ").map((n: string) => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{oc.contact.name}</span>
+                            {oc.role && <span className="text-[11px] text-muted-foreground">({oc.role})</span>}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/60">No owner on record</p>
+                    )}
+                  </div>
+
+                  {/* Vendors / partners */}
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Vendors &amp; Partners ({vendorContacts.length})</p>
+                    {vendorContacts.length > 0 ? (
+                      <div className="space-y-1.5">
+                        {vendorContacts.map((vc: any) => (
+                          <Link key={vc.contact.id} href={`/contacts/${vc.contact.id}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+                            <span>{vc.contact.name}</span>
+                            {vc.role && <span className="text-[11px] text-muted-foreground">({vc.role})</span>}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/60">No vendors/partners on record</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Risk Profile (Phase 4e / GAP 14A) */}
+            <Card className="glass md:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                  Risk Profile
+                  <span className={cn(
+                    "ml-auto text-[10px] px-2 py-0.5 rounded-full border",
+                    riskLevel === "HIGH"
+                      ? "bg-red-500/10 text-red-400 border-red-500/20"
+                      : riskLevel === "MEDIUM"
+                      ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                      : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  )}>
+                    {riskLevel}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-3 mb-4">
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
+                    <div className="text-2xl font-bold">{riskCounts.open}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Open Tasks</div>
+                  </div>
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
+                    <div className="text-2xl font-bold">{riskCounts.critical}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Critical Open</div>
+                  </div>
+                  <div className="text-center rounded-xl bg-white/[0.04] p-4">
+                    <div className="text-2xl font-bold">{riskCounts.total}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Needs Attention</div>
+                  </div>
+                </div>
+                {needsAttention.length > 0 ? (
+                  <div className="space-y-2">
+                    {needsAttention.slice(0, 5).map((n) => (
+                      <Link key={n.id} href={n.url} className="flex items-center gap-3 rounded-lg p-2.5 border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.06] transition-colors">
+                        <span className={cn("text-[10px] px-1.5 py-0 rounded border shrink-0", n.reason === "BLOCKED" || n.reason === "CRITICAL" ? "bg-red-500/10 text-red-400 border-red-500/20" : n.reason === "OVERDUE" || n.reason === "EXPIRED" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20")}>
+                          {n.reason.replace(/_/g, " ")}
+                        </span>
+                        <span className="text-sm truncate">{n.title}</span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">
+                    No open, overdue, blocked, or expiring items currently need attention at this entity.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Quick Summary */}
             <Card className="glass md:col-span-2">

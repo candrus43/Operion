@@ -18,6 +18,7 @@ import { projectStatusColor, phaseColor } from "@/lib/colors"
 import { AskAiButton } from "@/components/ai/ask-ai-button"
 import { ProjectTabs } from "./tabs"
 import { collectProjectNeedsAttention } from "@/lib/needs-attention"
+import { computeProjectRisk, reconcilePhaseProgress } from "@/lib/project-risk"
 
 const phaseLabels: Record<string, string> = {
   ACQUISITION: "Acquisition",
@@ -44,6 +45,7 @@ export default async function ProjectDetailPage({
     where: { id, organizationId: orgId },
     include: {
       entity: true,
+      ownerUser: { select: { id: true, name: true, image: true } },
       tasks: {
         include: {
           assignee: true,
@@ -61,6 +63,10 @@ export default async function ProjectDetailPage({
 
   const openTasks = project.tasks.filter((t) => t.status !== "DONE").length
   const doneTasks = project.tasks.filter((t) => t.status === "DONE").length
+
+  // Phase 4e: real risk profile + phase/progress reconciliation (GAP 14B).
+  const risk = computeProjectRisk(project, project.tasks)
+  const reconciliation = reconcilePhaseProgress(project.phase, project.progress)
 
   const [needsAttention, activity] = await Promise.all([
     collectProjectNeedsAttention(orgId, project.id),
@@ -154,7 +160,13 @@ export default async function ProjectDetailPage({
       </div>
 
       {/* Command center tabs */}
-      <ProjectTabs project={project} needsAttention={needsAttention} activity={activity} />
+      <ProjectTabs
+        project={project}
+        needsAttention={needsAttention}
+        activity={activity}
+        risk={risk}
+        reconciliation={reconciliation}
+      />
     </div>
   )
 }

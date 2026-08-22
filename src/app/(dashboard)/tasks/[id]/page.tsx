@@ -31,6 +31,7 @@ export default async function TaskDetailPage({
       project: true,
       entity: true,
       reviewer: { select: { id: true, name: true } },
+      waitingOnUser: { select: { id: true, name: true } },
       dependsOn: { select: { id: true, title: true, status: true } },
       dependedBy: {
         select: { id: true, title: true, status: true, priority: true, dueDate: true },
