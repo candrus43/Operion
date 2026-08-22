@@ -11,6 +11,7 @@ import { PostPaymentOnboarding } from "@/components/onboarding/PostPaymentOnboar
 import { CheckoutSuccessToast } from "@/components/dashboard/checkout-success-toast"
 import { cn } from "@/lib/utils"
 import { generateNotifications } from "@/lib/notifications"
+import { computeAggregateSignificance, type AggregateSignificance } from "@/lib/aggregate-significance"
 import { TIER_LIMITS } from "@/lib/tier-limits"
 import {
   Building2,
@@ -20,6 +21,7 @@ import {
   FileText,
   Users,
   Calendar,
+  Activity,
 } from "lucide-react"
 
 export default async function DashboardPage({
@@ -95,6 +97,16 @@ export default async function DashboardPage({
     console.error("Dashboard stats fetch failed:", err)
   }
 
+  // Cross-product aggregate significance — what the counts MEAN, org-scoped.
+  let significance: AggregateSignificance | null = null
+  if (entityCount > 0) {
+    try {
+      significance = await computeAggregateSignificance(orgId)
+    } catch (err) {
+      console.error("Dashboard significance fetch failed:", err)
+    }
+  }
+
   // Enforce trial expiration at page level
   if (org?.subscriptionStatus === "EXPIRED") {
     redirect("/trial-expired")
@@ -131,6 +143,18 @@ export default async function DashboardPage({
     ENTERPRISE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   }
 
+  // Significance sentence tone styling (dark-on-glass, AA-visible).
+  const significanceToneText: Record<string, string> = {
+    critical: "text-rose-300",
+    warn: "text-amber-300",
+    good: "text-emerald-300",
+  }
+  const significanceToneDot: Record<string, string> = {
+    critical: "bg-rose-500",
+    warn: "bg-amber-500",
+    good: "bg-emerald-500",
+  }
+
   // ── Checkout success handling ──────────────────────────────────
   const showCheckoutSuccess = searchParamsValue.checkout === "success"
   const planName = tier === "TEAM" ? "Studio" : "Founder"
@@ -152,6 +176,42 @@ export default async function DashboardPage({
 
       {/* Row 1: AI Daily Briefing */}
       <AIBriefingAI userName={userName} />
+
+      {/* Cross-product significance — what the portfolio counts MEAN. */}
+      {significance && significance.sentences.length > 0 && (
+        <div className="rounded-xl glass border border-white/[0.06] p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06]">
+              <Activity className="h-3.5 w-3.5 text-white/70" />
+            </div>
+            <h2 className="text-sm font-semibold">Significance</h2>
+            <p className="text-xs text-muted-foreground ml-1">what needs your attention right now</p>
+          </div>
+          <ul className="space-y-2">
+            {significance.sentences.map((s, i) => (
+              <li key={i}>
+                {s.href ? (
+                  <Link
+                    href={s.href}
+                    className={cn(
+                      "flex items-start gap-2 text-sm leading-relaxed hover:underline",
+                      significanceToneText[s.tone] ?? "text-white/70"
+                    )}
+                  >
+                    <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", significanceToneDot[s.tone] ?? "bg-white/40")} />
+                    {s.text}
+                  </Link>
+                ) : (
+                  <span className={cn("flex items-start gap-2 text-sm leading-relaxed", significanceToneText[s.tone] ?? "text-white/70")}>
+                    <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", significanceToneDot[s.tone] ?? "bg-white/40")} />
+                    {s.text}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Tier badge + entity limit warning */}
       <div className="flex items-center gap-3 flex-wrap">
