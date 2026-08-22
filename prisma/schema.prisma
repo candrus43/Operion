@@ -80,6 +80,7 @@ model User {
   auditLogs       AuditLog[]
   executiveNotes  ExecutiveNote[]
   reviewedTasks   Task[]         @relation("TaskReviewer")
+  ownedProjects   Project[]      @relation("ProjectOwner")
 }
 
 model Account {
@@ -130,7 +131,19 @@ model Entity {
   contacts       Contact[]
   contactRelations ContactRelation[]
 
+  // ── Command-center depth (Phase 4e; additive / nullable) ─────────────────
+  // Entity hierarchy (child entities under a parent, e.g. portfolio company
+  // under an SPV) and the entity's designated owner contact. Both are optional
+  // and purely additive — existing rows are untouched (NULL).
+  parentEntityId String?
+  ownerContactId String?
+
+  parent        Entity?   @relation("EntityChildren", fields: [parentEntityId], references: [id])
+  childEntities Entity[]  @relation("EntityChildren")
+  ownerContact  Contact?  @relation("ContactEntityOwner", fields: [ownerContactId], references: [id])
+
   @@index([organizationId])
+  @@index([parentEntityId])
 }
 
 model Project {
@@ -146,16 +159,21 @@ model Project {
   organizationId String
   entityId       String?
   isSample       Boolean      @default(false)
+  // Command-center depth (Phase 4e; additive / nullable): the org user who
+  // owns this project. NULL means unassigned — purely additive.
+  ownerUserId    String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   entity         Entity?      @relation(fields: [entityId], references: [id])
+  ownerUser      User?        @relation("ProjectOwner", fields: [ownerUserId], references: [id])
   tasks          Task[]
   documents      Document[]
   meetings       Meeting[]
 
   @@index([organizationId])
+  @@index([ownerUserId])
 }
 
 model Task {
@@ -289,6 +307,7 @@ model Contact {
   organization   Organization @relation(fields: [organizationId], references: [id])
   entity         Entity?      @relation(fields: [entityId], references: [id])
   relations      ContactRelation[]
+  entitiesOwned  Entity[]     @relation("ContactEntityOwner")
   mergedInto     Contact?      @relation("ContactMergeInto", fields: [mergedIntoId], references: [id])
   mergedContacts Contact[]     @relation("ContactMergeInto")
   mergesAsKeeper ContactMerge[] @relation("ContactMergeKeeper")

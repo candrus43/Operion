@@ -68,7 +68,7 @@ export async function PATCH(
 
   const { id } = await params
   const body = await req.json()
-  const { name, description, status, phase, progress, budget, startDate, targetDate, entityId } = body
+  const { name, description, status, phase, progress, budget, startDate, targetDate, entityId, ownerUserId } = body
 
   const existing = await prisma.project.findFirst({
     where: { id, organizationId: perm.orgId },
@@ -89,6 +89,7 @@ export async function PATCH(
       ...(startDate !== undefined && { startDate: startDate ? new Date(startDate) : null }),
       ...(targetDate !== undefined && { targetDate: targetDate ? new Date(targetDate) : null }),
       ...(entityId !== undefined && { entityId: entityId || null }),
+      ...(ownerUserId !== undefined && { ownerUserId: ownerUserId || null }),
     },
     include: {
       entity: true,

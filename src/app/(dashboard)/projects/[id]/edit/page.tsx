@@ -42,6 +42,7 @@ const statuses = [
 ]
 
 type Entity = { id: string; name: string }
+type UserOption = { id: string; name: string }
 
 export default function EditProjectPage() {
   const router = useRouter()
@@ -53,6 +54,7 @@ export default function EditProjectPage() {
   const [deleting, setDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [entities, setEntities] = useState<Entity[]>([])
+  const [users, setUsers] = useState<UserOption[]>([])
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -62,13 +64,15 @@ export default function EditProjectPage() {
   const [startDate, setStartDate] = useState("")
   const [targetDate, setTargetDate] = useState("")
   const [entityId, setEntityId] = useState("")
+  const [ownerUserId, setOwnerUserId] = useState("")
 
   useEffect(() => {
     async function load() {
       try {
-        const [projRes, entRes] = await Promise.all([
+        const [projRes, entRes, userRes] = await Promise.all([
           fetch(`/api/projects/${id}`),
           fetch("/api/entities"),
+          fetch("/api/users"),
         ])
 
         if (!projRes.ok) throw new Error("Not found")
@@ -90,9 +94,13 @@ export default function EditProjectPage() {
             : ""
         )
         setEntityId(project.entityId || "")
+        setOwnerUserId(project.ownerUserId || "")
 
         if (entRes.ok) {
           setEntities(await entRes.json())
+        }
+        if (userRes.ok) {
+          setUsers(await userRes.json())
         }
       } catch {
         toast.error("Project not found")
@@ -119,6 +127,7 @@ export default function EditProjectPage() {
         startDate: startDate || null,
         targetDate: targetDate || null,
         entityId: entityId || null,
+        ownerUserId: ownerUserId || null,
       }
 
       const res = await fetch(`/api/projects/${id}`, {
@@ -314,6 +323,27 @@ export default function EditProjectPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Owner (org user) */}
+            <div className="space-y-2">
+              <Label htmlFor="ownerUserId">Owner</Label>
+              <Select value={ownerUserId} onValueChange={setOwnerUserId}>
+                <SelectTrigger id="ownerUserId" className="bg-white/[0.04] border-0">
+                  <SelectValue placeholder="Select an owner (optional)" />
+                </SelectTrigger>
+                <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
+                  <SelectItem value="none">Unassigned</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                The team member accountable for this project.
+              </p>
             </div>
 
             {/* Actions */}

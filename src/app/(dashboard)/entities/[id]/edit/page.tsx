@@ -67,6 +67,10 @@ export default function EditEntityPage() {
   const [name, setName] = useState("")
   const [type, setType] = useState("")
   const [metadata, setMetadata] = useState<Record<string, string>>({})
+  const [parentEntityId, setParentEntityId] = useState("")
+  const [ownerContactId, setOwnerContactId] = useState("")
+  const [entityList, setEntityList] = useState<{ id: string; name: string }[]>([])
+  const [contactList, setContactList] = useState<{ id: string; name: string }[]>([])
 
   useEffect(() => {
     async function load() {
@@ -76,9 +80,14 @@ export default function EditEntityPage() {
         const entity = await res.json()
         setName(entity.name)
         setType(entity.type)
+        setParentEntityId(entity.parentEntityId || "")
+        setOwnerContactId(entity.ownerContactId || "")
         let parsed = {}
         try { parsed = JSON.parse(entity.metadata) } catch {}
         setMetadata(parsed)
+        const [entRes, conRes] = await Promise.all([fetch("/api/entities"), fetch("/api/contacts")])
+        if (entRes.ok) setEntityList(await entRes.json())
+        if (conRes.ok) setContactList(await conRes.json())
       } catch {
         toast.error("Entity not found")
         router.push("/entities")
@@ -98,7 +107,11 @@ export default function EditEntityPage() {
       const res = await fetch(`/api/entities/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, type, metadata }),
+        body: JSON.stringify({
+          name, type, metadata,
+          parentEntityId: parentEntityId || null,
+          ownerContactId: ownerContactId || null,
+        }),
       })
 
       if (!res.ok) {
@@ -220,6 +233,39 @@ export default function EditEntityPage() {
                 </div>
               </div>
             )}
+
+            <div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-white/[0.05]">
+              <div className="space-y-2">
+                <Label htmlFor="parentEntityId">Parent Entity</Label>
+                <Select value={parentEntityId} onValueChange={setParentEntityId}>
+                  <SelectTrigger id="parentEntityId" className="bg-white/[0.04] border-0">
+                    <SelectValue placeholder="Select a parent (optional)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
+                    <SelectItem value="none">No parent</SelectItem>
+                    {entityList.filter((e) => e.id !== id).map((e) => (
+                      <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">If this entity is a child of a holding/portfolio entity.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ownerContactId">Owner Contact</Label>
+                <Select value={ownerContactId} onValueChange={setOwnerContactId}>
+                  <SelectTrigger id="ownerContactId" className="bg-white/[0.04] border-0">
+                    <SelectValue placeholder="Select an owner (optional)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/[0.04] border border-white/[0.05]">
+                    <SelectItem value="none">No owner</SelectItem>
+                    {contactList.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">The contact who owns this entity.</p>
+              </div>
+            </div>
 
             <div className="flex items-center justify-between pt-4">
               <div className="flex items-center gap-3">

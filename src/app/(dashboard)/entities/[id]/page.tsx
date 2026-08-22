@@ -53,6 +53,13 @@ export default async function EntityDetailPage({
     where: { id, organizationId: orgId },
     include: {
       _count: { select: { projects: true, tasks: true, contacts: true, documents: true } },
+      parent: { select: { id: true, name: true, type: true } },
+      childEntities: {
+        where: { organizationId: orgId },
+        select: { id: true, name: true, type: true },
+        orderBy: { name: "asc" },
+      },
+      ownerContact: { select: { id: true, name: true, company: true, position: true, email: true } },
       projects: { orderBy: { updatedAt: "desc" } },
       tasks: {
         include: { assignee: true, project: true },

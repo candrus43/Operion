@@ -137,6 +137,37 @@ export function TaskTabs({ task, needsAttention, auditActivity }: TaskTabsProps)
                         Expected resolution: {task.expectedResolutionDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </p>
                     )}
+                    {/* Escalation chain (Phase 4e / GAP 14C) — the escalation owner and
+                        the org user this task is waiting on, when present. */}
+                    {(task.status === "BLOCKED" || task.status === "WAITING_ON") && (
+                      <div className="mt-2 pt-2 border-t border-white/[0.06] flex flex-wrap items-center gap-x-4 gap-y-1">
+                        {task.escalationOwner ? (
+                          <span className="flex items-center gap-1.5 text-sm">
+                            <span className={cn("text-[10px] px-1.5 py-0 rounded border", task.status === "BLOCKED" ? "bg-red-500/10 text-red-300 border-red-500/20" : "bg-amber-500/10 text-amber-300 border-amber-500/20")}>
+                              ESCALATED
+                            </span>
+                            <span className={cn("text-sm font-medium", task.status === "BLOCKED" ? "text-red-200/90" : "text-amber-200/90")}>
+                              {task.escalationOwner}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">No escalation owner set</span>
+                        )}
+                        {task.waitingOnUser && (
+                          <span className={cn(
+                            "flex items-center gap-1.5 text-sm",
+                            task.status === "WAITING_ON" ? "text-amber-200/90" : "text-red-200/90"
+                          )}>
+                            <Avatar className="h-4 w-4">
+                              <AvatarFallback className="text-[8px] bg-[#222]">
+                                {task.waitingOnUser.name.split(" ").map((n: string) => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            Waiting on: {task.waitingOnUser.name}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -75,7 +75,7 @@ export async function PATCH(
 
   const { id } = await params
   const body = await req.json()
-  const { name, type, metadata } = body
+  const { name, type, metadata, parentEntityId, ownerContactId } = body
 
   const existing = await prisma.entity.findFirst({
     where: { id, organizationId: perm.orgId },
@@ -91,6 +91,8 @@ export async function PATCH(
       ...(name && { name }),
       ...(type && { type }),
       ...(metadata !== undefined && { metadata: JSON.stringify(metadata) }),
+      ...(parentEntityId !== undefined && { parentEntityId: parentEntityId || null }),
+      ...(ownerContactId !== undefined && { ownerContactId: ownerContactId || null }),
     },
   })
 
