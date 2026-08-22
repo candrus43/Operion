@@ -10,6 +10,9 @@ import { ContactDeleteButton } from "./delete-button"
 import { AskAiButton } from "@/components/ai/ask-ai-button"
 import { ContactTabs } from "./tabs"
 import { collectNeedsAttention } from "@/lib/needs-attention"
+import { UnmergeButton } from "@/components/contacts/merge-actions"
+import { Card, CardContent } from "@/components/ui/card"
+import { GitMerge } from "lucide-react"
 
 export default async function ContactDetailPage({
   params,
@@ -52,7 +55,7 @@ export default async function ContactDetailPage({
     return { id: eid, name: named ?? primName }
   })
 
-  const [needsAttention, tasks, projects, documents, activity, entitiesMap] = await Promise.all([
+  const [needsAttention, tasks, projects, documents, activity, entitiesMap, merges] = await Promise.all([
     collectNeedsAttention(orgId, entityRefs, { includeProjects: true }),
     entityIds.length
       ? prisma.task.findMany({
@@ -81,6 +84,11 @@ export default async function ContactDetailPage({
     entityIds.length
       ? prisma.entity.findMany({ where: { id: { in: entityIds } }, select: { id: true, name: true } })
       : [],
+    prisma.contactMerge.findMany({
+      where: { organizationId: orgId, keeperId: contact.id, status: "MERGED" },
+      include: { mergedContact: { select: { id: true, name: true } } },
+      orderBy: { mergedAt: "desc" },
+    }),
   ])
   const entityNameById: Record<string, string> = Object.fromEntries(entitiesMap.map((e) => [e.id, e.name]))
 
@@ -144,6 +152,33 @@ export default async function ContactDetailPage({
         documents={documents}
         activity={activity}
       />
+
+      {/* Merge history — reversibility affordance */}
+      {merges.length > 0 && (
+        <Card className="glass">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground/90">
+              <GitMerge className="h-4 w-4 text-sky-400" />
+              Merged contacts
+              <span className="text-xs text-muted-foreground">— can be unmerged</span>
+            </div>
+            {merges.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.04] p-3 flex-wrap"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm">{m.mergedContact.name}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Merged into {contact.name} · {new Date(m.mergedAt).toLocaleString()}
+                  </p>
+                </div>
+                <UnmergeButton mergeId={m.id} mergedName={m.mergedContact.name} />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
