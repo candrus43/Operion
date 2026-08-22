@@ -72,6 +72,7 @@ export async function POST(req: Request) {
       type,
       url: url || null,
       filePath: filePath || null,
+      content: content || null,
       organizationId: orgId,
       projectId: projectId || null,
       entityId: entityId || null,

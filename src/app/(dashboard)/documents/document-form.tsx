@@ -56,6 +56,11 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
   const [projectId, setProjectId] = useState(document?.projectId || "")
   const [entityId, setEntityId] = useState(document?.entityId || "")
 
+  // ── Full-text capture (Phase 4c) — optional body so document Q&A can
+  //    summarize/quote real content. Populated from *.txt uploads automatically.
+  const [content, setContent] = useState(document?.content || "")
+  const [contentFromFile, setContentFromFile] = useState(false)
+
   // ── Document intelligence (Phase 3b) ──
   const [expiryDate, setExpiryDate] = useState(
     document?.expiryDate ? new Date(document.expiryDate).toISOString().slice(0, 10) : ""
@@ -120,6 +125,20 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
         size: file.size,
         path: data.url,
       })
+      // Plain-text uploads: capture the file's text so document Q&A can
+      // summarize/quote real content. Read client-side before the 10MB cap
+      // makes this impractical (txt files are tiny).
+      if (file.type === "text/plain" || file.name.toLowerCase().endsWith(".txt")) {
+        try {
+          const text = await file.text()
+          if (text && text.trim()) {
+            setContent((prev: string) => (prev && prev.trim() ? prev : text))
+            setContentFromFile(true)
+          }
+        } catch {
+          /* ignore — content capture is best-effort */
+        }
+      }
       toast.success("File uploaded")
     } catch (err: any) {
       toast.error(err.message || "Upload failed")
@@ -155,6 +174,7 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
         type,
         url: url.trim() || null,
         filePath: uploadedFile?.path || null,
+        content: content.trim() ? content : null,
         projectId: projectId || null,
         entityId: entityId || null,
         expiryDate: expiryDate ? new Date(expiryDate + "T00:00:00").toISOString() : null,
@@ -406,6 +426,33 @@ export function DocumentForm({ entities, projects, document, isEdit }: DocumentF
                   className="bg-white/[0.04] border-0"
                 />
               </div>
+            </div>
+
+            {/* ── Full document text (Phase 4c) ── */}
+            <div className="pt-2 border-t border-white/[0.03]">
+              <p className="text-sm font-medium flex items-center gap-2 mb-1.5">
+                <FileText className="h-4 w-4 text-violet-400" />
+                Document text <span className="text-[11px] font-normal text-muted-foreground/60">(optional)</span>
+              </p>
+              <p className="text-[11px] text-muted-foreground/60 mb-3">
+                Paste the document&apos;s body to let AI summarize and answer questions about its real contents.
+                Auto-captured from <span className="text-foreground/70">.txt</span> uploads. When blank, AI answers from
+                metadata only and says so honestly.
+              </p>
+              <textarea
+                id="content"
+                value={content}
+                onChange={(e) => { setContent(e.target.value); setContentFromFile(false) }}
+                placeholder="Paste the document body here…"
+                rows={6}
+                className="w-full rounded-lg bg-white/[0.04] border border-white/[0.05] px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-violet-500/30 resize-y"
+              />
+              {contentFromFile && (
+                <p className="text-[11px] text-emerald-400/80 mt-1.5">Text captured from the uploaded .txt file — you can edit or clear it above.</p>
+              )}
+              {content && !contentFromFile && (
+                <p className="text-[11px] text-muted-foreground/50 mt-1.5">{content.length.toLocaleString()} characters stored as full text.</p>
+              )}
             </div>
 
             {/* Submit */}
