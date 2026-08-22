@@ -1,49 +1,124 @@
 import { PageHeader } from "@/components/layout/page-header"
-import { Suspense } from "react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Plus, ExternalLink, Building2, FolderKanban, User, AlertTriangle } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { docTypeColor, docTypeLabel } from "@/lib/colors"
-import DocumentTypeFilter from "@/components/documents/document-type-filter"
+import { Plus } from "lucide-react"
+import type { Prisma } from "@prisma/client"
+import { DocumentsClient } from "./documents-client"
 
-const DOC_TYPES = [
-  "CONTRACT", "PURCHASE_AGREEMENT", "LEASE", "INSURANCE",
-  "LICENSE", "TAX", "FINANCIAL_STATEMENT", "PHOTO", "PDF", "OTHER"
-] as const
+export const dynamic = "force-dynamic"
 
+/** Documents whose expiry is within this many days count as "expiring soon". */
+export const EXPIRING_DAYS = 30
+const HOUR = 60 * 60 * 1000
 
-export default async function DocumentsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ type?: string }>
+/**
+ * Date/expiration range filter. Mirrors the task `due` builder so the filter
+ * feels native: expiring (within 30 days), expired, no-expiry, or all.
+ */
+function buildExpirationWhere(exp: string): Prisma.DocumentWhereInput {
+  const now = new Date()
+  switch (exp) {
+    case "expiring":
+      return { expiryDate: { gte: now, lte: new Date(now.getTime() + EXPIRING_DAYS * 24 * HOUR) } }
+    case "expired":
+      return { expiryDate: { lt: now } }
+    case "none":
+      return { expiryDate: null }
+    default:
+      return {}
+  }
+}
+
+/**
+ * Attention-status filter. "needs-attention" = expired OR expiring within 30
+ * days OR the operator set an explicit attention flag (RENEW/REVIEW/FLAGGED).
+ * "flagged" = only documents with an explicit attention flag.
+ */
+function buildAttentionWhere(att: string): Prisma.DocumentWhereInput {
+  const now = new Date()
+  switch (att) {
+    case "needs-attention":
+      return {
+        OR: [
+          { expiryDate: { lt: new Date(now.getTime() + EXPIRING_DAYS * 24 * HOUR) } },
+          { attention: { not: null } },
+        ],
+      }
+    case "flagged":
+      return { attention: { not: null } }
+    default:
+      return {}
+  }
+}
+
+export default async function DocumentsPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
   const session = await auth()
   if (!session?.user) redirect("/login")
 
   const orgId = (session.user as any).organizationId
-  const sp = await searchParams
-  const typeFilter = sp.type || "all"
-
-  const where: any = { organizationId: orgId }
-  if (typeFilter !== "all") {
-    where.type = typeFilter
+  if (!orgId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">No organization found.</p>
+      </div>
+    )
   }
 
-  const documents = await prisma.document.findMany({
-    where,
-    include: {
-      project: { select: { id: true, name: true } },
-      entity: { select: { id: true, name: true } },
-      uploadedBy: { select: { id: true, name: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  })
+  const params = await props.searchParams
+
+  // ── Parse the combinable filters from the URL ─────────────────────────────
+  const type = params.type && params.type !== "all" ? params.type : undefined
+  const search = params.search?.trim() || undefined
+  const entity = params.entity && params.entity !== "all" ? params.entity : undefined
+  const project = params.project && params.project !== "all" ? params.project : undefined
+  const expiration = params.expiration && params.expiration !== "all" ? params.expiration : undefined
+  const attention = params.attention && params.attention !== "all" ? params.attention : undefined
+
+  // ── Compose the single query: org scope AND'ed with each active filter ──
+  const filterFragments: Prisma.DocumentWhereInput[] = []
+  if (type) filterFragments.push({ type })
+  if (entity) filterFragments.push({ entityId: entity })
+  if (project) filterFragments.push({ projectId: project })
+  if (expiration) filterFragments.push(buildExpirationWhere(expiration))
+  if (attention) filterFragments.push(buildAttentionWhere(attention))
+  if (search) {
+    filterFragments.push({
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { notes: { contains: search, mode: "insensitive" } },
+        { content: { contains: search, mode: "insensitive" } },
+      ],
+    })
+  }
+
+  const where: Prisma.DocumentWhereInput = { AND: [{ organizationId: orgId }, ...filterFragments] }
+
+  const [documents, entities, projects] = await Promise.all([
+    prisma.document.findMany({
+      where,
+      include: {
+        project: { select: { id: true, name: true } },
+        entity: { select: { id: true, name: true } },
+        uploadedBy: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.entity.findMany({
+      where: { organizationId: orgId },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.project.findMany({
+      where: { organizationId: orgId },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ])
 
   return (
     <div className="space-y-6">
@@ -62,161 +137,12 @@ export default async function DocumentsPage({
         }
       />
 
-      {/* Type filter */}
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground">Filter by type:</span>
-        <DocumentTypeFilter currentType={typeFilter} />
-        {/* Client-side filter using search params */}
-        <Link href={`/documents?type=all`}>
-          <Button variant="ghost" size="sm" className={cn("text-xs", typeFilter === "all" && "bg-white/[0.04]")}>
-            All
-          </Button>
-        </Link>
-        {DOC_TYPES.map((t) => (
-          <Link key={t} href={`/documents?type=${t}`}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn("text-xs", typeFilter === t && "bg-white/[0.04]")}
-            >
-              {docTypeLabel[t]}
-            </Button>
-          </Link>
-        ))}
-      </div>
-
-      {/* Documents list */}
-      {documents.length === 0 ? (
-        <Card className="glass">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-500/10 mb-4">
-              <FileText className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-lg font-medium text-foreground/80">No documents yet</p>
-            <p className="text-sm text-muted-foreground mt-1 mb-6">
-              Upload your first document to keep everything organized.
-            </p>
-            <Link href="/documents/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Document
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="rounded-xl glass overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/[0.06]">
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Name</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Type</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Project</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Entity</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Uploaded by</th>
-                  <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Date</th>
-                  <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents.map((doc) => (
-                  <tr
-                    key={doc.id}
-                    className="border-b border-white/[0.03] hover:bg-white/[0.06] transition-colors group"
-                  >
-                    <td className="px-4 py-3">
-                      <Link href={`/documents/${doc.id}`} className="hover:text-white transition-colors">
-                        <p className="text-sm font-medium truncate max-w-[280px]">{doc.name}</p>
-                      </Link>
-                      {doc.expiryDate && (
-                        (() => {
-                          const diff = new Date(doc.expiryDate).getTime() - Date.now()
-                          const expired = diff < 0
-                          const soon = diff <= 30 * 24 * 60 * 60 * 1000
-                          return (
-                            <span className={cn(
-                              "inline-flex items-center gap-1 text-[10px] px-1.5 py-0 mt-0.5 rounded border",
-                              expired
-                                ? "bg-red-500/10 text-red-400 border-red-500/20"
-                                : soon
-                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                : "text-muted-foreground/60 border-transparent"
-                            )}>
-                              <AlertTriangle className="h-2.5 w-2.5" />
-                              {expired ? "Expired " : soon ? "Expiring " : "Expires "}
-                              {new Date(doc.expiryDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                            </span>
-                          )
-                        })()
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", docTypeColor(doc.type))}>
-                        {docTypeLabel[doc.type]}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      {doc.project ? (
-                        <Link
-                          href={`/projects/${doc.project.id}`}
-                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-white transition-colors"
-                        >
-                          <FolderKanban className="h-3 w-3" />
-                          {doc.project.name}
-                        </Link>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/70">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {doc.entity ? (
-                        <Link
-                          href={`/entities/${doc.entity.id}`}
-                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-white transition-colors"
-                        >
-                          <Building2 className="h-3 w-3" />
-                          {doc.entity.name}
-                        </Link>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/70">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {doc.uploadedBy ? (
-                        <div className="flex items-center gap-1.5">
-                          <User className="h-3 w-3 text-muted-foreground/40" />
-                          <span className="text-xs text-muted-foreground">{doc.uploadedBy.name}</span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/70">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-muted-foreground">
-                        {doc.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {doc.url && (
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-white transition-colors"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View
-                        </a>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <DocumentsClient
+        documents={JSON.parse(JSON.stringify(documents))}
+        entities={entities}
+        projects={projects}
+        activeFilterCount={filterFragments.length}
+      />
     </div>
   )
 }
