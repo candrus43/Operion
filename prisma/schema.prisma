@@ -42,6 +42,7 @@ model Organization {
   documents     Document[]
   contacts      Contact[]
   contactRelations ContactRelation[]
+  contactMerges  ContactMerge[]
   meetings      Meeting[]
   notifications Notification[]
   comments      Comment[]
@@ -275,14 +276,52 @@ model Contact {
   entityId       String?
   notes          String?
   isSample       Boolean      @default(false)
+  // ── Contact merge reversibility (Phase 4d) ──────────────────────────────
+  // When a contact is absorbed into a keeper during an owner-confirmed merge,
+  // the row is NOT deleted — it is kept and marked so the merge can be reversed
+  // (unmerged) from a stored ContactMerge record. `mergedIntoId` points at the
+  // keeper contact that absorbed this one; NULL means not currently absorbed.
+  mergedIntoId   String?
+  mergedAt       DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   entity         Entity?      @relation(fields: [entityId], references: [id])
   relations      ContactRelation[]
+  mergedInto     Contact?      @relation("ContactMergeInto", fields: [mergedIntoId], references: [id])
+  mergedContacts Contact[]     @relation("ContactMergeInto")
+  mergesAsKeeper ContactMerge[] @relation("ContactMergeKeeper")
+  mergesAsMerged ContactMerge[] @relation("ContactMergeMerged")
 
   @@index([organizationId])
+}
+
+// ── Contact merge history / reversibility record (Phase 4d) ────────────────
+// One row per absorbed contact per merge. Stores a full JSON snapshot of the
+// merged-away contact's pre-merge state (relations, primary entity, copied
+// fields, note lines appended to the keeper) so a previous merge can be
+// reversed cleanly. Idempotent: re-requesting a completed merge/its unmerge
+// is a no-op. `status` flips MERGED -> UNMERGED once reversed (row retained for
+// an honest audit trail).
+model ContactMerge {
+  id             String   @id @default(cuid())
+  organizationId String
+  keeperId       String
+  mergedId       String
+  snapshot       Json
+  status         String   @default("MERGED") // MERGED, UNMERGED
+  mergedBy       String?
+  mergedAt       DateTime @default(now())
+  unmergedBy     String?
+  unmergedAt     DateTime?
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  keeper         Contact     @relation("ContactMergeKeeper", fields: [keeperId], references: [id], onDelete: Cascade)
+  mergedContact  Contact     @relation("ContactMergeMerged", fields: [mergedId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([keeperId])
 }
 
 // ── Contact ↔ Entity relationship (Phase 3a: dedup structural fix) ──────────

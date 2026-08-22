@@ -15,8 +15,10 @@ import {
   Building2,
   ChevronRight,
   Search,
+  GitMerge,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { findPotentialDuplicateGroups } from "@/lib/contact-similarity"
 
 export default async function ContactsPage({
   searchParams,
@@ -31,7 +33,7 @@ export default async function ContactsPage({
   const entityFilter = sp.entityId || "all"
   const searchFilter = sp.search || ""
 
-  const where: any = { organizationId: orgId }
+  const where: any = { organizationId: orgId, mergedIntoId: null }
   if (entityFilter !== "all") {
     where.entityId = entityFilter
   }
@@ -43,7 +45,7 @@ export default async function ContactsPage({
     ]
   }
 
-  const [contacts, entities] = await Promise.all([
+  const [contacts, entities, allForGroups] = await Promise.all([
     prisma.contact.findMany({
       where,
       include: {
@@ -56,7 +58,21 @@ export default async function ContactsPage({
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
+    prisma.contact.findMany({
+      where: { organizationId: orgId, mergedIntoId: null },
+      select: {
+        id: true,
+        name: true,
+        company: true,
+        position: true,
+        phone: true,
+        email: true,
+        notes: true,
+        createdAt: true,
+      },
+    }),
   ])
+  const duplicateGroupCount = findPotentialDuplicateGroups(allForGroups as any).length
 
   return (
     <div className="space-y-6">
@@ -66,12 +82,22 @@ export default async function ContactsPage({
         title="Contacts"
         description={`${contacts.length} contact${contacts.length !== 1 ? "s" : ""}`}
         actions={
-          <Link href="/contacts/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Contact
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {duplicateGroupCount > 0 && (
+              <Link href="/contacts/duplicates">
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <GitMerge className="h-3.5 w-3.5 text-amber-400" />
+                  Review duplicates ({duplicateGroupCount})
+                </Button>
+              </Link>
+            )}
+            <Link href="/contacts/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Contact
+              </Button>
+            </Link>
+          </div>
         }
       />
 
