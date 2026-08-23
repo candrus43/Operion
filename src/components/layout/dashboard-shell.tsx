@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { DashboardBreadcrumbs } from "@/components/layout/dashboard-breadcrumbs"
+import { AIPanelProvider } from "@/components/ai/ai-panel-provider"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -17,6 +18,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const isPitchAccount = session?.user?.email === "morgan@blackstonepartners.demo"
 
   return (
+    <AIPanelProvider>
     <div className="relative flex h-screen overflow-hidden bg-[#08080a]">
       {/* Cinematic ambient background */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -55,5 +57,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
+    </AIPanelProvider>
   )
 }
