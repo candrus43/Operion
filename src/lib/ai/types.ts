@@ -54,4 +54,41 @@ export interface AskAiResponse {
   card: AiAnswerCard
   context: AiResolvedContext | null
   suggestions: string[]
+  /** Id of the persisted conversation when the ask was persisted (workspace). */
+  conversationId?: string | null
+}
+
+/** A persisted conversation as listed in the workspace sidebar. */
+export interface AiConversationSummary {
+  id: string
+  title: string
+  messageCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+/** A persisted conversation with its full message transcript. */
+export interface AiConversationDetail {
+  id: string
+  title: string
+  messages: AiChatMessage[]
+  createdAt: string
+  updatedAt: string
+}
+
+/** A persisted chat entry (reopened conversation or live chat). */
+export interface AiChatMessage {
+  role: "user" | "assistant"
+  content?: string
+  card?: AiAnswerCard | null
+}
+
+/** A saved/pinned insight shown in the workspace. */
+export interface AiInsightSummary {
+  id: string
+  title: string | null
+  question: string
+  answer: string
+  sources: AiSource[]
+  createdAt: string
 }

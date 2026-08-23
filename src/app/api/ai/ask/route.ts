@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/db"
+import type { Prisma } from "@prisma/client"
 import { applyRateLimit } from "@/lib/rate-limit"
 import { generateStructuredAnswer } from "@/lib/ai/engine"
-import { loadAiPool, resolveContextRef } from "@/lib/ai/records"
 import { getContextSuggestions } from "@/lib/ai/suggestions"
 import type { AiContextRef, AiSourceType, AskAiResponse } from "@/lib/ai/types"
 
@@ -21,6 +22,10 @@ export async function POST(req: NextRequest) {
   if (!orgId) {
     return NextResponse.json({ error: "No organization found" }, { status: 400 })
   }
+  const userId = (session.user as { id?: string }).id
+  if (!userId) {
+    return NextResponse.json({ error: "No user found" }, { status: 400 })
+  }
 
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
@@ -29,7 +34,13 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { question?: string; context?: AiContextRef | null; history?: { role: "user" | "assistant"; content: string }[] }
+  let body: {
+    question?: string
+    context?: AiContextRef | null
+    history?: { role: "user" | "assistant"; content: string }[]
+    persistConversation?: boolean
+    conversationId?: string | null
+  }
   try {
     body = await req.json()
   } catch {
@@ -52,13 +63,54 @@ export async function POST(req: NextRequest) {
     ? body.history.filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
     : []
 
+  const persistConversation = body.persistConversation === true
+
   try {
     const { card, context: resolved } = await generateStructuredAnswer({ orgId, question, context, history })
 
     // Context-driven suggestion chips follow the resolved context.
     const suggestions = resolved ? getContextSuggestions(resolved.type, resolved.title) : []
 
-    const response: AskAiResponse = { card, context: resolved, suggestions }
+    // Persist the exchange to a server-side conversation (org + user scoped).
+    // Only the workspace requests persistence; the compact panel does not.
+    let conversationId: string | null = body.conversationId ?? null
+    if (persistConversation) {
+      let convo =
+        conversationId
+          ? await prisma.aiConversation.findFirst({
+              where: { id: conversationId, userId, organizationId: orgId },
+              select: { id: true },
+            })
+          : null
+
+      if (!convo) {
+        // No (or foreign/expired) conversation — start a new one.
+        const created = await prisma.aiConversation.create({
+          data: { title: question.slice(0, 160) || "Conversation", userId, organizationId: orgId },
+          select: { id: true },
+        })
+        conversationId = created.id
+        convo = created
+      }
+
+      await prisma.aiMessage.createMany({
+        data: [
+          { conversationId: convo.id, role: "user", content: question },
+          {
+            conversationId: convo.id,
+            role: "assistant",
+            content: card.answer,
+            card: card as unknown as Prisma.InputJsonValue,
+          },
+        ],
+      })
+      await prisma.aiConversation.update({
+        where: { id: convo.id },
+        data: { updatedAt: new Date() },
+      })
+    }
+
+    const response: AskAiResponse = { card, context: resolved, suggestions, conversationId }
     return NextResponse.json(response)
   } catch (error) {
     console.error("AI ask error:", error)

@@ -8,9 +8,9 @@ import { Sparkles, Send, Loader2, Bot, User, ExternalLink, X } from "lucide-reac
 import { cn } from "@/lib/utils"
 import { AnswerCard } from "./answer-card"
 import { sourceTypeLabel } from "@/lib/ai/labels"
-import type { AiAnswerCard, AiResolvedContext } from "@/lib/ai/types"
+import type { AiAnswerCard, AiChatMessage, AiResolvedContext } from "@/lib/ai/types"
 
-interface ChatEntry {
+export interface ChatEntry {
   role: "user" | "assistant"
   content?: string
   card?: AiAnswerCard
@@ -27,6 +27,18 @@ interface AiConversationProps {
   compact?: boolean
   /** Hide the context chip (used by the full workspace where context is intrinsic). */
   hideContextChip?: boolean
+  /** Persist messages to a server-side conversation (workspace only). */
+  persist?: boolean
+  /** Active persisted conversation id (reopened conversation). */
+  conversationId?: string | null
+  /** Preloaded transcript for a reopened conversation. */
+  initialMessages?: ChatEntry[]
+  /** Called whenever the active persisted conversation id changes. */
+  onConversationChange?: (id: string | null) => void
+  /** Called after an exchange is persisted (let the workspace refresh its list). */
+  onActivity?: () => void
+  /** Called after an insight is saved (let the workspace refresh its list). */
+  onInsightSaved?: () => void
 }
 
 export function AiConversation({
@@ -35,13 +47,31 @@ export function AiConversation({
   placeholder = "Ask anything about your portfolio…",
   compact = false,
   hideContextChip = false,
+  persist = false,
+  conversationId = null,
+  initialMessages,
+  onConversationChange,
+  onActivity,
+  onInsightSaved,
 }: AiConversationProps) {
   const [context, setContext] = useState<AiResolvedContext | null>(initialContext)
   const [suggestions, setSuggestions] = useState<string[]>([])
-  const [messages, setMessages] = useState<ChatEntry[]>([])
+  const [messages, setMessages] = useState<ChatEntry[]>(initialMessages ?? [])
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(conversationId ?? null)
+  const [savedCards, setSavedCards] = useState<Set<number>>(new Set())
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Reset the transcript when the workspace switches/clears the active
+  // conversation (keyed on conversationId so ongoing "new" sessions survive
+  // their first message creating an id).
+  useEffect(() => {
+    setActiveConversationId(conversationId ?? null)
+    setMessages(initialMessages ?? [])
+    setSavedCards(new Set())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId])
 
   // Load context-driven (or global) suggestions when the context changes.
   useEffect(() => {
@@ -89,6 +119,8 @@ export function AiConversation({
           question: text,
           context: context ? { type: context.type, id: context.id } : null,
           history,
+          persistConversation: persist,
+          conversationId: persist ? activeConversationId : null,
         }),
       })
       const data = await res.json().catch(() => null)
@@ -103,12 +135,47 @@ export function AiConversation({
         ...nextMessages,
         { role: "assistant", card: data.card as AiAnswerCard },
       ])
+      // Track a newly created persisted conversation so follow-ups append to it.
+      if (persist && data?.conversationId && data.conversationId !== activeConversationId) {
+        setActiveConversationId(data.conversationId)
+        onConversationChange?.(data.conversationId)
+      }
+      if (persist) onActivity?.()
     } catch {
       setMessages([...nextMessages, { role: "assistant", error: "Unable to reach the AI service. Please try again." }])
     } finally {
       setLoading(false)
     }
-  }, [messages, loading, context])
+  }, [messages, loading, context, persist, activeConversationId, onConversationChange, onActivity])
+
+  const handleSaveInsight = useCallback(async (index: number, question: string, card: AiAnswerCard) => {
+    try {
+      const res = await fetch("/api/ai/insights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question || "",
+          answer: card.answer,
+          sources: card.sources,
+          conversationId: activeConversationId,
+        }),
+      })
+      if (res.ok) {
+        setSavedCards((prev) => new Set(prev).add(index))
+        onInsightSaved?.()
+      }
+    } catch {
+      // Non-blocking: the user can retry from the same card.
+    }
+  }, [activeConversationId, onInsightSaved])
+
+  /** The user question immediately preceding message index i (for saving). */
+  const questionForIndex = useCallback((i: number): string => {
+    for (let j = i - 1; j >= 0; j--) {
+      if (messages[j].role === "user") return messages[j].content ?? ""
+    }
+    return ""
+  }, [messages])
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -173,7 +240,12 @@ export function AiConversation({
                 <Sparkles className="h-4 w-4 text-violet-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <AnswerCard card={m.card} />
+                <AnswerCard
+                  card={m.card}
+                  question={questionForIndex(i)}
+                  onSave={persist ? (q, card) => handleSaveInsight(i, q, card) : undefined}
+                  saved={savedCards.has(i)}
+                />
               </div>
             </div>
           ) : (
