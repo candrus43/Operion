@@ -469,3 +469,21 @@
   }
   .rise-in { opacity: 1 !important; filter: none !important; transform: none !important; }
 }
+
+/* --- Mobile performance (<768px, Tailwind md) ----------------------------
+   The full-screen animated aurora blur layers and the heavy glass backdrop-filter
+   are the largest continuous GPU/compositor cost on phones. On small screens we
+   static-ize the aurora (no per-frame repaint) and cheapen the glass backdrop;
+   desktop keeps the full cinematic treatment. 
+   NOTE: prefers-reduced-motion already disables the animations for its users. */
+@media (max-width: 767px) {
+  .aurora-a, .aurora-b, .aurora-c {
+    animation: none !important;
+    opacity: 0.55;
+    will-change: auto;
+  }
+  .glass, .glass-deep {
+    backdrop-filter: blur(4px) saturate(120%);
+    -webkit-backdrop-filter: blur(4px) saturate(120%);
+  }
+}
