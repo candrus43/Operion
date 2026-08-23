@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import {
   useCallback,
@@ -486,13 +487,19 @@ export function DashboardShowcase() {
             willChange: "transform",
           }}
         >
-          {/* Screenshot */}
+          {/* Screenshot — optimized WebP served via next/image (lazy, sized,
+              no eager 995 KB PNG reference on first paint). */}
           <div className="relative">
-            <img
-              src="/dashboard-preview.png"
+            <Image
+              src="/dashboard-preview.webp"
               alt="The Operion dashboard showing an AI daily briefing across every entity"
-              className="w-full select-none"
+              width={1600}
+              height={834}
+              sizes="(max-width: 768px) 92vw, (max-width: 1280px) 70vw, 860px"
+              loading="lazy"
+              className="h-auto w-full select-none"
               draggable={false}
+              priority={false}
             />
             {/* Sheen sweep */}
             <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">

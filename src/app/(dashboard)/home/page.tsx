@@ -52,6 +52,8 @@ export default async function DashboardPage({
   let org: { subscriptionStatus: string; trialEndDate: Date | null; subscriptionTier: string; lastNotificationGeneration: Date | null } | null = null
   let awaitingReviewTasks: any[] = []
 
+  let significance: AggregateSignificance | null = null
+
   try {
     const result = await Promise.all([
       prisma.entity.count({ where: { organizationId: orgId } }),
@@ -80,6 +82,13 @@ export default async function DashboardPage({
         orderBy: { updatedAt: "desc" },
         take: 10,
       }),
+      // Cross-product aggregate significance runs in the same parallel batch
+      // (it only touches the DB, so running it concurrently costs nothing extra —
+      // it used to serialize after the counts above). Errors degrade to null.
+      computeAggregateSignificance(orgId).catch((err: unknown) => {
+        console.error("Dashboard significance fetch failed:", err)
+        return null
+      }),
     ]);
     [
       entityCount,
@@ -92,19 +101,10 @@ export default async function DashboardPage({
       contactCount,
       org,
       awaitingReviewTasks,
+      significance,
     ] = result
   } catch (err) {
     console.error("Dashboard stats fetch failed:", err)
-  }
-
-  // Cross-product aggregate significance — what the counts MEAN, org-scoped.
-  let significance: AggregateSignificance | null = null
-  if (entityCount > 0) {
-    try {
-      significance = await computeAggregateSignificance(orgId)
-    } catch (err) {
-      console.error("Dashboard significance fetch failed:", err)
-    }
   }
 
   // Enforce trial expiration at page level

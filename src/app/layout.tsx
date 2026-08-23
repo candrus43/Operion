@@ -10,9 +10,11 @@ export const metadata: Metadata = {
   title: "Operion — Your AI Chief of Staff for Every Business You Run",
   description:
     "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard, without anything falling through the cracks.",
+  // Favicon points at the tiny transparent SVG mark (2 KB) instead of the
+  // 734 KB icon.png — the old PNG was downloaded on landing AND every app page.
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: "/icon.svg",
+    apple: "/icon.svg",
   },
   openGraph: {
     title: "Operion — Your AI Chief of Staff for Every Business You Run",
