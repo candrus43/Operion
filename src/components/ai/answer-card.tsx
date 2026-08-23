@@ -3,10 +3,20 @@
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import Link from "next/link"
-import { AlertTriangle, BookOpen, ExternalLink } from "lucide-react"
+import { AlertTriangle, BookOpen, ExternalLink, Pin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { sourceTypeLabel } from "@/lib/ai/labels"
 import type { AiAnswerCard, AiSource } from "@/lib/ai/types"
+
+export interface AnswerCardProps {
+  card: AiAnswerCard
+  /** The user question that produced this card (shown on save). */
+  question?: string
+  /** When provided, renders a "Save insight" action that pins this answer. */
+  onSave?: (question: string, card: AiAnswerCard) => void | Promise<void>
+  /** True once this card's answer has been saved as an insight (shows "Saved"). */
+  saved?: boolean
+}
 
 const sourceIconDot: Record<string, string> = {
   entity: "bg-emerald-400",
@@ -22,7 +32,7 @@ const sourceIconDot: Record<string, string> = {
  * caveats. Reused by the AI workspace, the contextual panel, and anywhere an
  * AiAnswerCard needs to be shown.
  */
-export function AnswerCard({ card }: { card: AiAnswerCard }) {
+export function AnswerCard({ card, question, onSave, saved }: AnswerCardProps) {
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-[#0f0f0f] overflow-hidden">
       {/* Answer */}
@@ -82,6 +92,25 @@ export function AnswerCard({ card }: { card: AiAnswerCard }) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Save-as-insight action (workspace only — onSave is only passed there). */}
+      {onSave && (
+        <div className="border-t border-white/[0.05] px-5 py-2.5">
+          <button
+            onClick={() => onSave(question ?? "", card)}
+            disabled={saved}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[12px] font-medium transition-colors",
+              saved
+                ? "border-violet-500/30 bg-violet-500/[0.06] text-violet-300/80 cursor-default"
+                : "border-white/[0.07] bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
+            )}
+          >
+            <Pin className="h-3.5 w-3.5" />
+            {saved ? "Saved as insight" : "Save insight"}
+          </button>
         </div>
       )}
     </div>
