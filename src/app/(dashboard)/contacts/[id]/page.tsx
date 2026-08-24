@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ContactDeleteButton } from "./delete-button"
-import { AskAiButton } from "@/components/ai/ask-ai-button"
 import { ContactTabs } from "./tabs"
 import { collectNeedsAttention } from "@/lib/needs-attention"
 import { UnmergeButton } from "@/components/contacts/merge-actions"
@@ -131,7 +130,6 @@ export default async function ContactDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <AskAiButton type="contact" id={contact.id} title={contact.name} />
           <Link href={`/contacts/${contact.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />

@@ -15,7 +15,6 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { projectStatusColor, phaseColor } from "@/lib/colors"
-import { AskAiButton } from "@/components/ai/ask-ai-button"
 import { ProjectTabs } from "./tabs"
 import { collectProjectNeedsAttention } from "@/lib/needs-attention"
 import { computeProjectRisk, reconcilePhaseProgress } from "@/lib/project-risk"
@@ -125,7 +124,6 @@ export default async function ProjectDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <AskAiButton type="project" id={project.id} title={project.name} />
           <Link href={`/projects/${project.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />
