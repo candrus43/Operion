@@ -8,7 +8,6 @@ import { ArrowLeft, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { priorityColor, statusColor } from "@/lib/colors"
 import { TaskActions } from "./task-actions"
-import { AskAiButton } from "@/components/ai/ask-ai-button"
 import { TaskTabs } from "./tabs"
 import { collectTaskNeedsAttention } from "@/lib/needs-attention"
 
@@ -75,7 +74,6 @@ export default async function TaskDetailPage({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <AskAiButton type="task" id={task.id} title={task.title} />
           <Link href={`/tasks/${task.id}/edit`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-3.5 w-3.5" />
