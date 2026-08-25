@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "Operion — Your AI Chief of Staff for Every Business You Run",
     description:
       "Operion scans every entity, surfaces risks, and tells you what to do next — so you can run your entire portfolio from one dashboard, without anything falling through the cracks.",
-    url: "https://operion.ctonew.app",
+    url: "https://www.operion.online",
     siteName: "Operion",
     images: [
       {
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://operion.ctonew.app",
+    canonical: "https://www.operion.online",
   },
 }
 
