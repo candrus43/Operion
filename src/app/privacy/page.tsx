@@ -1,5 +1,19 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { ArrowLeft } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Operion — AI Operations Software for Multi-Business Owners",
+  description:
+    "How Operion collects, uses, and protects your business data, including AI processing, security safeguards, and your rights as a customer.",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://www.operion.online/privacy",
+  },
+}
 
 export default function PrivacyPage() {
   return (

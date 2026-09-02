@@ -14,6 +14,8 @@ export default auth((req) => {
                        req.nextUrl.pathname === "/terms" ||
                        req.nextUrl.pathname === "/privacy" ||
                        req.nextUrl.pathname === "/help" ||
+                       req.nextUrl.pathname === "/blog" ||
+                       req.nextUrl.pathname.startsWith("/blog/") ||
                        req.nextUrl.pathname.startsWith("/forgot-password") ||
                        req.nextUrl.pathname.startsWith("/reset-password") ||
                        req.nextUrl.pathname.startsWith("/accept-invite") ||
@@ -73,5 +75,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.png|og-image.png|og-image.svg|uploads|dashboard-preview.png|operion-demo.mp4|demo-screenshots).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.png|og-image.png|og-image.svg|uploads|dashboard-preview.png|operion-demo.mp4|demo-screenshots|robots.txt|sitemap.xml).*)"],
 }

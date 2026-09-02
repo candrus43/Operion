@@ -1,7 +1,16 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
+import type { Metadata } from "next"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
+
+export const metadata: Metadata = {
+  title: "Operion — AI Operations Software for Multi-Business Owners",
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function DashboardLayout({
   children,

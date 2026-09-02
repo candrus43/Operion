@@ -23,15 +23,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} — Operion Blog`,
     description: post.description,
+    robots: {
+      index: true,
+      follow: true,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
       type: "article",
-      url: `https://operion.ctonew.app/blog/${post.slug}`,
+      url: `https://www.operion.online/blog/${post.slug}`,
       siteName: "Operion",
     },
     alternates: {
-      canonical: `https://operion.ctonew.app/blog/${post.slug}`,
+      canonical: `https://www.operion.online/blog/${post.slug}`,
     },
   }
 }
@@ -213,15 +217,15 @@ export default async function BlogPostPage({ params }: Props) {
             headline: post.title,
             description: post.description,
             datePublished: post.date,
-            url: `https://operion.ctonew.app/blog/${post.slug}`,
+            url: `https://www.operion.online/blog/${post.slug}`,
             publisher: {
               "@type": "Organization",
               name: "Operion",
-              url: "https://operion.ctonew.app",
+              url: "https://www.operion.online",
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://operion.ctonew.app/blog/${post.slug}`,
+              "@id": `https://www.operion.online/blog/${post.slug}`,
             },
           }),
         }}
