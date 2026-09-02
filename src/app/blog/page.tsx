@@ -7,16 +7,20 @@ export const metadata: Metadata = {
   title: "Operion Blog — Insights on Multi-Entity Management & AI for Entrepreneurs",
   description:
     "Practical guides, honest comparisons, and strategic insights for entrepreneurs running multiple companies, properties, and investments. Written for owners who need decisions, not fluff.",
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: "Operion Blog — Multi-Entity Management & AI Insights",
     description:
       "For entrepreneurs running multiple companies. Practical guides on portfolio management, AI-powered operations, and building systems that scale across entities.",
-    url: "https://operion.ctonew.app/blog",
+    url: "https://www.operion.online/blog",
     siteName: "Operion",
     type: "website",
   },
   alternates: {
-    canonical: "https://operion.ctonew.app/blog",
+    canonical: "https://www.operion.online/blog",
   },
 }
 
@@ -356,11 +360,11 @@ export default function BlogIndexPage() {
             name: "Operion Blog",
             description:
               "Practical guides, honest comparisons, and strategic insights for entrepreneurs running multiple companies, properties, and investments.",
-            url: "https://operion.ctonew.app/blog",
+            url: "https://www.operion.online/blog",
             publisher: {
               "@type": "Organization",
               name: "Operion",
-              url: "https://operion.ctonew.app",
+              url: "https://www.operion.online",
             },
           }),
         }}

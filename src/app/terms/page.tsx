@@ -1,5 +1,19 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { ArrowLeft } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Operion — AI Operations Software for Multi-Business Owners",
+  description:
+    "The terms of service governing your use of Operion, the AI operations software for business owners managing multiple companies, properties, and portfolios.",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://www.operion.online/terms",
+  },
+}
 
 export default function TermsPage() {
   return (
